@@ -1,4 +1,5 @@
 # capstone
 beautiful/useful password manager
 
-good!!
+소스코드: src/
+이미지 등의 리소스 파일: resources/
