@@ -1,0 +1,47 @@
+/*!* Glassmorphism 스타일 *!*/
+/*.glass-nav {*/
+/*    background-color: rgba(255, 255, 255, 0.3);*/
+/*    backdrop-filter: blur(10px);*/
+/*    border-right: 1px solid rgba(255, 255, 255, 0.4);*/
+/*}*/
+
+/*.popup-glass {*/
+/*    background-color: rgba(255, 255, 255, 0.4);*/
+/*    backdrop-filter: blur(10px);*/
+/*    border: 1px solid rgba(255, 255, 255, 0.4);*/
+/*    border-radius: 1rem;*/
+/*    padding: 1.5rem;*/
+/*    margin-bottom: 1.5rem;*/
+/*}*/
+
+/*.glass-table {*/
+/*    background-color: rgba(255, 255, 255, 0.35);*/
+/*    backdrop-filter: blur(8px);*/
+/*    border: 1px solid rgba(255, 255, 255, 0.3);*/
+/*    border-radius: 1rem;*/
+/*}*/
+
+/*!* 기본 Tailwind 커스터마이징용 클래스 *!*/
+/*.input {*/
+/*    @apply w-full mt-1 p-2 rounded-lg bg-white/60 border border-white/30 focus:outline-none;*/
+/*}*/
+
+/*.btn-blue {*/
+/*    @apply px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition;*/
+/*}*/
+
+/*.btn-green {*/
+/*    @apply px-4 py-2 rounded-lg bg-green-500 text-white hover:bg-green-600 transition;*/
+/*}*/
+
+/*.btn-gray {*/
+/*    @apply px-4 py-2 rounded-lg bg-gray-400 text-white hover:bg-gray-500 transition;*/
+/*}*/
+
+/*.nav-btn {*/
+/*    @apply w-full text-left px-4 py-2 rounded-lg bg-white/40 hover:bg-white/60 transition;*/
+/*}*/
+
+/*.th {*/
+/*    @apply px-4 py-2 text-left;*/
+/*}*/

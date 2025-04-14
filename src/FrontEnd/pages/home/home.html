@@ -23,6 +23,28 @@
             margin-bottom: 10px;
             width: 100%;
         }
+        #popup {
+            display: none;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #fff;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 6px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        td, button {
+            cursor: default;
+        }
+
+        input[type="text"], input[type="password"] {
+            cursor: text;
+        }
     </style>
 </head>
 <body>
@@ -38,13 +60,14 @@
     <p>이곳은 홈입니다.</p>
     <button id="screenshot-toggle">🔓 스크린샷 허용</button>
 
-    <!-- 검색 버튼 -->
-    <input type="text" id="searchInput" placeholder="검색..." />
+    <!-- 검색 입력 -->
+    <label for="searchInput">🔎</label>
+    <input type="text" id="searchInput" placeholder="검색...">
     <!-- 비밀번호 추가 버튼 -->
     <button id="addEntryBtn">비밀번호 저장</button>
 
     <!-- 비밀번호 추가 팝업 -->
-    <div id="popup" style="display: none; border: 1px solid #ccc; padding: 10px;">
+    <div id="popup">
         <label>Title: <input type="text" id="titleInput" /></label><br/>
         <label>URL: <input type="text" id="urlInput" /></label><br/>
         <label>ID: <input type="text" id="idInput" /></label><br/>
@@ -54,18 +77,17 @@
         <button id="cancelBtn">취소</button>
     </div>
 
-    <!-- 비밀번호 항목이 표시될 테이블 -->
-    <table id="entryTable" border="1">
+    <!-- 비밀번호 테이블 -->
+    <table id="entryTable">
         <thead>
-            <tr>
-                <th>Icon</th>
-                <th>Title</th>
-                <th>URL</th>
-                <th>ID</th>
-                <th>PW</th>
-                <th>Tag</th>
-                <th>Action</th>
-            </tr>
+        <tr>
+            <th>Title</th>
+            <th>URL</th>
+            <th>ID</th>
+            <th>PW</th>
+            <th>Tag</th>
+            <th>Action</th>
+        </tr>
         </thead>
         <tbody></tbody>
     </table>

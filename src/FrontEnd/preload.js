@@ -16,26 +16,20 @@ contextBridge.exposeInMainWorld('electronAPI', {
     createFile: () => ipcRenderer.invoke('create-file'),
     getRecentFiles: () => ipcRenderer.invoke('get-recent-files'),
 
+    // 현재 파일 경로
+    setCurrentPasswordFile: (filePath) => ipcRenderer.invoke('set-current-password-file', filePath),
+    getCurrentPasswordFile: () => ipcRenderer.invoke('get-current-password-file'),
+
     // 마스터 비밀번호 관련
     readMasterPassword: (filePath) => ipcRenderer.invoke('read-master-password', filePath),
     setMasterPassword: (filePath, password) => ipcRenderer.invoke('set-master-password', filePath, password),
 
-    // ✅ [수정] 비밀번호 데이터 저장 요청 (파일 경로 포함)
+    // 비밀번호 데이터 저장/불러오기
     savePasswords: (entries) => ipcRenderer.invoke('save-passwords', entries),
-
-    // 비밀번호 데이터 불러오기 요청
     loadPasswords: () => ipcRenderer.send('load-passwords'),
+    onPasswordsLoaded: (callback) => ipcRenderer.on('passwords-loaded', (event, data) => callback(data)),
 
-    // 비밀번호 데이터 수신
-    onPasswordsLoaded: (callback) => {
-        ipcRenderer.on('passwords-loaded', (event, data) => callback(data));
-    }
+    // 현재 선택된 CSV 파일 관련 (start 페이지에서 고른 파일 home 과 연동)
+    setCurrentFile: (filePath) => ipcRenderer.invoke('set-current-file', filePath),
+    getCurrentFile: () => ipcRenderer.invoke('get-current-file'),
 });
-
-// // 팝업 열기
-// openAddPopup: () => ipcRenderer.send('open-add-popup'),
-//
-// // 팝업에서 새 비밀번호 항목 추가 수신
-// onPasswordAdded: (callback) => {
-//     ipcRenderer.on('password-added', (event, data) => callback(data));
-// }

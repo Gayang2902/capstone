@@ -1,4 +1,4 @@
-const INACTIVITY_LIMIT = 5 * 60 * 1000;
+const INACTIVITY_LIMIT = 5 * 60 * 1000;  // 초기값 5분
 let logoutTimer;
 
 function clearSensitiveData() {

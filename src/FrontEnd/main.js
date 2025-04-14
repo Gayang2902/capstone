@@ -2,24 +2,19 @@ const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const fs = require('fs');
 const path = require('path');
 
-// 최근 파일 목록 저장 경로
+// ================= 앱 초기 설정 =================
 const recentFilePath = path.join(app.getPath('userData'), 'recent-files.json');
-
-// 현재 사용 중인 CSV 파일 경로 변수
 let currentPasswordFilePath = null;
 let currentFile = null;
-
-// 메인 윈도우 및 현재 페이지 상태
 let mainWindow;
 let currentPage = 'start';
 let isForceQuit = false;
 
-// 완전 종료 플래그
 app.on('before-quit', () => {
     isForceQuit = true;
 });
 
-// 메인 윈도우 생성
+// ================= 메인 윈도우 생성 =================
 function createWindow() {
     mainWindow = new BrowserWindow({
         width: 1440,
@@ -31,25 +26,25 @@ function createWindow() {
         }
     });
 
-    mainWindow.loadFile(path.join(__dirname, 'pages/start/start.html'));
+    mainWindow.loadFile(path.join(__dirname, 'pages/start/start.html')).then(()=> {currentPage = 'start';});
 
     mainWindow.on('close', (e) => {
         if (!isForceQuit && currentPage !== 'start') {
             e.preventDefault();
-            mainWindow.loadFile(path.join(__dirname, 'pages/start/start.html'));
+            mainWindow.loadFile(path.join(__dirname, 'pages/start/start.html')).then(() => {currentPage = 'start';});
             currentPage = 'start';
         }
     });
 }
 
-// 페이지 이동 처리
+// ================= 페이지 네비게이션 =================
 ipcMain.on('navigate', (event, page) => {
     const filePath = path.join(__dirname, `pages/${page}/${page}.html`);
-    mainWindow.loadFile(filePath);
+    mainWindow.loadFile(filePath).then(() => {currentPage = 'start';});
     currentPage = page;
 });
 
-// 스크린샷 보호
+// ================= 스크린샷 제어 =================
 ipcMain.on('prevent-screenshot', () => {
     if (mainWindow) mainWindow.setContentProtection(true);
 });
@@ -57,12 +52,11 @@ ipcMain.on('allow-screenshot', () => {
     if (mainWindow) mainWindow.setContentProtection(false);
 });
 
-// 사용자 입력 감지
+// ================= 사용자 활동 감지 =================
 ipcMain.on('user-active', () => {
     // 타이머 리셋용
 });
 
-// 앱 실행
 app.whenReady().then(createWindow);
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();
@@ -71,18 +65,23 @@ app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
 });
 
-// 최근 파일 저장
+// ================= 파일 관련 핸들러 =================
 function saveRecentFile(filePath) {
     let list = [];
     if (fs.existsSync(recentFilePath)) {
-        list = JSON.parse(fs.readFileSync(recentFilePath));
+        list = JSON.parse(fs.readFileSync(recentFilePath, 'utf-8'));
     }
     if (!list.includes(filePath)) list.unshift(filePath);
     if (list.length > 5) list = list.slice(0, 5);
     fs.writeFileSync(recentFilePath, JSON.stringify(list));
 }
 
-// CSV 파일 열기
+function getMetaFilePath(csvFilePath) {
+    const dir = path.dirname(csvFilePath);
+    const nameWithoutExt = path.basename(csvFilePath, '.csv');
+    return path.join(dir, `${nameWithoutExt}.meta.json`);
+}
+
 ipcMain.handle('open-file', async () => {
     const { canceled, filePaths } = await dialog.showOpenDialog({
         title: '파일 선택',
@@ -98,15 +97,13 @@ ipcMain.handle('open-file', async () => {
     return null;
 });
 
-// 최근 파일 목록 반환
 ipcMain.handle('get-recent-files', () => {
     if (fs.existsSync(recentFilePath)) {
-        return JSON.parse(fs.readFileSync(recentFilePath));
+        return JSON.parse(fs.readFileSync(recentFilePath, 'utf-8'));
     }
     return [];
 });
 
-// 새 CSV 파일 생성
 ipcMain.handle('create-file', async () => {
     const { filePath, canceled } = await dialog.showSaveDialog({
         title: '새 비밀번호 파일 만들기',
@@ -115,44 +112,58 @@ ipcMain.handle('create-file', async () => {
     });
 
     if (!canceled && filePath) {
-        fs.writeFileSync(filePath, 'master-password\n');
+        fs.writeFileSync(filePath, '');
         saveRecentFile(filePath);
         return filePath;
     }
-
     return null;
 });
 
-// 마스터 비밀번호 읽기
+// ================= 마스터 비밀번호 관련 =================
 ipcMain.handle('read-master-password', (event, filePath) => {
-    if (fs.existsSync(filePath)) {
-        const content = fs.readFileSync(filePath, 'utf-8');
-        return content.split('\n')[0].trim();
+    try {
+        const metaFile = getMetaFilePath(filePath);
+        if (!fs.existsSync(metaFile)) return null;
+
+        const data = JSON.parse(fs.readFileSync(metaFile, 'utf-8'));
+        const metaFilePath = path.resolve(data.file); // 메타파일 내부에 저장된 절대경로
+        const currentPath = path.resolve(filePath);   // 현재 선택한 파일 경로
+
+        // 파일 경로가 일치하지 않으면 무시
+        if (metaFilePath !== currentPath) {
+            console.warn('[경고] 메타 파일과 선택한 파일 경로가 일치하지 않음');
+            return null;
+        }
+
+        return data.masterPassword || null;
+    } catch (err) {
+        console.error('[메타 파일 읽기 실패]', err);
+        return null;
     }
-    return null;
 });
 
-// 마스터 비밀번호 저장
 ipcMain.handle('set-master-password', (event, filePath, password) => {
     try {
-        let content = fs.readFileSync(filePath, 'utf-8');
-        const lines = content.split('\n');
-        lines[0] = password;
-        fs.writeFileSync(filePath, lines.join('\n'), 'utf-8');
+        const metaFile = getMetaFilePath(filePath);
+        const data = {
+            file: path.resolve(filePath), // 파일 절대 경로 형식으로 저장 (2)
+            masterPassword: password
+        };
+        fs.writeFileSync(metaFile, JSON.stringify(data, null, 2), 'utf-8');
         return true;
     } catch (err) {
-        console.error('[비밀번호 저장 실패]', err);
+        console.error('[메타 파일 저장 실패]', err);
         return false;
     }
 });
 
-// 현재 파일 경로 설정/반환
+// ================= 현재 선택된 파일 상태 =================
 ipcMain.handle('set-current-password-file', (event, filePath) => {
     currentPasswordFilePath = filePath;
-    return true; // ✅ 추가됨
+    return true;
 });
 ipcMain.handle('get-current-password-file', () => {
-    return currentPasswordFilePath; // ✅ 추가됨
+    return currentPasswordFilePath;
 });
 ipcMain.handle('set-current-file', (event, filePath) => {
     currentFile = filePath;
@@ -161,7 +172,7 @@ ipcMain.handle('get-current-file', () => {
     return currentFile;
 });
 
-// 팝업 열기
+// ================= 팝업 및 렌더러 통신 =================
 ipcMain.on('open-add-popup', () => {
     const addWindow = new BrowserWindow({
         width: 400,
@@ -173,30 +184,30 @@ ipcMain.on('open-add-popup', () => {
             contextIsolation: false
         }
     });
-    addWindow.loadFile(path.join(__dirname, 'pages/home/popup.html'));
+    addWindow.loadFile(path.join(__dirname, 'pages/home/popup.html')).then(()=> {currentPage = 'start';});
 });
 
-// 항목 추가 후 메인에 전송
 ipcMain.on('add-password-entry', (event, data) => {
     mainWindow.webContents.send('password-added', data);
 });
 
-// CSV 저장
+// ================= CSV 저장/불러오기 =================
 ipcMain.handle('save-passwords', async (event, entries) => {
     try {
-        if (!currentPasswordFilePath) throw new Error('파일 경로가 설정되지 않음');
+        if (!currentPasswordFilePath) {
+            console.error('[CSV 저장 실패] 파일 경로가 설정되지 않음');
+            return false;
+        }
 
         const content = entries.map(e =>
             `${e.title},${e.url},${e.id},${e.pw},${e.tag}`
         ).join('\n');
 
-        const existing = fs.existsSync(currentPasswordFilePath)
-            ? fs.readFileSync(currentPasswordFilePath, 'utf-8').split('\n')
-            : ['master-password'];
+        // const existing = fs.existsSync(currentPasswordFilePath)
+        //     ? fs.readFileSync(currentPasswordFilePath, 'utf-8').split('\n')
+        //     : [];
 
-        existing[0] = existing[0] || 'master-password';
-
-        fs.writeFileSync(currentPasswordFilePath, [existing[0], content].join('\n'), 'utf-8');
+        fs.writeFileSync(currentPasswordFilePath, content, 'utf-8');
         return true;
     } catch (err) {
         console.error('[CSV 저장 실패]', err);
@@ -204,7 +215,6 @@ ipcMain.handle('save-passwords', async (event, entries) => {
     }
 });
 
-// CSV 불러오기
 ipcMain.on('load-passwords', (event) => {
     try {
         if (!currentPasswordFilePath || !fs.existsSync(currentPasswordFilePath)) {
@@ -212,7 +222,7 @@ ipcMain.on('load-passwords', (event) => {
             return;
         }
 
-        const lines = fs.readFileSync(currentPasswordFilePath, 'utf-8').split('\n').slice(1);
+        const lines = fs.readFileSync(currentPasswordFilePath, 'utf-8').split('\n');
         const entries = lines.filter(l => l.trim()).map(line => {
             const [title, url, id, pw, tag] = line.split(',');
             return { title, url, id, pw, tag };
@@ -222,29 +232,5 @@ ipcMain.on('load-passwords', (event) => {
     } catch (err) {
         console.error('[CSV 불러오기 실패]', err);
         event.sender.send('passwords-loaded', []);
-    }
-});
-
-
-// ✅ JSON으로 저장
-ipcMain.handle('save-passwords-json', (event, filePath, entries) => {
-    try {
-        fs.writeFileSync(filePath, JSON.stringify(entries, null, 2), 'utf-8');
-        return true;
-    } catch (err) {
-        console.error('[JSON 저장 실패]', err);
-        return false;
-    }
-});
-
-// ✅ JSON 불러오기
-ipcMain.handle('load-passwords-json', (event, filePath) => {
-    try {
-        if (!fs.existsSync(filePath)) return [];
-        const data = fs.readFileSync(filePath, 'utf-8');
-        return JSON.parse(data);
-    } catch (err) {
-        console.error('[JSON 불러오기 실패]', err);
-        return [];
     }
 });

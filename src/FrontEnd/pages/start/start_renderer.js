@@ -44,8 +44,8 @@ document.getElementById('login-btn')?.addEventListener('click', async () => {
     // 저장된 마스터 비밀번호 불러와서 검증
     const storedPassword = await window.electronAPI.readMasterPassword(selectedPasswordFile);
     if (storedPassword === password) {
-        // 비밀번호 일치하면 홈 페이지로 이동
-        window.electronAPI.navigate('home');
+        await window.electronAPI.setCurrentPasswordFile(selectedPasswordFile); // 파일 경로 설정
+        window.electronAPI.navigate('home'); // 홈으로 이동
     } else {
         alert('비밀번호가 일치하지 않습니다.');
     }
