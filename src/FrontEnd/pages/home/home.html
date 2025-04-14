@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="kr">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+    <style>
+        body {
+            display: flex;
+            margin: 0;
+        }
+        nav {
+            width: 200px;
+            background-color: #f4f4f4;
+            height: 100vh;
+            padding: 20px;
+        }
+        main {
+            flex-grow: 1;
+            padding: 20px;
+        }
+        button {
+            display: block;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<nav>
+    <button onclick="goTo('home')">🏠 홈</button>
+    <button onclick="goTo('statistic')">📊 통계</button>
+    <button onclick="goTo('group')">👥 그룹</button>
+    <button onclick="goTo('setting')">⚙️ 설정</button>
+    <button onclick="goTo('start')">🔒 로그아웃</button>
+</nav>
+<main>
+    <h1>홈 페이지</h1>
+    <p>이곳은 홈입니다.</p>
+    <button id="screenshot-toggle">🔓 스크린샷 허용</button>
+
+    <!-- 검색 버튼 -->
+    <input type="text" id="searchInput" placeholder="검색..." />
+    <!-- 비밀번호 추가 버튼 -->
+    <button id="addEntryBtn">비밀번호 저장</button>
+
+    <!-- 비밀번호 추가 팝업 -->
+    <div id="popup" style="display: none; border: 1px solid #ccc; padding: 10px;">
+        <label>Title: <input type="text" id="titleInput" /></label><br/>
+        <label>URL: <input type="text" id="urlInput" /></label><br/>
+        <label>ID: <input type="text" id="idInput" /></label><br/>
+        <label>PW: <input type="password" id="pwInput" /></label><br/>
+        <label>Tag: <input type="text" id="tagInput" /></label><br/>
+        <button id="saveBtn">확인</button>
+        <button id="cancelBtn">취소</button>
+    </div>
+
+    <!-- 비밀번호 항목이 표시될 테이블 -->
+    <table id="entryTable" border="1">
+        <thead>
+            <tr>
+                <th>Icon</th>
+                <th>Title</th>
+                <th>URL</th>
+                <th>ID</th>
+                <th>PW</th>
+                <th>Tag</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</main>
+
+<script src="./home_renderer.js"></script>
+<script type="module" src="../../shared/shared_renderer.js"></script>
+</body>
+</html>
