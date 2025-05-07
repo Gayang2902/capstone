@@ -32,4 +32,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // 현재 선택된 CSV 파일 관련 (start 페이지에서 고른 파일 home 과 연동)
     setCurrentFile: (filePath) => ipcRenderer.invoke('set-current-file', filePath),
     getCurrentFile: () => ipcRenderer.invoke('get-current-file'),
+
+    // 최근 파일 목록에서 제거 (start)
+    removeFromRecent: (filePath) => ipcRenderer.invoke('remove-from-recent', filePath),
 });

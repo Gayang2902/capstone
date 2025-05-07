@@ -76,25 +76,42 @@ document.getElementById('set-master-password')?.addEventListener('click', async 
     }
 });
 
-// 최근 파일 목록 로딩 및 선택 UI 처리
+// 최근 파일 목록
 async function loadRecentFiles() {
     const files = await window.electronAPI.getRecentFiles();
-    list.innerHTML = ''; // 기존 목록 초기화
+    list.innerHTML = '';
 
     files.forEach(f => {
-        const li = document.createElement('li'); // 파일 목록 항목 생성
-        li.textContent = f; // 파일 경로를 텍스트로 표시
-        li.classList.add('file-item'); // 기본 스타일 추가
+        const li = document.createElement('li');
+        li.textContent = f;
+        li.classList.add('file-item');
 
-        // 파일 항목 클릭 시 선택 상태 변경
+        // 선택 처리
         li.addEventListener('click', () => {
-            if (selectedElement) selectedElement.classList.remove('selected'); // 이전 선택 해제
-            li.classList.add('selected'); // 현재 선택된 항목 강조
-            selectedElement = li; // 현재 선택된 항목 저장
-            selectedPasswordFile = f; // 선택된 파일 경로 저장
+            if (selectedElement) selectedElement.classList.remove('selected');
+            li.classList.add('selected');
+            selectedElement = li;
+            selectedPasswordFile = f;
         });
 
-        list.appendChild(li); // 목록에 항목 추가
+        // 삭제 버튼
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = '🗑';
+        deleteBtn.style.marginLeft = '10px';
+        deleteBtn.addEventListener('click', async (e) => {
+            e.stopPropagation(); // 클릭 이벤트 겹침 방지
+            if (confirm('최근 파일 목록에서 제거하시겠습니까?')) {
+                const success = await window.electronAPI.removeFromRecent(f);
+                if (success) {
+                    await loadRecentFiles(); // 다시 렌더링
+                } else {
+                    alert('목록에서 제거 실패');
+                }
+            }
+        });
+
+        li.appendChild(deleteBtn);
+        list.appendChild(li);
     });
 }
 

@@ -3,46 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <title>Start Page</title>
-    <style>
-        li.file-item {
-            padding: 8px;
-            margin-bottom: 5px;
-            border: 1px solid transparent;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        li.file-item.selected {
-            border: 2px solid dodgerblue;
-            background-color: #e6f0ff;
-        }
-    </style>
+    <link rel="stylesheet" href="./start_style.css">
 </head>
 <body>
-    <h1>🔐 패스워드 매니저</h1>
+<div class="background"></div>
 
-    <!-- 파일 열기 / 만들기 -->
-    <h2>📂 패스워드 파일 선택</h2>
-    <button id="open-password-file">기존 파일 열기</button>
-    <button id="create-password-file">새 파일 만들기</button>
+<div class="glass-container">
+    <h1 class="title">Password Manager</h1>
 
-    <!-- 최근 파일 목록 -->
-    <h3>🕘 최근 열었던 파일</h3>
-    <ul id="recent-files" style="list-style: none; padding: 0;"></ul>
+    <h2 class="steps">File</h2>
 
-    <!-- 마스터 비밀번호 설정 -->
-    <h3>🔐 마스터 비밀번호 설정</h3>
-    <input type="password" id="master-password-input" placeholder="새 비밀번호">
-    <button id="set-master-password">비밀번호 설정</button>
+    <div class="cards">
+        <div class="card">
+            <button id="open-password-file">기존 파일 열기</button>
+        </div>
+        <div class="card">
+            <button id="create-password-file">새 파일 만들기</button>
+        </div>
+    </div>
 
-    <!-- 로그인 -->
-    <h3>🔐 로그인</h3>
-    <label for="password">비밀번호:</label>
-    <input type="password" id="password" placeholder="비밀번호">
-    <button id="login-btn">로그인</button>
+    <div class="link-card">
+        <h3>최근 열었던 파일</h3>
+        <ul id="recent-files" style="list-style: none; padding: 0;"></ul>
+    </div>
 
-    <!-- 렌더러 연결 -->
-    <script src="./start_renderer.js"></script>
+    <div class="link-card">
+        <h3>마스터 비밀번호 설정</h3>
+        <input type="password" id="master-password-input" placeholder="새 비밀번호" />
+        <button id="set-master-password">비밀번호 설정</button>
+    </div>
+
+    <div class="link-card">
+        <h3>🔐 로그인</h3>
+        <input type="password" id="password" placeholder="비밀번호" />
+        <button id="login-btn">로그인</button>
+    </div>
+</div>
+<script src="./start_renderer.js"></script>
 </body>
 </html>
-

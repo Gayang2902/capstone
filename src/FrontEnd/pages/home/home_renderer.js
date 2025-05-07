@@ -9,20 +9,17 @@ function goTo(page) {
 // 스크린샷 방지 토글
 let screenshotBlocked = false;
 const toggleBtn = document.getElementById('screenshot-toggle');
-
 toggleBtn.addEventListener('click', () => {
     screenshotBlocked = !screenshotBlocked;
     toggleBtn.innerText = screenshotBlocked ? '스크린샷 방지' : '스크린샷 허용';
     screenshotBlocked ? window.electronAPI.preventScreenshot() : window.electronAPI.allowScreenshot();
 });
 
-// 팝업 관련
+// 입력 필드 및 팝업
 const addEntryBtn = document.getElementById('addEntryBtn');
 const popup = document.getElementById('popup');
 const saveBtn = document.getElementById('saveBtn');
 const cancelBtn = document.getElementById('cancelBtn');
-
-// 입력 필드
 const titleInput = document.getElementById('titleInput');
 const urlInput = document.getElementById('urlInput');
 const idInput = document.getElementById('idInput');
@@ -32,7 +29,8 @@ const entryTable = document.getElementById('entryTable').querySelector('tbody');
 const searchInput = document.getElementById('searchInput');
 
 let entries = [];
-let editIndex = null; // 수정 중인 인덱스
+let favorites = {};
+let editIndex = null;
 
 addEntryBtn.addEventListener('click', () => {
     editIndex = null;
@@ -50,9 +48,8 @@ saveBtn.addEventListener('click', async () => {
     const id = idInput.value;
     const pw = pwInput.value;
     const tag = tagInput.value;
-    const faviconUrl = await getFavicon(url);
-
-    const newEntry = { title, url, id, pw, tag, icon: faviconUrl };
+    const icon = await getFavicon(url);
+    const newEntry = { title, url, id, pw, tag, icon };
 
     if (editIndex !== null) {
         entries[editIndex] = newEntry;
@@ -61,10 +58,12 @@ saveBtn.addEventListener('click', async () => {
         entries.push(newEntry);
     }
 
+    applyFavorites();
+    savePasswords(entries);
+    saveFavorites();
     renderTable();
     popup.style.display = 'none';
     clearInputs();
-    savePasswords(entries);
 });
 
 function clearInputs() {
@@ -75,108 +74,105 @@ function clearInputs() {
     tagInput.value = '';
 }
 
+// 즐겨찾기 고유 키 생성 (title + url + tag)
+function generateFavoriteKey(entry) {
+    return `${entry.title}::${entry.url}::${entry.tag}`;
+}
+
+// 즐겨찾기 정보 적용
+function applyFavorites() {
+    entries.forEach(entry => {
+        const key = generateFavoriteKey(entry);
+        entry.favorite = !!favorites[key];
+    });
+}
+
+// 테이블 렌더링
 function renderTable(filtered = entries) {
     entryTable.innerHTML = '';
+    const sorted = [...filtered].sort((a, b) => (b.favorite ? 1 : 0) - (a.favorite ? 1 : 0));
 
-    filtered.forEach((entry, index) => {
+    sorted.forEach((entry, index) => {
         const row = document.createElement('tr');
 
-        // Title + Favicon
+        // Title
         const titleCell = document.createElement('td');
-        const faviconImg = document.createElement('img');
-        faviconImg.src = entry.icon || './a.png';
-        faviconImg.width = 30;
-        faviconImg.height = 30;
-        faviconImg.style.verticalAlign = 'middle';
-        faviconImg.style.marginRight = '5px';
-
-        const titleText = document.createTextNode(entry.title);
-        titleCell.appendChild(faviconImg);
-        titleCell.appendChild(titleText);
+        const favicon = document.createElement('img');
+        favicon.src = entry.icon || './a.png';
+        favicon.width = 20;
+        favicon.height = 20;
+        favicon.style.verticalAlign = 'middle';
+        favicon.style.marginRight = '5px';
+        titleCell.appendChild(favicon);
+        titleCell.appendChild(document.createTextNode(entry.title));
 
         // URL
         const urlCell = document.createElement('td');
         urlCell.textContent = entry.url;
 
-        // ID
-        // const idCell = document.createElement('td');
-        // idCell.textContent = entry.id;
-
-        // ID (클릭 시 복사)
+        // ID (복사)
         const idCell = document.createElement('td');
         idCell.textContent = entry.id;
-        idCell.style.cursor = 'default'; // 기본 마우스 포인터 유지
+        idCell.style.cursor = 'pointer';
         idCell.title = '클릭하여 복사';
-
         idCell.addEventListener('click', () => {
             navigator.clipboard.writeText(entry.id).then(() => {
-                console.log('ID 클립보드에 복사됨:', entry.id);
-
-                // 복사 완료 메시지 추가
-                const copiedMsg = document.createElement('span');
-                copiedMsg.textContent = ' ✅';
-                copiedMsg.style.color = 'green';
-                copiedMsg.style.marginLeft = '5px';
-                copiedMsg.className = 'copied-msg';
-                idCell.appendChild(copiedMsg);
-
-            }).catch(err => {
-                console.error('ID 클립보드 복사 실패:', err);
+                const copied = document.createElement('span');
+                copied.textContent = ' ✅';
+                copied.style.color = 'green';
+                copied.style.marginLeft = '5px';
+                idCell.appendChild(copied);
+                setTimeout(() => copied.remove(), 2000);
             });
         });
 
-
-        // PW (숨김 처리 + 마우스 오버 시 표시 + 클릭 시 클립보드 복사)
-        const passwordCell = document.createElement('td');
-        const passwordSpan = document.createElement('span');
-        passwordSpan.className = 'password';
-        passwordSpan.textContent = '*'.repeat(entry.pw.length);
-
-        passwordCell.appendChild(passwordSpan);
-
-        passwordCell.addEventListener('mouseenter', () => {
-            passwordSpan.textContent = entry.pw;
+        // PW
+        const pwCell = document.createElement('td');
+        const pwSpan = document.createElement('span');
+        pwSpan.className = 'password';
+        pwSpan.textContent = '*'.repeat(entry.pw.length);
+        pwCell.appendChild(pwSpan);
+        pwCell.addEventListener('mouseenter', () => {
+            pwSpan.textContent = entry.pw;
         });
-        passwordCell.addEventListener('mouseleave', () => {
-            passwordSpan.textContent = '*'.repeat(entry.pw.length);
+        pwCell.addEventListener('mouseleave', () => {
+            pwSpan.textContent = '*'.repeat(entry.pw.length);
         });
-
-        passwordSpan.addEventListener('click', () => {
+        pwSpan.addEventListener('click', () => {
             navigator.clipboard.writeText(entry.pw).then(() => {
-                console.log('클립보드에 복사됨:', entry.pw);
-
-                // 복사 완료 메시지 추가
-                const copiedMsg = document.createElement('span');
-                copiedMsg.textContent = ' ✅';
-                copiedMsg.style.color = 'green';
-                copiedMsg.style.marginLeft = '5px';
-                copiedMsg.className = 'copied-msg';
-                passwordCell.appendChild(copiedMsg);
-
-                // 2초 후 메시지 제거
-                setTimeout(() => {
-                    copiedMsg.remove();
-                }, 2000);
-
-                // 30초 후 클립보드 만료
-                setTimeout(async () => {
-                    await navigator.clipboard.writeText(''); // 원하는 문자열 넣어도 재밌음 ㅋㅋ
-                    console.log('클립보드에서 비밀번호 삭제됨');
-                }, 30000); // 단위 1000 : 1초
-
-
-            }).catch(err => {
-                console.error('클립보드 복사 실패:', err);
+                const copied = document.createElement('span');
+                copied.textContent = ' ✅';
+                copied.style.color = 'green';
+                copied.style.marginLeft = '5px';
+                pwCell.appendChild(copied);
+                setTimeout(() => copied.remove(), 2000);
+                setTimeout(() => navigator.clipboard.writeText(''), 30000);
             });
         });
 
-        // TAG
+        // Tag
         const tagCell = document.createElement('td');
         tagCell.textContent = entry.tag;
 
-        // ACTION (수정 / 삭제 버튼)
-        const actionCell = document.createElement('td');
+        // 즐겨찾기
+        const favoriteCell = document.createElement('td');
+        const star = document.createElement('img');
+        star.src = entry.favorite ? './fill_star.png' : './empty_star.png';
+        star.width = 20;
+        star.height = 20;
+        star.style.cursor = 'pointer';
+        star.addEventListener('click', () => {
+            const key = generateFavoriteKey(entry);
+            entry.favorite = !entry.favorite;
+            favorites[key] = entry.favorite;
+            if (!entry.favorite) delete favorites[key];
+            saveFavorites();
+            renderTable();
+        });
+        favoriteCell.appendChild(star);
 
+        // 수정 / 삭제
+        const actionCell = document.createElement('td');
         const editBtn = document.createElement('button');
         editBtn.textContent = '수정';
         editBtn.onclick = () => {
@@ -185,7 +181,7 @@ function renderTable(filtered = entries) {
             idInput.value = entry.id;
             pwInput.value = entry.pw;
             tagInput.value = entry.tag;
-            editIndex = index;
+            editIndex = entries.indexOf(entry);
             popup.style.display = 'block';
         };
 
@@ -193,47 +189,49 @@ function renderTable(filtered = entries) {
         deleteBtn.textContent = '삭제';
         deleteBtn.onclick = () => {
             if (confirm('정말 삭제하시겠습니까?')) {
-                entries.splice(index, 1);
-                renderTable();
+                const key = generateFavoriteKey(entry);
+                delete favorites[key];
+                entries.splice(entries.indexOf(entry), 1);
                 savePasswords(entries);
+                saveFavorites();
+                renderTable();
             }
         };
 
         actionCell.appendChild(editBtn);
         actionCell.appendChild(deleteBtn);
 
-        // 테이블에 행 추가
         row.appendChild(titleCell);
         row.appendChild(urlCell);
         row.appendChild(idCell);
-        row.appendChild(passwordCell);
+        row.appendChild(pwCell);
         row.appendChild(tagCell);
+        row.appendChild(favoriteCell);
         row.appendChild(actionCell);
 
         entryTable.appendChild(row);
     });
 }
 
-
-
+// favicon 가져오기
 async function getFavicon(url) {
     try {
-        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        if (!url.startsWith('http')) {
             url = 'https://' + url;
         }
         const hostname = new URL(url).hostname;
         const faviconUrl = `https://www.google.com/s2/favicons?sz=32&domain=${hostname}`;
         const res = await fetch(faviconUrl);
         if (!res.ok || !res.headers.get("content-type")?.includes("image")) {
-            throw new Error("favicon not found");
+            throw new Error();
         }
         return faviconUrl;
     } catch {
-        return './a.png'; // 디폴트 아이콘
+        return './a.png';
     }
 }
 
-// 검색 기능
+// 검색
 searchInput.addEventListener('input', () => {
     const keyword = searchInput.value.toLowerCase();
     const filtered = entries.filter(entry =>
@@ -245,7 +243,7 @@ searchInput.addEventListener('input', () => {
     renderTable(filtered);
 });
 
-// 초기 데이터 불러오기
+// 초기 데이터 로딩
 window.electronAPI.loadPasswords();
 window.electronAPI.onPasswordsLoaded(async (loadedEntries) => {
     for (const entry of loadedEntries) {
@@ -254,26 +252,22 @@ window.electronAPI.onPasswordsLoaded(async (loadedEntries) => {
         }
     }
     entries = loadedEntries;
+
+    const loadedFavorites = await window.electronAPI.loadFavorites();
+    favorites = loadedFavorites;
+    applyFavorites();
     renderTable();
 });
 
-// 페이지가 닫힐 때 자동 저장
-window.addEventListener('unload', () => {
-    if (entries.length > 0) {
-        savePasswords(entries);
-    }
-});
-
-// 🔐 파일 저장 요청
-function savePasswords(passwordEntries) {
-    window.electronAPI.savePasswords(passwordEntries);
+// 저장
+function savePasswords(data) {
+    window.electronAPI.savePasswords(data);
+}
+function saveFavorites() {
+    window.electronAPI.saveFavorites(favorites);
 }
 
-// 🔔 저장 결과 수신
-window.electronAPI.onPasswordsSaved((success) => {
-    if (success) {
-        console.log('비밀번호가 성공적으로 저장되었습니다.');
-    } else {
-        console.log('비밀번호 저장에 실패했습니다.');
-    }
+window.addEventListener('unload', () => {
+    savePasswords(entries);
+    saveFavorites();
 });

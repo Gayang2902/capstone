@@ -1,0 +1,182 @@
+/* 1) 창 배경은 기본 흰색 */
+html, body {
+    width: 100%; height: 100%;
+    margin: 0; padding: 0;
+    background: #ffffff;
+    overflow: hidden;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* 2) 앱 전체 컨테이너 */
+.app-container {
+    display: flex;
+    width: 100%; height: 100%;
+}
+
+/* 3) 사이드바 (반투명 + 블러) */
+nav {
+    width: 200px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top-left-radius: 16px;
+    border-bottom-left-radius: 16px;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    display: flex; flex-direction: column;
+}
+
+nav button {
+    background: rgba(255, 255, 255, 0.8);
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 12px;
+    text-align: left;
+    color: #333;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+nav button:hover {
+    background: rgba(255, 255, 255, 1);
+}
+
+/* 4) 메인 영역 (반투명 + 블러) */
+main {
+    flex-grow: 1;
+    padding: 24px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-top-right-radius: 16px;
+    border-bottom-right-radius: 16px;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: auto;
+}
+
+main h1 {
+    margin-top: 0;
+    color: #222;
+}
+
+/* 공통 버튼 스타일 */
+main > button,
+#addEntryBtn {
+    background: rgba(255, 255, 255, 0.7);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    margin-bottom: 16px;
+    color: #333;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+main > button:hover,
+#addEntryBtn:hover {
+    background: rgba(255, 255, 255, 1);
+}
+
+/* 검색창 */
+.search-container {
+    margin-bottom: 20px;
+}
+
+.search-container input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    outline: none;
+    font-size: 14px;
+}
+
+/* 팝업 */
+#popup {
+    display: none;
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 320px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+}
+
+.popup-content {
+    padding: 20px;
+    display: flex; flex-direction: column;
+}
+
+.popup-content label {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.popup-content input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 4px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    outline: none;
+}
+
+.popup-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.popup-actions button {
+    background: rgba(255, 255, 255, 0.8);
+    border: none;
+    border-radius: 8px;
+    padding: 6px 12px;
+    color: #333;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.popup-actions button:hover {
+    background: rgba(255, 255, 255, 1);
+}
+
+/* 테이블 */
+#entryTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+#entryTable th,
+#entryTable td {
+    padding: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    color: #333;
+}
+
+#entryTable tbody tr:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+#entryTable td {
+    vertical-align: middle;
+}
+
+#entryTable td button,
+#entryTable td img {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+#entryTable td button:hover,
+#entryTable td img:hover {
+    transform: scale(1.1);
+}

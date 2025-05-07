@@ -3,95 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <title>Home</title>
-    <style>
-        body {
-            display: flex;
-            margin: 0;
-        }
-        nav {
-            width: 200px;
-            background-color: #f4f4f4;
-            height: 100vh;
-            padding: 20px;
-        }
-        main {
-            flex-grow: 1;
-            padding: 20px;
-        }
-        button {
-            display: block;
-            margin-bottom: 10px;
-            width: 100%;
-        }
-        #popup {
-            display: none;
-            border: 1px solid #ccc;
-            padding: 10px;
-            background-color: #fff;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 6px;
-            border: 1px solid #ddd;
-            text-align: left;
-        }
-        td, button {
-            cursor: default;
-        }
-
-        input[type="text"], input[type="password"] {
-            cursor: text;
-        }
-    </style>
+    <link rel="stylesheet" href="./home_style.css">
 </head>
 <body>
-<nav>
-    <button onclick="goTo('home')">🏠 홈</button>
-    <button onclick="goTo('statistic')">📊 통계</button>
-    <button onclick="goTo('group')">👥 그룹</button>
-    <button onclick="goTo('setting')">⚙️ 설정</button>
-    <button onclick="goTo('start')">🔒 로그아웃</button>
-</nav>
-<main>
-    <h1>홈 페이지</h1>
-    <p>이곳은 홈입니다.</p>
-    <button id="screenshot-toggle">🔓 스크린샷 허용</button>
+<div class="app-container">
+    <nav>
+        <button onclick="goTo('home')">🏠 홈</button>
+        <button onclick="goTo('statistic')">📊 통계</button>
+        <button onclick="goTo('group')">👥 그룹</button>
+        <button onclick="goTo('setting')">⚙️ 설정</button>
+        <button onclick="goTo('start')">🔒 로그아웃</button>
+    </nav>
+    <main>
+        <h1>홈 페이지</h1>
+        <button id="screenshot-toggle">🔓 스크린샷 허용</button>
 
-    <!-- 검색 입력 -->
-    <label for="searchInput">🔎</label>
-    <input type="text" id="searchInput" placeholder="검색...">
-    <!-- 비밀번호 추가 버튼 -->
-    <button id="addEntryBtn">비밀번호 저장</button>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="🔎 검색...">
+        </div>
+        <button id="addEntryBtn">비밀번호 저장</button>
 
-    <!-- 비밀번호 추가 팝업 -->
-    <div id="popup">
-        <label>Title: <input type="text" id="titleInput" /></label><br/>
-        <label>URL: <input type="text" id="urlInput" /></label><br/>
-        <label>ID: <input type="text" id="idInput" /></label><br/>
-        <label>PW: <input type="password" id="pwInput" /></label><br/>
-        <label>Tag: <input type="text" id="tagInput" /></label><br/>
-        <button id="saveBtn">확인</button>
-        <button id="cancelBtn">취소</button>
-    </div>
+        <div id="popup">
+            <div class="popup-content">
+                <label>Title: <input type="text" id="titleInput"/></label>
+                <label>URL: <input type="text" id="urlInput"/></label>
+                <label>ID: <input type="text" id="idInput"/></label>
+                <label>PW: <input type="password" id="pwInput"/></label>
+                <label>Tag: <input type="text" id="tagInput"/></label>
+                <div class="popup-actions">
+                    <button id="saveBtn">확인</button>
+                    <button id="cancelBtn">취소</button>
+                </div>
+            </div>
+        </div>
 
-    <!-- 비밀번호 테이블 -->
-    <table id="entryTable">
-        <thead>
-        <tr>
-            <th>Title</th>
-            <th>URL</th>
-            <th>ID</th>
-            <th>PW</th>
-            <th>Tag</th>
-            <th>Action</th>
-        </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-</main>
+        <table id="entryTable">
+            <thead>
+            <tr>
+                <th>Title</th>
+                <th>URL</th>
+                <th>ID</th>
+                <th>PW</th>
+                <th>Tag</th>
+                <th>즐겨찾기</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </main>
+</div>
 
 <script src="./home_renderer.js"></script>
 <script type="module" src="../../shared/shared_renderer.js"></script>
