@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Password Manager</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+</head>
+<body>
+  <!-- 커스텀 타이틀바 -->
+  <div class="titlebar">
+    <div class="window-controls">
+      <button id="min-btn">—</button>
+      <button id="max-btn">□</button>
+      <button id="close-btn">×</button>
+    </div>
+  </div>
+
+  <div class="wrapper">
+    <!-- 사이드바 -->
+    <aside class="sidebar">
+      <div class="logo"><i class="fa fa-lock"></i> DP</div>
+      <nav>
+        <ul class="nav">
+          <li class="active" data-page="home"><i class="fa fa-home"></i><span>Home</span></li>
+          <li data-page="group"><i class="fa fa-users"></i><span>Group</span></li>
+          <li data-page="generator"><i class="fa fa-key"></i><span>Generator</span></li>
+          <li data-page="statistics"><i class="fa fa-chart-line"></i><span>Statistics</span></li>
+          <li data-page="setting"><i class="fa fa-cog"></i><span>Settings</span></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main-content">
+      <div id="main-content">
+        <!-- Home 화면 -->
+        <header class="topbar">
+          <ul class="tabs">
+            <li class="active">All Passwords</li>
+            <li>Favorites</li>
+            <li>Weak</li>
+            <li>Recent</li>
+          </ul>
+          <div class="top-actions">
+            <input type="text" placeholder="Search…" />
+            <i class="fa fa-bell"></i>
+            <i class="fa fa-user-circle"></i>
+          </div>
+        </header>
+
+        <!-- 배너 (이미지 부분 제거) -->
+        <section class="banner">
+          <div class="banner-text">
+            <h2>Weak passwords detected!</h2>
+            <p>보안 강화가 필요한 3개의 비밀번호가 있습니다.</p>
+            <button>지금 점검하기</button>
+          </div>
+        </section>
+
+        <!-- 비밀번호 테이블 -->
+        <section class="pw-table-section">
+          <table class="pw-table">
+            <thead>
+              <tr>
+                <th>Site</th>
+                <th>ID</th>
+                <th>Password</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>example.com</td>
+                <td>user@example.com</td>
+                <td>••••••••</td>
+                <td><button class="btn-small">Edit</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- 추천 작업 카드 -->
+        <section class="card-grid">
+          <div class="card">
+            <h3>새로운 비밀번호 추가</h3>
+            <p>간편하게 비밀번호를 저장해 보세요.</p>
+            <button>추가하기</button>
+          </div>
+          <div class="card">
+            <h3>그룹 관리</h3>
+            <p>비밀번호를 카테고리별로 묶어보세요.</p>
+            <button>그룹 보기</button>
+          </div>
+          <div class="card">
+            <h3>통계 확인</h3>
+            <p>안전하지 않은 비밀번호 통계를 확인하세요.</p>
+            <button>통계 보기</button>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
