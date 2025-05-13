@@ -1,0 +1,52 @@
+<div class="page-header">
+  <h2>비밀번호 생성기</h2>
+</div>
+
+<div class="generator-container">
+  <div class="option-group">
+    <label for="length">길이: <span id="length-value">12</span></label>
+    <input type="range" id="length" min="6" max="32" value="12" />
+  </div>
+  <div class="option-group">
+    <label><input type="checkbox" id="include-lower" checked /> 소문자</label>
+    <label><input type="checkbox" id="include-upper" checked /> 대문자</label>
+    <label><input type="checkbox" id="include-number" checked /> 숫자</label>
+    <label><input type="checkbox" id="include-symbol" /> 특수문자</label>
+  </div>
+  <button id="generate-btn" class="btn-primary">생성하기</button>
+
+  <div class="password-output">
+    <input type="text" id="password-output" readonly placeholder="여기에 비밀번호가 표시됩니다" />
+    <button id="copy-btn" class="btn-secondary">복사</button>
+  </div>
+</div>
+
+<script>
+  const lengthInput = document.getElementById('length');
+  const lengthValue = document.getElementById('length-value');
+  lengthInput.addEventListener('input', e => lengthValue.textContent = e.target.value);
+
+  document.getElementById('generate-btn').addEventListener('click', () => {
+    const length = +lengthInput.value;
+    const lower = 'abcdefghijklmnopqrstuvwxyz';
+    const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const number = '0123456789';
+    const symbol = '!@#$%^&*()_+[]{}|;:,.<>?';
+    let chars = '';
+    if (document.getElementById('include-lower').checked) chars += lower;
+    if (document.getElementById('include-upper').checked) chars += upper;
+    if (document.getElementById('include-number').checked) chars += number;
+    if (document.getElementById('include-symbol').checked) chars += symbol;
+    let pw = '';
+    for (let i = 0; i < length; i++) {
+      pw += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    document.getElementById('password-output').value = pw;
+  });
+
+  document.getElementById('copy-btn').addEventListener('click', () => {
+    const pw = document.getElementById('password-output').value;
+    if (!pw) return;
+    navigator.clipboard.writeText(pw);
+  });
+</script>

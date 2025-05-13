@@ -1,0 +1,33 @@
+.page-header {
+  margin: 1rem 2rem 0;
+  padding: 1rem 2rem;
+  background: rgba(42,42,61,0.5);
+  backdrop-filter: blur(16px);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+.page-header h2 {
+  color: #ececec;
+  font-size: 1.25rem;
+}
+
+.stats-container {
+  margin: 1.5rem 2rem;
+  display: flex;
+  justify-content: center;
+}
+.chart-card {
+  width: 100%;
+  max-width: 600px;
+  padding: 1.5rem;
+  background: rgba(42,42,61,0.5);
+  backdrop-filter: blur(16px);
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.5);
+}
+
+/* 캔버스 크기 고정 */
+.chart-card canvas {
+  width: 100% !important;
+  height: 300px !important;
+}
