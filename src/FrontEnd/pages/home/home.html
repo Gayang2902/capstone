@@ -4,56 +4,68 @@
     <meta charset="UTF-8">
     <title>Home</title>
     <link rel="stylesheet" href="./home_style.css">
+<!--    <link rel="stylesheet" href="../../shared/shared_sidebar.css">-->
 </head>
 <body>
-<div class="app-container">
-    <nav>
-        <button onclick="goTo('home')">🏠 홈</button>
-        <button onclick="goTo('statistic')">📊 통계</button>
-        <button onclick="goTo('group')">👥 그룹</button>
-        <button onclick="goTo('setting')">⚙️ 설정</button>
-        <button onclick="goTo('start')">🔒 로그아웃</button>
-    </nav>
-    <main>
-        <h1>홈 페이지</h1>
-        <button id="screenshot-toggle">🔓 스크린샷 허용</button>
-
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="🔎 검색...">
+<nav>
+    <button id="nav-home" onclick="goTo('home')">🏠 Home</button>
+    <button id="nav-statistic" onclick="goTo('statistic')">📊 Statistics</button>
+    <button id="nav-group" onclick="goTo('group')">👥 Group</button>
+    <button id="nav-setting" onclick="goTo('setting')">⚙️ Setting</button>
+    <button id="nav-logout" onclick="goTo('start')">🔒 Logout</button>
+</nav>
+<main>
+    <div class="topbar">
+        <div class="topbar-left">
+            <button id="sidebarToggle">☰</button>
+            <button id="globalAddBtn">＋</button>
         </div>
-        <button id="addEntryBtn">비밀번호 저장</button>
-
-        <div id="popup">
-            <div class="popup-content">
-                <label>Title: <input type="text" id="titleInput"/></label>
-                <label>URL: <input type="text" id="urlInput"/></label>
-                <label>ID: <input type="text" id="idInput"/></label>
-                <label>PW: <input type="password" id="pwInput"/></label>
-                <label>Tag: <input type="text" id="tagInput"/></label>
-                <div class="popup-actions">
-                    <button id="saveBtn">확인</button>
-                    <button id="cancelBtn">취소</button>
-                </div>
-            </div>
+        <div class="topbar-right">
+            <button id="screenshot-toggle">🔓 스크린샷 방지</button>
+            <button id="helpBtn">❓</button>
+            <select id="langSelect">
+                <option value="kr">Korean</option>
+                <option value="en">English</option>
+            </select>
+            <label for="searchInput">🔎</label>
+            <input type="text" id="searchInput" placeholder="검색...">
+            <button id="themeToggle">🌙/☀️</button>
         </div>
-
-        <table id="entryTable">
-            <thead>
-            <tr>
-                <th>Title</th>
-                <th>URL</th>
-                <th>ID</th>
-                <th>PW</th>
-                <th>Tag</th>
-                <th>즐겨찾기</th>
-                <th>Action</th>
-            </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </main>
-</div>
-
+    </div>
+    <section class="password-section">
+        <div class="password-section-header">
+            <button id="addEntryBtn">＋</button>
+            <select id="filterSelect">
+                <option value="date">추가순</option>
+                <option value="alpha">가나다순</option>
+            </select>
+        </div>
+        <div class="password-container">
+            <table id="entryTable">
+                <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>URL</th>
+                    <th>ID</th>
+                    <th>PW</th>
+                    <th>Tag</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </section>
+    <div id="popup">
+        <label>Title: <input type="text" id="titleInput"></label><br>
+        <label>URL: <input type="text" id="urlInput"></label><br>
+        <label>ID: <input type="text" id="idInput"></label><br>
+        <label>PW: <input type="password" id="pwInput"></label><br>
+        <label>Tag: <input type="text" id="tagInput"></label><br>
+        <button id="saveBtn">확인</button>
+        <button id="cancelBtn">취소</button>
+    </div>
+</main>
 <script src="./home_renderer.js"></script>
 <script type="module" src="../../shared/shared_renderer.js"></script>
 </body>

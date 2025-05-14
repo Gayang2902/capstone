@@ -40,4 +40,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     saveFavorites: (fav) => ipcRenderer.invoke('save-favorites', fav),
     loadFavorites: () => ipcRenderer.invoke('load-favorites'),
 
+    loadRecentFiles: () => ipcRenderer.invoke('load-recent-files'),
+    saveRecentFiles: (files) => ipcRenderer.invoke('save-recent-files', files),
+
 });

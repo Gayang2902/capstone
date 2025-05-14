@@ -8,8 +8,8 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 1200,
     height: 800,
-    frame: false,
     transparent: true,
+    frame: false,
     vibrancy: 'acrylic',
     backgroundColor: '#00000000',
     webPreferences: {
