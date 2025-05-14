@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>Home</title>
     <link rel="stylesheet" href="./home_style.css">
-<!--    <link rel="stylesheet" href="../../shared/shared_sidebar.css">-->
 </head>
 <body>
 <nav>
@@ -15,13 +14,14 @@
     <button id="nav-logout" onclick="goTo('start')">🔒 Logout</button>
 </nav>
 <main>
+    <!-- 상단바: 컨테이너 바깥쪽 맨 위 -->
     <div class="topbar">
         <div class="topbar-left">
             <button id="sidebarToggle">☰</button>
             <button id="globalAddBtn">＋</button>
         </div>
         <div class="topbar-right">
-            <button id="screenshot-toggle">🔓 스크린샷 방지</button>
+            <button id="screenshot-toggle">🔒 스크린샷 방지</button>
             <button id="helpBtn">❓</button>
             <select id="langSelect">
                 <option value="kr">Korean</option>
@@ -33,6 +33,7 @@
         </div>
     </div>
     <section class="password-section">
+        <!-- 필터 헤더 -->
         <div class="password-section-header">
             <button id="addEntryBtn">＋</button>
             <select id="filterSelect">
@@ -40,6 +41,7 @@
                 <option value="alpha">가나다순</option>
             </select>
         </div>
+        <!-- 비밀번호 목록 -->
         <div class="password-container">
             <table id="entryTable">
                 <thead>
@@ -56,15 +58,20 @@
             </table>
         </div>
     </section>
+    <!-- 팝업 모달 -->
     <div id="popup">
         <label>Title: <input type="text" id="titleInput"></label><br>
-        <label>URL: <input type="text" id="urlInput"></label><br>
-        <label>ID: <input type="text" id="idInput"></label><br>
-        <label>PW: <input type="password" id="pwInput"></label><br>
-        <label>Tag: <input type="text" id="tagInput"></label><br>
+        <label>URL:   <input type="text" id="urlInput"></label><br>
+        <label>ID:    <input type="text" id="idInput"></label><br>
+        <label>PW:    <input type="password" id="pwInput"></label><br>
+        <label>Tag:   <input type="text" id="tagInput"></label><br>
         <button id="saveBtn">확인</button>
         <button id="cancelBtn">취소</button>
     </div>
+
+    <!-- 알림 박스 -->
+    <div id="notification" class="notification"></div>
+
 </main>
 <script src="./home_renderer.js"></script>
 <script type="module" src="../../shared/shared_renderer.js"></script>

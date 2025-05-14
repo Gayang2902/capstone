@@ -1,5 +1,13 @@
 // pages/home/home_renderer.js
 
+// 알림 표시 함수
+function showNotification(message) {
+    const notif = document.getElementById('notification');
+    notif.textContent = message;
+    notif.classList.add('show');
+    setTimeout(() => notif.classList.remove('show'), 2000);
+}
+
 // 페이지 이동 구현
 function goTo(page) {
     if (entries.length > 0) {
@@ -9,15 +17,11 @@ function goTo(page) {
 }
 
 // 스크린샷 방지 토글 로직
-// 1) 기본값을 true(방지 ON)로 설정
 let screenshotBlocked = true;
 const toggleBtn = document.getElementById('screenshot-toggle');
-
-// 2) 초기 실행 시 스크린샷 방지 상태 적용 및 버튼 텍스트 설정
+// 초기 실행 시 방지 모드 적용
 window.electronAPI.preventScreenshot();
 toggleBtn.innerText = '🔒 스크린샷 방지';
-
-// 3) 클릭 시 토글 동작은 그대로 유지
 toggleBtn.addEventListener('click', () => {
     screenshotBlocked = !screenshotBlocked;
     toggleBtn.innerText = screenshotBlocked
@@ -45,19 +49,19 @@ let entries   = [];
 let favorites = {};
 let editIndex = null;
 
-// 새 항목 추가 버튼 클릭 시 모달 오픈
+// 새 항목 추가 버튼 클릭
 addEntryBtn.addEventListener('click', () => {
     editIndex = null;
     popup.style.display = 'block';
 });
 
-// 취소 버튼 클릭 시 모달 숨김 및 입력 초기화
+// 취소 버튼 클릭
 cancelBtn.addEventListener('click', () => {
     popup.style.display = 'none';
     clearInputs();
 });
 
-// 저장 버튼 클릭 시 새 항목 추가 또는 수정
+// 저장 버튼 클릭
 saveBtn.addEventListener('click', async () => {
     const title = titleInput.value;
     const url   = urlInput.value;
@@ -68,10 +72,10 @@ saveBtn.addEventListener('click', async () => {
     const newEntry = { title, url, id, pw, tag, icon };
 
     if (editIndex !== null) {
-        entries[editIndex] = newEntry;  // 수정 모드
+        entries[editIndex] = newEntry;
         editIndex = null;
     } else {
-        entries.push(newEntry);         // 추가 모드
+        entries.push(newEntry);
     }
 
     applyFavorites();
@@ -82,7 +86,7 @@ saveBtn.addEventListener('click', async () => {
     clearInputs();
 });
 
-// 입력 필드 초기화 함수
+// 입력 필드 초기화
 function clearInputs() {
     titleInput.value = '';
     urlInput.value   = '';
@@ -91,12 +95,12 @@ function clearInputs() {
     tagInput.value   = '';
 }
 
-// 즐겨찾기 고유 키 생성 함수
+// 즐겨찾기 키 생성
 function generateFavoriteKey(entry) {
     return `${entry.title}::${entry.url}::${entry.tag}`;
 }
 
-// 즐겨찾기 적용 함수
+// 즐겨찾기 정보 적용
 function applyFavorites() {
     entries.forEach(entry => {
         const key = generateFavoriteKey(entry);
@@ -104,7 +108,7 @@ function applyFavorites() {
     });
 }
 
-// 테이블 렌더링 함수
+// 테이블 렌더링
 function renderTable(filtered = entries) {
     entryTable.innerHTML = '';
     const sorted = [...filtered]
@@ -113,7 +117,7 @@ function renderTable(filtered = entries) {
     sorted.forEach(entry => {
         const row = document.createElement('tr');
 
-        // Title + Favicon 셀 생성
+        // Title + Favicon
         const titleCell = document.createElement('td');
         const favicon   = document.createElement('img');
         favicon.src     = entry.icon || './a.png';
@@ -121,19 +125,17 @@ function renderTable(filtered = entries) {
         favicon.height  = 48;
         const titleText = document.createElement('span');
         titleText.textContent = entry.title;
-        // 제목 텍스트 크기 조정 (조금 더 키움)
         titleText.style.fontSize = '18px';
         titleCell.appendChild(favicon);
         titleCell.appendChild(titleText);
 
-        // URL 셀 생성
+        // URL 셀
         const urlCell = document.createElement('td');
         urlCell.textContent = entry.url;
-        // URL 글씨 크기 조정
         urlCell.style.fontSize = '14px';
         urlCell.style.cursor = 'text';
 
-        // ID 복사 영역 (텍스트 span에만 이벤트)
+        // ID 복사 (알림)
         const idCell = document.createElement('td');
         const idSpan = document.createElement('span');
         idSpan.textContent = entry.id;
@@ -142,15 +144,12 @@ function renderTable(filtered = entries) {
         idSpan.addEventListener('click', e => {
             e.stopPropagation();
             navigator.clipboard.writeText(entry.id).then(() => {
-                const copied = document.createElement('span');
-                copied.textContent = ' ✅';
-                idSpan.appendChild(copied);
-                setTimeout(() => copied.remove(), 2000);
+                showNotification('복사되었습니다.');
             });
         });
         idCell.appendChild(idSpan);
 
-        // PW 복사 및 호버 영역 (pwSpan만)
+        // PW 복사/호버 (알림)
         const pwCell = document.createElement('td');
         const pwSpan = document.createElement('span');
         pwSpan.className = 'password';
@@ -161,20 +160,16 @@ function renderTable(filtered = entries) {
         pwSpan.addEventListener('click', e => {
             e.stopPropagation();
             navigator.clipboard.writeText(entry.pw).then(() => {
-                const copied = document.createElement('span');
-                copied.textContent = ' ✅';
-                pwSpan.appendChild(copied);
-                setTimeout(() => copied.remove(), 2000);
-                setTimeout(() => navigator.clipboard.writeText(''), 30000);
+                showNotification('복사되었습니다.');
             });
         });
         pwCell.appendChild(pwSpan);
 
-        // Tag 셀
+        // Tag
         const tagCell = document.createElement('td');
         tagCell.textContent = entry.tag;
 
-        // 즐겨찾기 셀
+        // Favorite
         const favCell = document.createElement('td');
         const star    = document.createElement('img');
         star.src      = entry.favorite ? './fill.png' : './empty.png';
@@ -192,7 +187,7 @@ function renderTable(filtered = entries) {
         });
         favCell.appendChild(star);
 
-        // 삭제 버튼 셀
+        // 삭제 버튼
         const actionCell = document.createElement('td');
         const deleteBtn  = document.createElement('button');
         deleteBtn.textContent = '삭제';
@@ -209,7 +204,7 @@ function renderTable(filtered = entries) {
         };
         actionCell.appendChild(deleteBtn);
 
-        // 행 클릭 시 수정 모달 오픈
+        // 행 클릭 시 수정 모달
         row.addEventListener('click', () => {
             titleInput.value = entry.title;
             urlInput.value   = entry.url;
@@ -220,19 +215,13 @@ function renderTable(filtered = entries) {
             popup.style.display = 'block';
         });
 
-        // 행에 셀 추가
-        row.appendChild(titleCell);
-        row.appendChild(urlCell);
-        row.appendChild(idCell);
-        row.appendChild(pwCell);
-        row.appendChild(tagCell);
-        row.appendChild(favCell);
-        row.appendChild(actionCell);
+        [titleCell, urlCell, idCell, pwCell, tagCell, favCell, actionCell]
+            .forEach(cell => row.appendChild(cell));
         entryTable.appendChild(row);
     });
 }
 
-// favicon 가져오기 함수
+// favicon 가져오기
 async function getFavicon(url) {
     try {
         if (!url.startsWith('http')) url = 'https://' + url;
@@ -246,7 +235,7 @@ async function getFavicon(url) {
     }
 }
 
-// 검색 입력 이벤트
+// 검색 처리
 searchInput.addEventListener('input', () => {
     const kw      = searchInput.value.toLowerCase();
     const filtered= entries.filter(e =>
@@ -268,11 +257,11 @@ window.electronAPI.onPasswordsLoaded(async loaded => {
 });
 window.electronAPI.loadPasswords();
 
-// 저장 함수
+// 저장
 function savePasswords(data) { window.electronAPI.savePasswords(data); }
 function saveFavorites()        { window.electronAPI.saveFavorites(favorites); }
 
-// 페이지 언로드 시 저장
+// 언로드 시 저장
 window.addEventListener('unload', () => {
     if (entries.length > 0) savePasswords(entries);
     saveFavorites();

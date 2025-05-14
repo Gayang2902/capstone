@@ -54,7 +54,8 @@ main {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    margin-top: 50px;
+    margin-bottom: 0;
 }
 .topbar-left,
 .topbar-right {
@@ -74,8 +75,8 @@ main {
     display: flex;
     flex-direction: column;
     /*flex: 1;*/
-    height: 66.667vh;
-    margin-top: 100px;
+    height: 75vh;
+    margin-top: 20px;
     border: 1px solid #ddd;
     overflow: hidden;
 }
@@ -227,4 +228,22 @@ main {
     z-index: 1000;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* 알림 박스 */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(0,0,0,0.75);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 1001;
+}
+.notification.show {
+    opacity: 1;
 }

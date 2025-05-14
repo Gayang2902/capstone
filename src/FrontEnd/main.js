@@ -32,8 +32,8 @@ app.on('before-quit', () => {
 function createWindow() {
     // 공통 옵션
     const windowOpts = {
-        width: 1440,
-        height: 900,
+        width: 1200, // 1440
+        height: 700, // 900
         transparent: true,
         frame: false,
         backgroundColor: '#00000000',
