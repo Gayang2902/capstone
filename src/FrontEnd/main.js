@@ -32,11 +32,11 @@ app.on('before-quit', () => {
 function createWindow() {
     // 공통 옵션
     const windowOpts = {
-        width: 1200, // 1440
-        height: 700, // 900
+        width: 1440,
+        height: 900,
         transparent: true,
         frame: false,
-        backgroundColor: '#00000000',
+        // backgroundColor: '#00000000',
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             contextIsolation: true,
@@ -47,8 +47,9 @@ function createWindow() {
     // 플랫폼별 추가 옵션
     if (process.platform === 'darwin') {
         Object.assign(windowOpts, {
-            titleBarStyle: 'hidden',
-            vibrancy: 'fullscreen-ui'
+            // titleBarStyle: 'hidden',
+            vibrancy: 'fullscreen-ui',
+            backgroundColor: '#33253238',
         });
     } else if (process.platform === 'win32') {
         Object.assign(windowOpts, {

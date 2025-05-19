@@ -16,22 +16,6 @@ function goTo(page) {
     window.electronAPI.navigate(page);
 }
 
-// 스크린샷 방지 토글 로직
-let screenshotBlocked = true;
-const toggleBtn = document.getElementById('screenshot-toggle');
-// 초기 실행 시 방지 모드 적용
-window.electronAPI.preventScreenshot();
-toggleBtn.innerText = '🔒 스크린샷 방지';
-toggleBtn.addEventListener('click', () => {
-    screenshotBlocked = !screenshotBlocked;
-    toggleBtn.innerText = screenshotBlocked
-        ? '🔒 스크린샷 방지'
-        : '🔓 스크린샷 허용';
-    screenshotBlocked
-        ? window.electronAPI.preventScreenshot()
-        : window.electronAPI.allowScreenshot();
-});
-
 // 입력 필드 및 팝업 요소 참조
 const addEntryBtn = document.getElementById('addEntryBtn');
 const popup       = document.getElementById('popup');

@@ -58,3 +58,33 @@ function goTo(page) {
 // 초기 로딩 시에도 현재 페이지 강조
 // 예: window.currentPage 변수를 서버나 렌더러에서 세팅해준 경우
 setActiveNav(window.currentPage || 'home');
+
+
+// ==================================================================================
+// 스크린샷 방지
+const SCREENSHOT_BTN_SELECTOR = '#screenshot-btn';
+let screenshotBlocked = true;
+
+function initScreenshotToggle() {
+    const toggleBtn = document.querySelector(SCREENSHOT_BTN_SELECTOR);
+    if (!toggleBtn) return;
+
+    // 초기 실행 시 스크린샷 방지 모드 적용
+    window.electronAPI.preventScreenshot();
+    toggleBtn.innerText = '🔒 스크린샷 방지';
+
+    toggleBtn.addEventListener('click', () => {
+        screenshotBlocked = !screenshotBlocked;
+        toggleBtn.innerText = screenshotBlocked
+            ? '🔒 스크린샷 방지'
+            : '🔓 스크린샷 허용';
+
+        if (screenshotBlocked) {
+            window.electronAPI.preventScreenshot();
+        } else {
+            window.electronAPI.allowScreenshot();
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', initScreenshotToggle);
