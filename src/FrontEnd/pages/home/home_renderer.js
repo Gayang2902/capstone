@@ -1,4 +1,14 @@
-// 페이지 이동
+// pages/home/home_renderer.js
+
+// 알림 표시 함수
+function showNotification(message) {
+    const notif = document.getElementById('notification');
+    notif.textContent = message;
+    notif.classList.add('show');
+    setTimeout(() => notif.classList.remove('show'), 2000);
+}
+
+// 페이지 이동 구현
 function goTo(page) {
     if (entries.length > 0) {
         savePasswords(entries);
@@ -6,49 +16,43 @@ function goTo(page) {
     window.electronAPI.navigate(page);
 }
 
-// 스크린샷 방지 토글
-let screenshotBlocked = false;
-const toggleBtn = document.getElementById('screenshot-toggle');
-toggleBtn.addEventListener('click', () => {
-    screenshotBlocked = !screenshotBlocked;
-    toggleBtn.innerText = screenshotBlocked ? '스크린샷 방지' : '스크린샷 허용';
-    screenshotBlocked ? window.electronAPI.preventScreenshot() : window.electronAPI.allowScreenshot();
-});
-
-// 입력 필드 및 팝업
+// 입력 필드 및 팝업 요소 참조
 const addEntryBtn = document.getElementById('addEntryBtn');
-const popup = document.getElementById('popup');
-const saveBtn = document.getElementById('saveBtn');
-const cancelBtn = document.getElementById('cancelBtn');
-const titleInput = document.getElementById('titleInput');
-const urlInput = document.getElementById('urlInput');
-const idInput = document.getElementById('idInput');
-const pwInput = document.getElementById('pwInput');
-const tagInput = document.getElementById('tagInput');
-const entryTable = document.getElementById('entryTable').querySelector('tbody');
+const popup       = document.getElementById('popup');
+const saveBtn     = document.getElementById('saveBtn');
+const cancelBtn   = document.getElementById('cancelBtn');
+const titleInput  = document.getElementById('titleInput');
+const urlInput    = document.getElementById('urlInput');
+const idInput     = document.getElementById('idInput');
+const pwInput     = document.getElementById('pwInput');
+const tagInput    = document.getElementById('tagInput');
+const entryTable  = document.getElementById('entryTable').querySelector('tbody');
 const searchInput = document.getElementById('searchInput');
 
-let entries = [];
+let entries   = [];
 let favorites = {};
 let editIndex = null;
 
+// 새 항목 추가 버튼 클릭
 addEntryBtn.addEventListener('click', () => {
     editIndex = null;
     popup.style.display = 'block';
 });
 
+// 취소 버튼 클릭
 cancelBtn.addEventListener('click', () => {
     popup.style.display = 'none';
     clearInputs();
 });
 
+// 저장 버튼 클릭
 saveBtn.addEventListener('click', async () => {
     const title = titleInput.value;
-    const url = urlInput.value;
-    const id = idInput.value;
-    const pw = pwInput.value;
-    const tag = tagInput.value;
-    const icon = await getFavicon(url);
+    const url   = urlInput.value;
+    const id    = idInput.value;
+    const pw    = pwInput.value;
+    const tag   = tagInput.value;
+    const icon  = await getFavicon(url);
     const newEntry = { title, url, id, pw, tag, icon };
 
     if (editIndex !== null) {
@@ -66,15 +70,16 @@ saveBtn.addEventListener('click', async () => {
     clearInputs();
 });
 
+// 입력 필드 초기화
 function clearInputs() {
     titleInput.value = '';
-    urlInput.value = '';
-    idInput.value = '';
-    pwInput.value = '';
-    tagInput.value = '';
+    urlInput.value   = '';
+    idInput.value    = '';
+    pwInput.value    = '';
+    tagInput.value   = '';
 }
 
-// 즐겨찾기 고유 키 생성 (title + url + tag)
+// 즐겨찾기 키 생성
 function generateFavoriteKey(entry) {
     return `${entry.title}::${entry.url}::${entry.tag}`;
 }
@@ -90,78 +95,73 @@ function applyFavorites() {
 // 테이블 렌더링
 function renderTable(filtered = entries) {
     entryTable.innerHTML = '';
-    const sorted = [...filtered].sort((a, b) => (b.favorite ? 1 : 0) - (a.favorite ? 1 : 0));
+    const sorted = [...filtered]
+        .sort((a, b) => (b.favorite ? 1 : 0) - (a.favorite ? 1 : 0));
 
-    sorted.forEach((entry, index) => {
+    sorted.forEach(entry => {
         const row = document.createElement('tr');
 
-        // Title
+        // Title + Favicon
         const titleCell = document.createElement('td');
-        const favicon = document.createElement('img');
-        favicon.src = entry.icon || './a.png';
-        favicon.width = 20;
-        favicon.height = 20;
-        favicon.style.verticalAlign = 'middle';
-        favicon.style.marginRight = '5px';
+        const favicon   = document.createElement('img');
+        favicon.src     = entry.icon || './a.png';
+        favicon.width   = 48;
+        favicon.height  = 48;
+        const titleText = document.createElement('span');
+        titleText.textContent = entry.title;
+        titleText.style.fontSize = '18px';
         titleCell.appendChild(favicon);
-        titleCell.appendChild(document.createTextNode(entry.title));
+        titleCell.appendChild(titleText);
 
-        // URL
+        // URL 셀
         const urlCell = document.createElement('td');
         urlCell.textContent = entry.url;
+        urlCell.style.fontSize = '14px';
+        urlCell.style.cursor = 'text';
 
-        // ID (복사)
+        // ID 복사 (알림)
         const idCell = document.createElement('td');
-        idCell.textContent = entry.id;
-        idCell.style.cursor = 'pointer';
-        idCell.title = '클릭하여 복사';
-        idCell.addEventListener('click', () => {
+        const idSpan = document.createElement('span');
+        idSpan.textContent = entry.id;
+        idSpan.style.cursor = 'pointer';
+        idSpan.title = '클릭하여 복사';
+        idSpan.addEventListener('click', e => {
+            e.stopPropagation();
             navigator.clipboard.writeText(entry.id).then(() => {
-                const copied = document.createElement('span');
-                copied.textContent = ' ✅';
-                copied.style.color = 'green';
-                copied.style.marginLeft = '5px';
-                idCell.appendChild(copied);
-                setTimeout(() => copied.remove(), 2000);
+                showNotification('복사되었습니다.');
             });
         });
+        idCell.appendChild(idSpan);
 
-        // PW
+        // PW 복사/호버 (알림)
         const pwCell = document.createElement('td');
         const pwSpan = document.createElement('span');
         pwSpan.className = 'password';
         pwSpan.textContent = '*'.repeat(entry.pw.length);
-        pwCell.appendChild(pwSpan);
-        pwCell.addEventListener('mouseenter', () => {
-            pwSpan.textContent = entry.pw;
-        });
-        pwCell.addEventListener('mouseleave', () => {
-            pwSpan.textContent = '*'.repeat(entry.pw.length);
-        });
-        pwSpan.addEventListener('click', () => {
+        pwSpan.style.cursor = 'pointer';
+        pwSpan.addEventListener('mouseenter', () => pwSpan.textContent = entry.pw);
+        pwSpan.addEventListener('mouseleave', () => pwSpan.textContent = '*'.repeat(entry.pw.length));
+        pwSpan.addEventListener('click', e => {
+            e.stopPropagation();
             navigator.clipboard.writeText(entry.pw).then(() => {
-                const copied = document.createElement('span');
-                copied.textContent = ' ✅';
-                copied.style.color = 'green';
-                copied.style.marginLeft = '5px';
-                pwCell.appendChild(copied);
-                setTimeout(() => copied.remove(), 2000);
-                setTimeout(() => navigator.clipboard.writeText(''), 30000);
+                showNotification('복사되었습니다.');
             });
         });
+        pwCell.appendChild(pwSpan);
 
         // Tag
         const tagCell = document.createElement('td');
         tagCell.textContent = entry.tag;
 
-        // 즐겨찾기
-        const favoriteCell = document.createElement('td');
-        const star = document.createElement('img');
-        star.src = entry.favorite ? './fill_star.png' : './empty_star.png';
-        star.width = 20;
-        star.height = 20;
+        // Favorite
+        const favCell = document.createElement('td');
+        const star    = document.createElement('img');
+        star.src      = entry.favorite ? './fill.png' : './empty.png';
+        star.width    = 20;
+        star.height   = 20;
         star.style.cursor = 'pointer';
-        star.addEventListener('click', () => {
+        star.addEventListener('click', e => {
+            e.stopPropagation();
             const key = generateFavoriteKey(entry);
             entry.favorite = !entry.favorite;
             favorites[key] = entry.favorite;
@@ -169,25 +169,14 @@ function renderTable(filtered = entries) {
             saveFavorites();
             renderTable();
         });
-        favoriteCell.appendChild(star);
+        favCell.appendChild(star);
 
-        // 수정 / 삭제
+        // 삭제 버튼
         const actionCell = document.createElement('td');
-        const editBtn = document.createElement('button');
-        editBtn.textContent = '수정';
-        editBtn.onclick = () => {
-            titleInput.value = entry.title;
-            urlInput.value = entry.url;
-            idInput.value = entry.id;
-            pwInput.value = entry.pw;
-            tagInput.value = entry.tag;
-            editIndex = entries.indexOf(entry);
-            popup.style.display = 'block';
-        };
-
-        const deleteBtn = document.createElement('button');
+        const deleteBtn  = document.createElement('button');
         deleteBtn.textContent = '삭제';
-        deleteBtn.onclick = () => {
+        deleteBtn.onclick = e => {
+            e.stopPropagation();
             if (confirm('정말 삭제하시겠습니까?')) {
                 const key = generateFavoriteKey(entry);
                 delete favorites[key];
@@ -197,18 +186,21 @@ function renderTable(filtered = entries) {
                 renderTable();
             }
         };
-
-        actionCell.appendChild(editBtn);
         actionCell.appendChild(deleteBtn);
 
-        row.appendChild(titleCell);
-        row.appendChild(urlCell);
-        row.appendChild(idCell);
-        row.appendChild(pwCell);
-        row.appendChild(tagCell);
-        row.appendChild(favoriteCell);
-        row.appendChild(actionCell);
+        // 행 클릭 시 수정 모달
+        row.addEventListener('click', () => {
+            titleInput.value = entry.title;
+            urlInput.value   = entry.url;
+            idInput.value    = entry.id;
+            pwInput.value    = entry.pw;
+            tagInput.value   = entry.tag;
+            editIndex = entries.indexOf(entry);
+            popup.style.display = 'block';
+        });
 
+        [titleCell, urlCell, idCell, pwCell, tagCell, favCell, actionCell]
+            .forEach(cell => row.appendChild(cell));
         entryTable.appendChild(row);
     });
 }
@@ -216,58 +208,45 @@ function renderTable(filtered = entries) {
 // favicon 가져오기
 async function getFavicon(url) {
     try {
-        if (!url.startsWith('http')) {
-            url = 'https://' + url;
-        }
-        const hostname = new URL(url).hostname;
+        if (!url.startsWith('http')) url = 'https://' + url;
+        const hostname   = new URL(url).hostname;
         const faviconUrl = `https://www.google.com/s2/favicons?sz=32&domain=${hostname}`;
-        const res = await fetch(faviconUrl);
-        if (!res.ok || !res.headers.get("content-type")?.includes("image")) {
-            throw new Error();
-        }
+        const res        = await fetch(faviconUrl);
+        if (!res.ok || !res.headers.get('content-type')?.includes('image')) throw new Error();
         return faviconUrl;
     } catch {
         return './a.png';
     }
 }
 
-// 검색
+// 검색 처리
 searchInput.addEventListener('input', () => {
-    const keyword = searchInput.value.toLowerCase();
-    const filtered = entries.filter(entry =>
-        entry.title.toLowerCase().includes(keyword) ||
-        entry.url.toLowerCase().includes(keyword) ||
-        entry.id.toLowerCase().includes(keyword) ||
-        entry.tag.toLowerCase().includes(keyword)
+    const kw      = searchInput.value.toLowerCase();
+    const filtered= entries.filter(e =>
+        e.title.toLowerCase().includes(kw) ||
+        e.url.toLowerCase().includes(kw)   ||
+        e.id.toLowerCase().includes(kw)    ||
+        e.tag.toLowerCase().includes(kw)
     );
     renderTable(filtered);
 });
 
 // 초기 데이터 로딩
-window.electronAPI.loadPasswords();
-window.electronAPI.onPasswordsLoaded(async (loadedEntries) => {
-    for (const entry of loadedEntries) {
-        if (!entry.icon) {
-            entry.icon = await getFavicon(entry.url);
-        }
-    }
-    entries = loadedEntries;
-
-    const loadedFavorites = await window.electronAPI.loadFavorites();
-    favorites = loadedFavorites;
+window.electronAPI.onPasswordsLoaded(async loaded => {
+    for (const e of loaded) if (!e.icon) e.icon = await getFavicon(e.url);
+    entries = loaded;
+    favorites = await window.electronAPI.loadFavorites();
     applyFavorites();
     renderTable();
 });
+window.electronAPI.loadPasswords();
 
 // 저장
-function savePasswords(data) {
-    window.electronAPI.savePasswords(data);
-}
-function saveFavorites() {
-    window.electronAPI.saveFavorites(favorites);
-}
+function savePasswords(data) { window.electronAPI.savePasswords(data); }
+function saveFavorites()        { window.electronAPI.saveFavorites(favorites); }
 
+// 언로드 시 저장
 window.addEventListener('unload', () => {
-    savePasswords(entries);
+    if (entries.length > 0) savePasswords(entries);
     saveFavorites();
 });

@@ -35,4 +35,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
     // 최근 파일 목록에서 제거 (start)
     removeFromRecent: (filePath) => ipcRenderer.invoke('remove-from-recent', filePath),
+
+    // 즐겨찾기 저장 / 불러오기
+    saveFavorites: (fav) => ipcRenderer.invoke('save-favorites', fav),
+    loadFavorites: () => ipcRenderer.invoke('load-favorites'),
+
+    loadRecentFiles: () => ipcRenderer.invoke('load-recent-files'),
+    saveRecentFiles: (files) => ipcRenderer.invoke('save-recent-files', files),
+
 });

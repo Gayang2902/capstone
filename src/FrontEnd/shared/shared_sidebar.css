@@ -1,0 +1,41 @@
+/* 사이드바 */
+nav {
+    width: 200px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 0; /* li 스타일처럼 margin-bottom으로 간격 관리 */
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+/* recent-files 스타일을 그대로 적용한 사이드바 버튼 */
+nav button {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 12px;
+    border: none;
+    border-radius: 12px;
+    background: transparent;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+
+/* 호버 시 배경 강조 */
+nav button:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* 선택된(Active) 버튼 */
+nav button.active,
+nav button:active {
+    background: rgba(255, 255, 255, 0.4);
+    transform: scale(0.98);
+}
+
+/* 마지막 버튼 아래 여백 제거 */
+nav button:last-child {
+    margin-bottom: 0;
+}
