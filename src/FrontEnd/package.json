@@ -1,0 +1,23 @@
+{
+  "name": "cju",
+  "version": "1.0.0",
+  "description": "Electron Password Manager",
+  "main": "main.js",
+  "scripts": {
+    "build:css":      "tailwindcss -i ./tailwind.css -o ./pages/styles/styles.css --watch",
+    "build:css:prod": "tailwindcss -i ./tailwind.css -o ./pages/styles/styles.css",
+    "start":          "electron .",
+    "dev":            "concurrently \"npm run build:css\" \"npm run start\"",
+    "build":          "npm run build:css:prod && electron-builder"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.14",
+    "concurrently": "^8.2.0",
+    "postcss":      "^8.4.24",
+    "tailwindcss":  "^3.4.9"
+  },
+  "dependencies": {
+    "electron": "^26.1.0",
+    "electron-store": "^8.0.0"
+  }
+}

@@ -1,79 +1,32 @@
 <!DOCTYPE html>
-<html lang="kr">
+<html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <title>Home</title>
-    <link rel="stylesheet" href="./home_style.css">
+    <meta charset="UTF-8"/>
+    <title>Home - Password Manager</title>
+    <link rel="stylesheet" href="../styles/styles.css"/>
+    <script defer src="./home_renderer.js"></script>
 </head>
-<body>
-<nav>
-    <button id="nav-home" onclick="goTo('home')">🏠 Home</button>
-    <button id="nav-statistic" onclick="goTo('statistic')">📊 Statistics</button>
-    <button id="nav-group" onclick="goTo('group')">👥 Group</button>
-    <button id="nav-setting" onclick="goTo('setting')">⚙️ Setting</button>
-    <button id="nav-logout" onclick="goTo('start')">🔒 Logout</button>
-</nav>
-<main>
-    <!-- 상단바: 컨테이너 바깥쪽 맨 위 -->
-    <div class="topbar">
-        <div class="topbar-left">
-            <button id="sidebarToggle">☰</button>
-            <button id="globalAddBtn">＋</button>
-        </div>
-        <div class="topbar-right">
-            <button id="screenshot-btn">🔒 스크린샷 방지</button>
-            <button id="helpBtn">❓</button>
-            <select id="langSelect">
-                <option value="kr">Korean</option>
-                <option value="en">English</option>
-            </select>
-            <label for="searchInput">🔎</label>
-            <input type="text" id="searchInput" placeholder="검색...">
-            <button id="themeToggle">🌙/☀️</button>
-        </div>
+<body class="bg-gray-100 h-screen p-4">
+<div class="max-w-4xl mx-auto space-y-4">
+    <h1 class="text-2xl font-bold">전체 비밀번호</h1>
+    <div class="flex justify-between items-center">
+        <button id="btn-add-entry"
+                class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">추가</button>
+        <input type="text" id="input-search" placeholder="검색어 입력"
+               class="px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"/>
     </div>
-    <section class="password-section">
-        <!-- 필터 헤더 -->
-        <div class="password-section-header">
-            <button id="addEntryBtn">＋</button>
-            <select id="filterSelect">
-                <option value="date">추가순</option>
-                <option value="alpha">가나다순</option>
-            </select>
-        </div>
-        <!-- 비밀번호 목록 -->
-        <div class="password-container">
-            <table id="entryTable">
-                <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>URL</th>
-                    <th>ID</th>
-                    <th>PW</th>
-                    <th>Tag</th>
-                    <th>Action</th>
-                </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-    </section>
-    <!-- 팝업 모달 -->
-    <div id="popup">
-        <label>Title: <input type="text" id="titleInput"></label><br>
-        <label>URL:   <input type="text" id="urlInput"></label><br>
-        <label>ID:    <input type="text" id="idInput"></label><br>
-        <label>PW:    <input type="password" id="pwInput"></label><br>
-        <label>Tag:   <input type="text" id="tagInput"></label><br>
-        <button id="saveBtn">확인</button>
-        <button id="cancelBtn">취소</button>
-    </div>
-
-    <!-- 알림 박스 -->
-    <div id="notification" class="notification"></div>
-
-</main>
-<script src="./home_renderer.js"></script>
-<script type="module" src="../../shared/shared_renderer.js"></script>
+    <table class="min-w-full bg-white shadow rounded overflow-hidden">
+        <thead>
+        <tr class="bg-gray-200 text-left">
+            <th class="px-4 py-2">Label</th>
+            <th class="px-4 py-2">Type</th>
+            <th class="px-4 py-2">Details</th>
+            <th class="px-4 py-2">Actions</th>
+        </tr>
+        </thead>
+        <tbody id="pw-list" class="divide-y bg-white"></tbody>
+    </table>
+    <div id="empty-msg" class="text-center text-gray-500">로딩 중...</div>
+</div>
 </body>
 </html>

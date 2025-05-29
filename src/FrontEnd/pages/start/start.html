@@ -1,42 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Start Page</title>
-    <link rel="stylesheet" href="./start_style.css" />
+    <title>Start - Password Manager</title>
+    <link rel="stylesheet" href="../styles/styles.css" />
+    <script defer src="./start_renderer.js"></script>
 </head>
-<body>
-<div class="card">
-    <h3>Welcome to Password Manager</h3>
-    <button id="open-password-file">Open Password File</button>
-    <button id="create-password-file">New Password File</button>
-    <h3>Recently Opened Files</h3>
-    <ul id="recent-files"></ul>
-    <button id="connect-btn" disabled>Connect</button>
-</div>
+<body class="bg-gray-100 h-screen flex items-center justify-center p-4">
+<div class="w-full max-w-md bg-white rounded-xl shadow-lg p-6 space-y-6">
+    <h1 class="text-2xl font-bold text-center">비밀번호 파일 관리</h1>
 
-<!-- Create Master Password Modal -->
-<div id="createMasterModal" class="modal">
-    <div class="modal-content">
-        <h3>Create Master Password</h3>
-        <input type="password" id="create-master-input" placeholder="New master password" />
-        <button id="create-master-save">Create</button>
-        <button id="create-master-cancel">Cancel</button>
+    <div class="flex justify-between space-x-2">
+        <button id="btn-open-file" class="flex-1 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+            파일 열기
+        </button>
+        <button id="btn-create-file" class="flex-1 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+            새 파일 생성
+        </button>
     </div>
-</div>
 
-<!-- Enter Master Password Modal -->
-<div id="enterMasterModal" class="modal">
-    <div class="modal-content">
-        <h3>Enter Master Password</h3>
-        <input type="password" id="enter-master-input" placeholder="Master password" />
-        <button id="enter-master-submit">Submit</button>
-        <button id="enter-master-cancel">Cancel</button>
+    <!-- 파일 리스트: 선택된 항목 옆에만 “삭제” 버튼이 나타납니다 -->
+    <ul id="file-list" class="border rounded p-2 h-32 overflow-auto bg-gray-50 space-y-1">
+        <!-- 예시: 선택 안 됐을 때 -->
+        <li class="text-gray-500 italic">선택된 파일이 없습니다.</li>
+
+        <!-- 예시: 선택된 파일이 있을 때 li 구조 -->
+        <!--
+        <li class="flex items-center justify-between p-2 rounded cursor-pointer hover:bg-blue-100">
+          <span class="">/path/to/your.csv</span>
+          <button class="ml-2 px-2 py-1 bg-red-500 text-white rounded">삭제</button>
+        </li>
+        -->
+    </ul>
+
+    <div class="flex space-x-2">
+        <input id="input-master-key"
+               type="password"
+               placeholder="마스터 비밀번호 입력"
+               class="flex-1 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"/>
+        <button id="btn-authenticate"
+                class="px-4 py-2 bg-indigo-500 text-white rounded disabled:opacity-50"
+                disabled>
+            인증하기
+        </button>
     </div>
-</div>
 
-<script src="./start_renderer.js"></script>
+    <div id="status-msg" class="text-red-500 text-sm h-5"></div>
+</div>
 </body>
 </html>
