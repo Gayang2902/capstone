@@ -1,0 +1,157 @@
+<!-- ─── 문서 타입 선언 및 루트 엘리먼트 시작 ─── -->
+<!DOCTYPE html>
+<html lang="ko">
+<!-- ─── 문서 타입 선언 및 루트 엘리먼트 끝 ─── -->
+
+<!-- ─── HEAD: 메타데이터 & 외부 리소스 로드 시작 ─── -->
+<head>
+  <!-- 문자 인코딩 설정: UTF-8 -->
+  <meta charset="UTF-8" />
+  <!-- 반응형 웹뷰포트 설정 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <!-- 브라우저 탭에 표시될 제목 -->
+  <title>Setting</title>
+
+  <!-- Tailwind CSS CDN: 유틸리티 클래스 사용 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome CDN: 아이콘 사용 -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+</head>
+<!-- ─── HEAD 끝 ─── -->
+
+<!-- ─── BODY: 페이지 본문 시작 ─── -->
+<body class="bg-gray-100        <!-- 배경색: 연한 회색 -->
+             text-gray-800      <!-- 텍스트 색상: 짙은 회색 -->
+             font-sans         <!-- 기본 폰트: 산세리프 -->
+             p-8               <!-- 전체 패딩: 2rem -->
+    ">
+
+  <!-- ─── 컨테이너: 최대 너비 3xl, 중앙 정렬, 요소 간 수직 간격 설정 ─── -->
+  <div class="max-w-3xl      <!-- 최대 가로폭: 48rem -->
+              mx-auto       <!-- 수평 중앙 정렬 -->
+              space-y-8     <!-- 자식 요소들 사이 수직 간격: 2rem -->
+      ">
+    
+    <!-- ─── 데이터베이스 설정 카드 시작 ─── -->
+    <div class="relative            <!-- 내부 절대 위치 요소를 감싸는 부모 -->
+                bg-white/60        <!-- 반투명 흰색 배경(60% 불투명도) -->
+                backdrop-blur-md   <!-- 배경 블러 효과 -->
+                rounded-2xl        <!-- 모서리 둥글게 -->
+                p-6                <!-- 내부 패딩: 1.5rem -->
+                shadow-lg          <!-- 그림자 효과 -->
+        ">
+      <!-- 카드 제목 -->
+      <h2 class="text-lg            <!-- 폰트 크기: large -->
+                 font-semibold     <!-- 폰트 굵기: semibold -->
+                 mb-4              <!-- 아래 여백: 1rem -->
+        ">
+        데이터베이스 설정
+      </h2>
+
+      <!-- 상단 우측 액션 버튼들 절대 위치 컨테이너 -->
+      <div class="absolute         <!-- 절대 위치 지정 -->
+                  top-6            <!-- 부모 상단으로부터 1.5rem 아래 -->
+                  right-6          <!-- 부모 우측으로부터 1.5rem 왼쪽 -->
+                  flex             <!-- 플렉스 컨테이너 -->
+                  space-x-4        <!-- 아이템 간 가로 간격: 1rem -->
+                  text-gray-600    <!-- 아이콘 기본 색상: 회색 -->
+        ">
+        <!-- 추가 버튼 -->
+        <button>
+          <i class="fa-solid fa-plus hover:text-gray-800"></i>
+        </button>
+        <!-- 폴더 열기 버튼 -->
+        <button>
+          <i class="fa-solid fa-folder-open hover:text-gray-800"></i>
+        </button>
+        <!-- 저장(디스크) 버튼 -->
+        <button>
+          <i class="fa-solid fa-floppy-disk hover:text-gray-800"></i>
+        </button>
+      </div>
+
+      <!-- 카드 내용: 입력 필드 및 버튼 그룹 -->
+      <div class="space-y-4"> <!-- 자식 요소들 사이 수직 간격: 1rem -->
+        <!-- 비밀번호 저장 DB 경로 입력 필드 -->
+        <div class="flex items-center space-x-4">
+          <!-- 레이블: 고정 너비 -->
+          <label class="w-44 font-medium">비밀번호 저장 DB:</label>
+          <!-- 입력 박스: 확장, 반투명 배경, 테두리, 패딩 -->
+          <input
+            type="text"
+            class="flex-1              <!-- 남은 공간 모두 차지 -->
+                   bg-white/80         <!-- 반투명 흰색 배경 -->
+                   border border-gray-300 <!-- 회색 테두리 -->
+                   rounded-lg          <!-- 둥근 모서리 -->
+                   p-2                 <!-- 패딩: 0.5rem -->
+                   outline-none        <!-- 포커스 시 아웃라인 제거 -->
+            value="/Users/cjw/password.kdbx"
+          />
+        </div>
+
+        <!-- 마스터 비밀번호 변경 버튼 -->
+        <div class="flex items-center space-x-4">
+          <!-- 레이블: 고정 너비 -->
+          <label class="w-44 font-medium">마스터 비밀번호 변경:</label>
+          <!-- 변경 버튼: 색상, 그림자, 호버 효과 -->
+          <button class="px-4 py-2         <!-- 패딩: 좌우1rem, 상하0.5rem -->
+                         bg-blue-600      <!-- 배경색: 파란색 -->
+                         text-white       <!-- 텍스트: 흰색 -->
+                         rounded-lg       <!-- 모서리 둥글게 -->
+                         shadow-sm        <!-- 가벼운 그림자 -->
+                         hover:shadow     <!-- 호버 시 그림자 강화 -->
+              ">
+            변경
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- ─── 데이터베이스 설정 카드 끝 ─── -->
+
+
+    <!-- ─── 앱 잠금 카드 시작 ─── -->
+    <div class="bg-white/60          <!-- 반투명 흰색 배경 -->
+                backdrop-blur-md     <!-- 배경 블러 효과 -->
+                rounded-2xl          <!-- 모서리 둥글게 -->
+                p-6                  <!-- 내부 패딩 -->
+                shadow-lg            <!-- 그림자 효과 -->
+        ">
+      <!-- 카드 제목 -->
+      <h2 class="text-lg font-semibold mb-4">
+        앱 잠금
+      </h2>
+
+      <!-- 자동 잠금 옵션 셀렉트 박스 -->
+      <div class="flex items-center space-x-4 mb-2">
+        <!-- 레이블: 고정 너비 -->
+        <label class="w-44 font-medium">자동 잠금:</label>
+        <!-- 드롭다운: 반투명 배경, 테두리, 패딩 -->
+        <select class="bg-white/80 border border-gray-300 rounded-lg p-2 outline-none">
+          <option>1분 후</option>
+          <option>5분 후</option>
+          <option>10분 후</option>
+          <option>30분 후</option>
+        </select>
+      </div>
+      <!-- 설명 텍스트 -->
+      <p class="text-sm text-gray-500">
+        설정된 시간 이후 화면과 비밀번호 입력이 잠금됩니다.
+      </p>
+    </div>
+    <!-- ─── 앱 잠금 카드 끝 ─── -->
+
+  </div>
+  <!-- ─── 컨테이너 끝 ─── -->
+
+  <!-- ─── SCRIPT: 토글 및 데이터 로드 로직 연결 포인트 ─── -->
+  <script>
+    // 토글 및 데이터 로드 로직은 기존 코드 그대로 연결하세요.
+  </script>
+  <!-- ─── SCRIPT 끝 ─── -->
+</body>
+<!-- ─── BODY 끝 ─── -->
+</html>
+<!-- ─── 문서 종료 ─── -->
