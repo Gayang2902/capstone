@@ -1,0 +1,171 @@
+<!-- ──────────────────────────────────────────────────────────────────────────────── -->
+<!-- src/statistics/index.html                                                    -->
+<!-- 역할: 요약 카드, 차트, 액션 리스트를 표시하는 통계 페이지 마크업 및 초기 차트 스크립트 -->
+<!-- ──────────────────────────────────────────────────────────────────────────────── -->
+
+<!DOCTYPE html>
+<html lang="ko">
+<!-- ─── 문서 타입 선언 및 루트 엘리먼트 시작 ─── -->
+
+<head>
+  <!-- 문자 인코딩 설정: UTF-8 -->
+  <meta charset="UTF-8" />
+  <!-- 반응형 웹뷰포트 설정 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <!-- 브라우저 탭 제목 -->
+  <title>Statistics</title>
+
+  <!-- Tailwind CSS CDN: 유틸리티 클래스 사용 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome CDN: 아이콘 사용 (필요 시) -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+</head>
+<!-- ─── HEAD 끝 ─── -->
+
+<body class="bg-gray-100       <!-- 배경색: 연한 회색 -->
+             text-gray-800     <!-- 텍스트 색상: 짙은 회색 -->
+             font-sans        <!-- 기본 폰트: 산세리프 -->
+             p-8              <!-- 전체 패딩: 2rem -->
+    ">
+  <!-- ─── BODY 시작 ─── -->
+
+  <!-- ─── 1) 요약 카드 섹션 시작 ─── -->
+  <div class="grid              <!-- CSS Grid 컨테이너 -->
+              grid-cols-1       <!-- 기본 1열 -->
+              sm:grid-cols-2    <!-- 작은 화면 이상 2열 -->
+              md:grid-cols-4    <!-- 중간 화면 이상 4열 -->
+              gap-6             <!-- 카드 간격: 1.5rem -->
+              mb-8              <!-- 아래 여백: 2rem -->
+      ">
+    <!-- ─── 카드 아이템 반복: 총 비밀번호 ─── -->
+    <div class="bg-white/60         <!-- 반투명 흰색 배경 -->
+                backdrop-blur-md    <!-- 배경 블러 효과 -->
+                rounded-2xl         <!-- 모서리 둥글게 -->
+                p-6                 <!-- 내부 패딩: 1.5rem -->
+                shadow-lg           <!-- 그림자 효과 -->
+        ">
+      <!-- 카드 제목 -->
+      <p class="text-sm text-gray-500">총 비밀번호</p>
+      <!-- 카드 값 -->
+      <p class="text-2xl font-semibold text-gray-900">0개</p>
+    </div>
+    <!-- ─── 카드 아이템 끝 ─── -->
+
+    <!-- ─── 카드 아이템: 취약 비밀번호 ─── -->
+    <div class="bg-white/60 backdrop-blur-md rounded-2xl p-6 shadow-lg">
+      <p class="text-sm text-red-500">취약 비밀번호</p>
+      <p class="text-2xl font-semibold text-red-600">0개</p>
+    </div>
+    <!-- ─── 카드 아이템 끝 ─── -->
+
+    <!-- ─── 카드 아이템: 보안된 비밀번호 ─── -->
+    <div class="bg-white/60 backdrop-blur-md rounded-2xl p-6 shadow-lg">
+      <p class="text-sm text-green-500">보안된 비밀번호</p>
+      <p class="text-2xl font-semibold text-green-600">0개</p>
+    </div>
+    <!-- ─── 카드 아이템 끝 ─── -->
+
+    <!-- ─── 카드 아이템: 중복된 암호 ─── -->
+    <div class="bg-white/60 backdrop-blur-md rounded-2xl p-6 shadow-lg">
+      <p class="text-sm text-yellow-500">중복된 암호</p>
+      <p class="text-2xl font-semibold text-yellow-600">0개</p>
+    </div>
+    <!-- ─── 카드 아이템 끝 ─── -->
+  </div>
+  <!-- ─── 1) 요약 카드 섹션 끝 ─── -->
+
+
+  <!-- ─── 2) 차트 카드 섹션 시작 ─── -->
+  <div class="grid                  <!-- CSS Grid 컨테이너 -->
+              grid-cols-1           <!-- 기본 1열 -->
+              md:grid-cols-2        <!-- 중간 화면 이상 2열 -->
+              gap-6                 <!-- 카드 간격 -->
+              mb-8                  <!-- 아래 여백 -->
+      ">
+    <!-- ─── 계정 수 차트 카드 ─── -->
+    <div class="bg-white/60 backdrop-blur-md rounded-2xl p-6 shadow-lg">
+      <!-- Bar 또는 Line 차트를 그릴 캔버스 -->
+      <canvas id="accountChart" class="w-full h-64"></canvas>
+    </div>
+    <!-- ─── 계정 수 차트 카드 끝 ─── -->
+
+    <!-- ─── 비밀번호 강도 차트 카드 ─── -->
+    <div class="bg-white/60 backdrop-blur-md rounded-2xl p-6 shadow-lg">
+      <!-- Pie 또는 Doughnut 차트를 그릴 캔버스 -->
+      <canvas id="strengthChart" class="w-full h-64"></canvas>
+    </div>
+    <!-- ─── 비밀번호 강도 차트 카드 끝 ─── -->
+  </div>
+  <!-- ─── 2) 차트 카드 섹션 끝 ─── -->
+
+
+  <!-- ─── 3) 액션 리스트 섹션 시작 ─── -->
+  <div class="space-y-4">        <!-- 아이템 간 수직 간격: 1rem -->
+    <!-- ─── 액션 아이템: 재생성된 비밀번호 조회 ─── -->
+    <div class="bg-white/60 backdrop-blur-md rounded-2xl p-4 shadow-lg flex justify-between items-center">
+      <!-- 설명 텍스트 -->
+      <span class="text-gray-900">재생성된 비밀번호</span>
+      <!-- 동작 버튼 -->
+      <button class="text-blue-600 hover:underline">조회하기</button>
+    </div>
+    <!-- ─── 액션 아이템 끝 ─── -->
+
+    <!-- ─── 액션 아이템: 유출된 비밀번호 관리 ─── -->
+    <div class="bg-white/60 backdrop-blur-md rounded-2xl p-4 shadow-lg flex justify-between items-center">
+      <span class="text-gray-900">유출된 비밀번호</span>
+      <button class="text-red-600 hover:underline">관리하기</button>
+    </div>
+    <!-- ─── 액션 아이템 끝 ─── -->
+
+    <!-- ─── 액션 아이템: 만료 임박 비밀번호 관리 ─── -->
+    <div class="bg-white/60 backdrop-blur-md rounded-2xl p-4 shadow-lg flex justify-between items-center">
+      <span class="text-gray-900">만료 임박 비밀번호</span>
+      <button class="text-yellow-600 hover:underline">관리하기</button>
+    </div>
+    <!-- ─── 액션 아이템 끝 ─── -->
+  </div>
+  <!-- ─── 3) 액션 리스트 섹션 끝 ─── -->
+
+
+  <!-- ─── 차트 스크립트 로드 시작 ─── -->
+  <!-- Chart.js CDN: 차트 그리기 라이브러리 -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- 초기 차트 인스턴스 생성 스크립트 -->
+  <script>
+    // ① accountChart 초기화 (라인 차트)
+    const ctx1 = document.getElementById('accountChart').getContext('2d');
+    new Chart(ctx1, {
+      type: 'line',                   // 선 그래프
+      data: {
+        labels: [],                   // 초기 레이블 없음
+        datasets: [{ label: '계정 수', data: [], fill: false }]
+      },
+      options: {
+        responsive: true,             // 반응형
+        maintainAspectRatio: false    // 캔버스 비율 유지 안 함
+      }
+    });
+
+    // ② strengthChart 초기화 (파이 차트)
+    const ctx2 = document.getElementById('strengthChart').getContext('2d');
+    new Chart(ctx2, {
+      type: 'pie',                    // 파이 차트
+      data: {
+        labels: ['강력','보통','취약'], // 섹션 레이블
+        datasets: [{ data: [0,0,0] }]  // 초기 데이터
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+  </script>
+  <!-- ─── 차트 스크립트 로드 끝 ─── -->
+
+</body>
+<!-- ─── BODY 끝 ─── -->
+</html>
+<!-- ─── 문서 종료 ─── -->
