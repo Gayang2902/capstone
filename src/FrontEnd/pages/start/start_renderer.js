@@ -1,7 +1,7 @@
 // File: pages/start/start_renderer.js
 window.addEventListener('DOMContentLoaded', () => {
-    const btnCreate = document.getElementById('btn-create-file');
     const btnOpen   = document.getElementById('btn-open-file');
+    const btnCreate = document.getElementById('btn-create-file');
     const btnAuth   = document.getElementById('btn-authenticate');
     const inputKey  = document.getElementById('input-master-key');
     const fileList  = document.getElementById('file-list');
@@ -14,30 +14,30 @@ window.addEventListener('DOMContentLoaded', () => {
         fileList.innerHTML = '';
         if (filePaths.length === 0) {
             const li = document.createElement('li');
-            li.className = 'text-gray-500';
+            li.className = 'text-gray-500 italic';
             li.textContent = '선택된 파일이 없습니다.';
             fileList.append(li);
             currentFileIndex = -1;
             btnAuth.disabled = true;
             return;
         }
-
         filePaths.forEach((fp, idx) => {
             const li = document.createElement('li');
-            li.className = 'flex items-center justify-between p-1 cursor-pointer hover:bg-blue-100 rounded';
+            li.className = 'flex items-center justify-between p-2 rounded cursor-pointer hover:bg-blue-100';
 
             const span = document.createElement('span');
             span.textContent = fp;
+            span.className = idx === currentFileIndex ? 'bg-blue-200 px-2 py-1 rounded' : '';
             li.append(span);
 
             const btnDel = document.createElement('button');
             btnDel.textContent = '삭제';
             btnDel.className = 'ml-2 px-2 py-1 bg-red-500 text-white rounded';
-            btnDel.style.display = (idx === currentFileIndex) ? 'inline-block' : 'none';
-            btnDel.addEventListener('click', (e) => {
+            btnDel.style.display = idx === currentFileIndex ? 'inline-block' : 'none';
+            btnDel.addEventListener('click', e => {
                 e.stopPropagation();
                 filePaths.splice(idx, 1);
-                if (currentFileIndex === idx) currentFileIndex = -1;
+                currentFileIndex = -1;
                 renderFileList();
             });
             li.append(btnDel);
@@ -53,29 +53,29 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 새 파일 생성
-    btnCreate.addEventListener('click', async () => {
-        const res = await window.electronAPI.invokeOper('createFile', {});
+    // CSV 파일 열기
+    btnOpen.addEventListener('click', async () => {
+        const res = await window.electronAPI.openFile();
         if (res.status) {
             filePaths.push(res.file_path);
             currentFileIndex = filePaths.length - 1;
             renderFileList();
-            statusMsg.innerText = '';
+            statusMsg.textContent = '';
         } else {
-            statusMsg.innerText = res.error_message;
+            statusMsg.textContent = res.error_message;
         }
     });
 
-    // 파일 열기
-    btnOpen.addEventListener('click', async () => {
-        const res = await window.electronAPI.invokeOper('openFile', {});
+    // 새 CSV 파일 생성
+    btnCreate.addEventListener('click', async () => {
+        const res = await window.electronAPI.createFile();
         if (res.status) {
-            filePaths.push(res.file_path);
-            currentFileIndex = filePaths.length - 1;
+            filePaths = [res.file_path];
+            currentFileIndex = 0;
             renderFileList();
-            statusMsg.innerText = '';
+            statusMsg.textContent = '';
         } else {
-            statusMsg.innerText = res.error_message;
+            statusMsg.textContent = res.error_message;
         }
     });
 
@@ -85,18 +85,15 @@ window.addEventListener('DOMContentLoaded', () => {
         statusMsg.textContent = '';
     });
 
-    // 인증하기
+    // 마스터 키 인증 요청
     btnAuth.addEventListener('click', async () => {
-        const key = inputKey.value.trim();
-        const chosenPath = filePaths[currentFileIndex];
-        const res = await window.electronAPI.invokeOper(
-            'postMasterKey',
-            { master_key: key, file_path: chosenPath }
-        );
+        const key  = inputKey.value.trim();
+        const path = filePaths[currentFileIndex];
+        const res  = await window.electronAPI.postMasterKey(key, path);
         if (res.status) {
             window.electronAPI.navigate('home');
         } else {
-            statusMsg.innerText = '인증 실패: ' + res.error_message;
+            statusMsg.textContent = '인증 실패: ' + res.error_message;
         }
     });
 

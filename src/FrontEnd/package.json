@@ -1,5 +1,5 @@
 {
-  "name": "cju",
+  "name": "dph-passwordmanager",
   "version": "1.0.0",
   "description": "Electron Password Manager",
   "main": "main.js",

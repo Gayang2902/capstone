@@ -12,6 +12,19 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // 사용자 활동 감지
     userActive:       ()   => ipcRenderer.send('user-active'),
 
-    // 백엔드 API 호출: oper 이름과 data 객체를 넘겨줌
-    invokeOper:       (op, data) => ipcRenderer.invoke('invoke-oper', { oper: op, data })
+    // 전체 비밀번호 조회
+    getAllPwds:       () => ipcRenderer.invoke('getAllPwds'),
+    // CSV 파일 열기 다이얼로그
+    openFile:         () => ipcRenderer.invoke('openFile'),
+    // 새 CSV 파일 생성 다이얼로그
+    createFile:       () => ipcRenderer.invoke('createFile'),
+    // 마스터 키 인증 요청
+    postMasterKey:    (master_key, file_path) =>
+                       ipcRenderer.invoke('postMasterKey', { master_key, file_path }),
+    // 비밀번호 항목 생성
+    createEntry:      data => ipcRenderer.invoke('createEntry', data),
+    // 비밀번호 항목 수정
+    updateEntry:      data => ipcRenderer.invoke('updateEntry', data),
+    // 비밀번호 항목 삭제
+    deleteEntry:      uid  => ipcRenderer.invoke('deleteEntry', { uid }),
 });
