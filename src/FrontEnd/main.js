@@ -4,8 +4,13 @@ const { spawn } = require('child_process');
 const fs   = require('fs');
 const path = require('path');
 
-// Mock backend mode: true면 모의, false면 실제 C 프로세스 사용
 const MOCK_BACKEND = true;
+let currentPwds = [];
+let currentFilePath = '';   // <— 새로 추가: 현재 선택된 파일 경로를 저장할 변수
+
+
+// Mock backend mode: true면 모의, false면 실제 C 프로세스 사용
+// const MOCK_BACKEND = true;
 
 let mainWindow;
 let backendProcess;
@@ -109,82 +114,132 @@ ipcMain.on('allow-screenshot',    () => mainWindow.setContentProtection(false));
 // 사용자 활동
 ipcMain.on('user-active', () => { /* 필요 시 처리 */ });
 
-// --- IPC 채널 분리 ---
 ipcMain.handle('getAllPwds', async () => {
-  try {
-    return MOCK_BACKEND
-      ? { status: true, data: [] }
-      : await sendToBackend('getAllPwds', {});
-  } catch (err) {
-    return { status: false, error_message: err.message };
-  }
+    if (MOCK_BACKEND) {
+        return { status: true, data: currentPwds };
+    } else {
+        try {
+            return await sendToBackend('getAllPwds', {});
+        } catch (err) {
+            return { status: false, error_message: err.message };
+        }
+    }
 });
 
 ipcMain.handle('openFile', async () => {
-  try {
-    const { canceled, filePaths } = await dialog.showOpenDialog(mainWindow, {
-      title: 'CSV 파일 선택',
-      properties: ['openFile'],
-      filters: [{ name: 'CSV', extensions: ['csv'] }],
-    });
-    if (canceled) return { status: false, error_message: '파일 선택을 취소했습니다.' };
-    return { status: true, file_path: filePaths[0] };
-  } catch (err) {
-    return { status: false, error_message: err.message };
-  }
+    try {
+        const { canceled, filePaths } = await dialog.showOpenDialog(mainWindow, {
+            title: 'CSV 파일 선택',
+            properties: ['openFile'],
+            filters: [{ name: 'CSV', extensions: ['csv'] }],
+        });
+        if (canceled) return { status: false, error_message: '파일 선택을 취소했습니다.' };
+        return { status: true, file_path: filePaths[0] };
+    } catch (err) {
+        return { status: false, error_message: err.message };
+    }
 });
 
 ipcMain.handle('createFile', async () => {
-  try {
-    const { canceled, filePath } = await dialog.showSaveDialog(mainWindow, {
-      title: '새 CSV 파일 생성',
-      defaultPath: 'passwords.csv',
-      filters: [{ name: 'CSV', extensions: ['csv'] }],
-    });
-    if (canceled) return { status: false, error_message: '파일 생성을 취소했습니다.' };
-    fs.writeFileSync(filePath, '');
-    return { status: true, file_path: filePath };
-  } catch (err) {
-    return { status: false, error_message: err.message };
-  }
+    try {
+        const { canceled, filePath } = await dialog.showSaveDialog(mainWindow, {
+            title: '새 CSV 파일 생성',
+            defaultPath: 'passwords.csv',
+            filters: [{ name: 'CSV', extensions: ['csv'] }],
+        });
+        if (canceled) return { status: false, error_message: '파일 생성을 취소했습니다.' };
+        fs.writeFileSync(filePath, '');
+        return { status: true, file_path: filePath };
+    } catch (err) {
+        return { status: false, error_message: err.message };
+    }
 });
 
 ipcMain.handle('postMasterKey', async (_evt, { master_key, file_path }) => {
-  try {
-    return MOCK_BACKEND
-      ? { status: true }
-      : await sendToBackend('postMasterKey', { master_key, file_path });
-  } catch (err) {
-    return { status: false, error_message: err.message };
-  }
+    try {
+        return MOCK_BACKEND
+            ? { status: true }
+            : await sendToBackend('postMasterKey', { master_key, file_path });
+    } catch (err) {
+        return { status: false, error_message: err.message };
+    }
 });
 
-ipcMain.handle('createEntry', async (_evt, data) => {
-  try {
-    return MOCK_BACKEND
-      ? { status: true, uid: 'mock-' + Date.now() }
-      : await sendToBackend('createEntry', data);
-  } catch (err) {
-    return { status: false, error_message: err.message };
-  }
+ipcMain.on('set-file-path', (_evt, filePath) => {
+    currentFilePath = filePath;   // <— 파일 경로를 전역 변수에 저장
+    if (MOCK_BACKEND) {
+        try {
+            const content = fs.readFileSync(filePath, 'utf8');
+            const lines = content.split('\n').filter(line => line.trim());
+            currentPwds = lines.slice(1).map(line => {
+                const cols = line.split(',');
+                return {
+                    uid:      cols[0].trim(),
+                    label:    cols[1].trim(),
+                    type:     cols[2].trim(),
+                    userId:   cols[3].trim(),
+                    password: cols[4].trim()
+                };
+            });
+        } catch (err) {
+            console.error('CSV parsing error:', err);
+            currentPwds = [];
+        }
+    } else {
+        sendToBackend('setFile', { path: filePath });
+    }
 });
 
-ipcMain.handle('updateEntry', async (_evt, data) => {
-  try {
-    return MOCK_BACKEND
-      ? { status: true }
-      : await sendToBackend('updateEntry', data);
-  } catch (err) {
-    return { status: false, error_message: err.message };
-  }
+ipcMain.handle('getFilePath', async () => {
+    return { status: true, file_path: currentFilePath };
+});
+
+ipcMain.handle('createEntry', async (_evt, entry) => {
+    if (MOCK_BACKEND) {
+        const newUid = Date.now().toString();
+        currentPwds.push({ uid: newUid, ...entry });
+        return { status: true, uid: newUid };
+    } else {
+        try {
+            return await sendToBackend('createEntry', entry);
+        } catch (err) {
+            return { status: false, error_message: err.message };
+        }
+    }
+});
+
+ipcMain.handle('updateEntry', async (_evt, updateData) => {
+    if (MOCK_BACKEND) {
+        const idx = currentPwds.findIndex(e => e.uid === updateData.uid);
+        if (idx !== -1) {
+            currentPwds[idx] = { ...currentPwds[idx], ...updateData };
+            return { status: true };
+        } else {
+            return { status: false, error_message: 'Entry not found' };
+        }
+    } else {
+        try {
+            return await sendToBackend('updateEntry', updateData);
+        } catch (err) {
+            return { status: false, error_message: err.message };
+        }
+    }
 });
 
 ipcMain.handle('deleteEntry', async (_evt, { uid }) => {
-  try {
-    return MOCK_BACKEND
-      ? { status: true }
-      : await sendToBackend('deleteEntry', { uid });
-  } catch (err) {
-    return { status: false, error_message: err.message };
-  }
+    if (MOCK_BACKEND) {
+        const idx = currentPwds.findIndex(e => e.uid === uid);
+        if (idx !== -1) {
+            currentPwds.splice(idx, 1);
+            return { status: true };
+        } else {
+            return { status: false, error_message: 'Entry not found' };
+        }
+    } else {
+        try {
+            return await sendToBackend('deleteEntry', { uid });
+        } catch (err) {
+            return { status: false, error_message: err.message };
+        }
+    }
 });

@@ -1,44 +1,170 @@
 <!DOCTYPE html>
-<html lang="kr">
+<html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <title>Setting</title>
-    <link rel="stylesheet" href="../../shared/shared_sidebar.css">
-    <style>
-        body {
-            display: flex;
-            margin: 0;
-        }
-        nav {
-            width: 200px;
-            background-color: #f4f4f4;
-            height: 100vh;
-            padding: 20px;
-        }
-        main {
-            flex-grow: 1;
-            padding: 20px;
-        }
-        button {
-            display: block;
-            margin-bottom: 10px;
-            width: 100%;
-        }
-    </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Setting - Password Manager</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome CDN -->
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
 </head>
-<body>
-<nav>
-    <button onclick="goTo('home')">🏠 홈</button>
-    <button onclick="goTo('statistic')">📊 통계</button>
-    <button onclick="goTo('group')">👥 그룹</button>
-    <button onclick="goTo('setting')">⚙️ 설정</button>
-    <button onclick="goTo('start')">🔒 로그아웃</button>
-</nav>
-<main>
-    <h1>설정 페이지</h1>
-    <p>이곳은 설정입니다.</p>
-</main>
+
+<body data-page="setting" class="flex h-screen bg-gray-100 text-gray-800 font-sans">
+<!-- ─── 사이드바 시작 ─── -->
+<aside class="w-64 flex-shrink-0 pt-10 px-6 pb-6 bg-white/30 backdrop-blur-xl border-r border-white/40 flex flex-col space-y-6">
+    <!-- 상단 로고 영역 -->
+    <div class="flex items-center mb-6">
+        <i class="fa-solid fa-key text-indigo-700 text-xl mr-2"></i>
+        <span class="text-base font-semibold text-gray-700">Password Manager</span>
+    </div>
+
+    <!-- 네비게이션 버튼 (아이콘 + 텍스트) -->
+    <nav class="space-y-3">
+        <button id="navHome" class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition" onclick="goTo('home')">
+            <i class="fa-solid fa-house text-indigo-600 text-lg mr-3"></i>
+            <span class="text-base">Home</span>
+        </button>
+        <button id="navStats" class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition" onclick="goTo('statistic')">
+            <i class="fa-solid fa-chart-line text-indigo-600 text-lg mr-3"></i>
+            <span class="text-base">Statistics</span>
+        </button>
+        <button id="navGroup" class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition" onclick="goTo('group')">
+            <i class="fa-solid fa-users text-indigo-600 text-lg mr-3"></i>
+            <span class="text-base">Group</span>
+        </button>
+        <button id="navSetting" class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition" onclick="goTo('setting')">
+            <i class="fa-solid fa-cog text-indigo-600 text-lg mr-3"></i>
+            <span class="text-base">Setting</span>
+        </button>
+    </nav>
+</aside>
+<!-- ─── 사이드바 끝 ─── -->
+
+<!-- ─── 메인 영역 시작 ─── -->
+<div class="flex-1 flex flex-col min-h-0">
+    <!-- ─── 헤더 시작 (아이콘 및 검색창 오른쪽 정렬) ─── -->
+    <header class="flex items-center justify-between px-8 py-4 bg-white/30 backdrop-blur-xl shadow-sm z-10 flex-shrink-0">
+        <!-- 상단 왼쪽 + 버튼: 기능 제거, 단순 데코 -->
+        <button
+                class="p-3 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-full shadow-md transition hover:from-indigo-600 hover:to-indigo-800 active:scale-95 focus:outline-none"
+                title="새 비밀번호 추가"
+        >
+            <i class="fa-solid fa-plus text-white text-lg"></i>
+        </button>
+
+        <!-- 오른쪽 아이콘 그룹 -->
+        <div class="flex items-center space-x-4">
+            <button
+                    id="btnScreenshotPrevent"
+                    class="p-3 bg-indigo-50 rounded-full shadow-md transition hover:bg-indigo-100 active:scale-95 focus:outline-none"
+                    title="스크린샷 방지"
+            >
+                <i class="fa-solid fa-shield-halved text-indigo-700 text-lg"></i>
+            </button>
+
+            <button
+                    id="btnHelp"
+                    class="p-3 bg-rose-50 rounded-full shadow-md transition hover:bg-rose-100 active:scale-95 focus:outline-none"
+                    title="도움말"
+            >
+                <i class="fa-solid fa-question text-rose-600 text-lg"></i>
+            </button>
+
+            <button
+                    class="p-3 bg-emerald-50 rounded-full shadow-md transition hover:bg-emerald-100 active:scale-95 focus:outline-none"
+                    title="언어 전환"
+            >
+                <i class="fa-solid fa-earth-asia text-emerald-600 text-lg"></i>
+            </button>
+
+            <div class="relative w-72">
+                <input
+                        type="text"
+                        id="input-search"
+                        placeholder="검색..."
+                        class="w-full pl-12 pr-4 py-3 bg-white/50 backdrop-blur-md border border-indigo-200 rounded-full text-gray-700 placeholder-indigo-400 shadow-sm transition focus:bg-white/70 focus:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                />
+                <div class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-600">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+            </div>
+
+            <button
+                    class="p-3 bg-gray-50 rounded-full shadow-md transition hover:bg-gray-100 active:scale-95 focus:outline-none"
+                    title="다크모드 토글"
+            >
+                <i class="fa-solid fa-moon text-gray-700 text-lg"></i>
+            </button>
+        </div>
+    </header>
+    <!-- ─── 헤더 끝 ─── -->
+
+    <!-- ─── Setting 콘텐츠 영역 시작 ─── -->
+    <div class="flex-1 overflow-auto px-8 py-4">
+        <h1 class="text-2xl font-semibold mb-6">Setting</h1>
+
+        <div class="max-w-3xl mx-auto space-y-8">
+            <!-- 데이터베이스 설정 카드 -->
+            <div class="relative bg-white/60 backdrop-blur-md rounded-2xl p-6 shadow-lg">
+                <h2 class="text-lg font-semibold mb-4">데이터베이스 설정</h2>
+                <div class="absolute top-6 right-6 flex space-x-4 text-gray-600">
+                    <button>
+                        <i class="fa-solid fa-plus hover:text-gray-800"></i>
+                    </button>
+                    <button>
+                        <i class="fa-solid fa-folder-open hover:text-gray-800"></i>
+                    </button>
+                    <button>
+                        <i class="fa-solid fa-floppy-disk hover:text-gray-800"></i>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-4">
+                        <label class="w-44 font-medium">파일 경로</label>
+                        <input
+                                type="text"
+                                id="dbPathInput"
+                                class="flex-1 bg-white/80 border border-gray-300 rounded-lg p-2 outline-none"
+                                readonly
+                        />
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <label class="w-44 font-medium">마스터 비밀번호 변경:</label>
+                        <button class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-sm hover:shadow focus:outline-none">
+                            변경
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 앱 잠금 카드 -->
+            <div class="bg-white/60 backdrop-blur-md rounded-2xl p-6 shadow-lg">
+                <h2 class="text-lg font-semibold mb-4">앱 잠금</h2>
+                <div class="flex items-center space-x-4 mb-2">
+                    <label class="w-44 font-medium">자동 잠금:</label>
+                    <select id="autoLockSelect" class="bg-white/80 border border-gray-300 rounded-lg p-2 outline-none">
+                        <option value="1">1분 후</option>
+                        <option value="5">5분 후</option>
+                        <option value="10">10분 후</option>
+                        <option value="30">30분 후</option>
+                    </select>
+                </div>
+                <p class="text-sm text-gray-500">
+                    설정된 시간 이후 화면과 비밀번호 입력이 잠금됩니다.
+                </p>
+            </div>
+        </div>
+    </div>
+    <!-- ─── Setting 콘텐츠 영역 끝 ─── -->
+</div>
+<!-- ─── 메인 영역 끝 ─── -->
+
+<script src="../../shared/shared_renderer.js"></script>
 <script src="./setting_renderer.js"></script>
-<script type="module" src="../../shared/shared_renderer.js"></script>
 </body>
 </html>

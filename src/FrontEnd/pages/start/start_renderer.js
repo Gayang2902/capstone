@@ -58,6 +58,8 @@ window.addEventListener('DOMContentLoaded', () => {
         const res = await window.electronAPI.openFile();
         if (res.status) {
             filePaths.push(res.file_path);
+            window.electronAPI.setFilePath(res.file_path);
+            console.log('DEBUG: start_renderer sent file path to main:', res.file_path);
             currentFileIndex = filePaths.length - 1;
             renderFileList();
             statusMsg.textContent = '';
@@ -71,6 +73,8 @@ window.addEventListener('DOMContentLoaded', () => {
         const res = await window.electronAPI.createFile();
         if (res.status) {
             filePaths = [res.file_path];
+            window.electronAPI.setFilePath(res.file_path);
+            console.log('DEBUG: start_renderer created and sent file path to main:', res.file_path);
             currentFileIndex = 0;
             renderFileList();
             statusMsg.textContent = '';

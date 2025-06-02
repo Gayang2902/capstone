@@ -1,32 +1,256 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8"/>
-    <title>Home - Password Manager</title>
-    <link rel="stylesheet" href="../styles/styles.css"/>
-    <script defer src="./home_renderer.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Password Manager</title>
+
+  <!-- Tailwind CSS 유틸리티 클래스 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome 아이콘 -->
+  <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+  <style>
+    /* 스크롤바 공간을 항상 확보하여 레이아웃 흔들림을 방지 */
+    body {
+      scrollbar-gutter: stable;
+    }
+  </style>
 </head>
-<body class="bg-gray-100 h-screen p-4">
-<div class="max-w-4xl mx-auto space-y-4">
-    <h1 class="text-2xl font-bold">전체 비밀번호</h1>
-    <div class="flex justify-between items-center">
-        <button id="btn-add-entry"
-                class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">추가</button>
-        <input type="text" id="input-search" placeholder="검색어 입력"
-               class="px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"/>
+
+<!-- data-page="home"를 추가해야 shared_renderer.js가 현재 페이지를 감지하여 네비 버튼을 하이라이트합니다. -->
+<body data-page="home" class="flex h-screen bg-gray-100 font-sans text-gray-800 overflow-hidden">
+
+<!-- ─── 사이드바 시작 ─── -->
+<aside class="w-64 flex-shrink-0 pt-10 px-6 pb-6 bg-white/30 backdrop-blur-xl border-r border-white/40 flex flex-col space-y-6">
+  <!-- 상단 로고 영역 -->
+  <div class="flex items-center mb-6">
+    <i class="fa-solid fa-key text-indigo-700 text-xl mr-2"></i>
+    <span class="text-base font-semibold text-gray-700">Password Manager</span>
+  </div>
+
+  <!-- 네비게이션 버튼 (아이콘 + 텍스트) -->
+  <nav class="space-y-3">
+    <button id="navHome"
+            class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl
+               hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition"
+    >
+      <i class="fa-solid fa-house text-indigo-600 text-lg mr-3"></i>
+      <span class="text-base">Home</span>
+    </button>
+
+    <button id="navStats"
+            class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl
+               hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition"
+    >
+      <i class="fa-solid fa-chart-line text-indigo-600 text-lg mr-3"></i>
+      <span class="text-base">Statistics</span>
+    </button>
+
+    <button id="navGroup"
+            class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl
+               hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition"
+    >
+      <i class="fa-solid fa-users text-indigo-600 text-lg mr-3"></i>
+      <span class="text-base">Group</span>
+    </button>
+
+    <button id="navSetting"
+            class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl
+               hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition"
+    >
+      <i class="fa-solid fa-cog text-indigo-600 text-lg mr-3"></i>
+      <span class="text-base">Setting</span>
+    </button>
+  </nav>
+</aside>
+<!-- ─── 사이드바 끝 ─── -->
+
+
+<!-- ─── 메인 영역 시작 ─── -->
+<div class="flex-1 flex flex-col min-h-0">
+
+  <!-- ─── 헤더 시작 (아이콘 및 검색창 오른쪽 정렬) ─── -->
+  <header class="flex items-center justify-between px-8 py-4 bg-white/30 backdrop-blur-xl shadow-sm z-10 flex-shrink-0">
+    <!-- 상단 왼쪽 + 버튼: 기능 제거, 단순 데코 -->
+    <button
+            class="p-3 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-full shadow-md transition
+               hover:from-indigo-600 hover:to-indigo-800 active:scale-95 focus:outline-none"
+            title="새 비밀번호 추가"
+    >
+      <i class="fa-solid fa-plus text-white text-lg"></i>
+    </button>
+
+    <!-- 오른쪽 아이콘 그룹 -->
+    <div class="flex items-center space-x-4">
+      <button
+              id="btnScreenshotPrevent"
+              class="p-3 bg-indigo-50 rounded-full shadow-md transition
+                 hover:bg-indigo-100 active:scale-95 focus:outline-none"
+              title="스크린샷 방지"
+      >
+        <i class="fa-solid fa-shield-halved text-indigo-700 text-lg"></i>
+      </button>
+
+      <button
+              id="btnHelp"
+              class="p-3 bg-rose-50 rounded-full shadow-md transition
+                 hover:bg-rose-100 active:scale-95 focus:outline-none"
+              title="도움말"
+      >
+        <i class="fa-solid fa-question text-rose-600 text-lg"></i>
+      </button>
+
+      <button
+              class="p-3 bg-emerald-50 rounded-full shadow-md transition
+                 hover:bg-emerald-100 active:scale-95 focus:outline-none"
+              title="언어 전환"
+      >
+        <i class="fa-solid fa-earth-asia text-emerald-600 text-lg"></i>
+      </button>
+
+      <div class="relative w-72">
+        <input
+                type="text"
+                id="input-search"
+                placeholder="검색..."
+                class="w-full pl-12 pr-4 py-3 bg-white/50 backdrop-blur-md border border-indigo-200
+                   rounded-full text-gray-700 placeholder-indigo-400 shadow-sm transition
+                   focus:bg-white/70 focus:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+        />
+        <div class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-600">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+      </div>
+
+      <button
+              class="p-3 bg-gray-50 rounded-full shadow-md transition
+                 hover:bg-gray-100 active:scale-95 focus:outline-none"
+              title="다크모드 토글"
+      >
+        <i class="fa-solid fa-moon text-gray-700 text-lg"></i>
+      </button>
     </div>
-    <table class="min-w-full bg-white shadow rounded overflow-hidden">
-        <thead>
-        <tr class="bg-gray-200 text-left">
-            <th class="px-4 py-2">Label</th>
-            <th class="px-4 py-2">Type</th>
-            <th class="px-4 py-2">Details</th>
-            <th class="px-4 py-2">Actions</th>
-        </tr>
-        </thead>
-        <tbody id="pw-list" class="divide-y bg-white"></tbody>
-    </table>
-    <div id="empty-msg" class="text-center text-gray-500">로딩 중...</div>
+  </header>
+  <!-- ─── 헤더 끝 ─── -->
+
+
+  <!-- ─── 동적 콘텐츠 영역 시작 ─── -->
+  <div id="main-content"
+       class="flex-1 overflow-y-scroll px-8 py-4 mx-8 my-6 bg-white/20 backdrop-blur-lg
+                rounded-2xl shadow-inner space-y-6 min-h-0"
+  >
+    <!-- 초기 로딩 시 loadHome()이 삽입됨 -->
+  </div>
+  <!-- ─── 동적 콘텐츠 영역 끝 ─── -->
+
 </div>
+<!-- ─── 메인 영역 끝 ─── -->
+
+
+<!-- ───────────────────────────────────────────────────────────────────────── -->
+<!-- 모달(팝업) 영역: 처음엔 숨겨진 상태                                  -->
+<!-- “+” 버튼을 누르면 열려서 유형 선택 및 해당 폼이 나타납니다.                -->
+<!-- ───────────────────────────────────────────────────────────────────────── -->
+<div id="addPasswordModal"
+     class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 opacity-0 pointer-events-none transition-opacity">
+  <!-- 반투명 레이어 -->
+  <div class="bg-transparent w-full h-full absolute"></div>
+
+  <!-- 모달 박스 -->
+  <div id="modalBox"
+       class="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 p-6 transform scale-95 transition-transform relative z-10">
+    <!-- 1) 모달 헤더: 뒤로가기 버튼 + 제목 -->
+    <div class="flex items-center mb-6">
+      <button id="backBtn"
+              class="mr-3 p-2 bg-gray-100 rounded-full shadow-sm hover:shadow-md transition hidden focus:outline-none">
+        <i class="fa-solid fa-arrow-left text-gray-600"></i>
+      </button>
+      <h2 class="text-xl font-semibold text-gray-800">새 비밀번호 추가</h2>
+    </div>
+
+    <!-- 2) 유형 선택 버튼 그룹 -->
+    <div id="type-selection" class="grid grid-cols-4 gap-6 mb-6">
+      <button id="type-wifi"
+              class="flex flex-col items-center justify-center w-20 h-20 bg-white rounded-full shadow-md cursor-pointer transition
+                       hover:shadow-xl active:scale-95 focus:ring-2 focus:ring-indigo-300 focus:outline-none"
+      >
+        <i class="fa-solid fa-wifi text-indigo-500 text-2xl mb-1"></i>
+        <span class="text-sm text-gray-700">Wi-Fi</span>
+      </button>
+      <button id="type-server"
+              class="flex flex-col items-center justify-center w-20 h-20 bg-white rounded-full shadow-md cursor-pointer transition
+                       hover:shadow-xl active:scale-95 focus:ring-2 focus:ring-blue-300 focus:outline-none"
+      >
+        <i class="fa-solid fa-server text-blue-500 text-2xl mb-1"></i>
+        <span class="text-sm text-gray-700">Server</span>
+      </button>
+      <button id="type-bankbook"
+              class="flex flex-col items-center justify-center w-20 h-20 bg-white rounded-full shadow-md cursor-pointer transition
+                       hover:shadow-xl active:scale-95 focus:ring-2 focus:ring-yellow-300 focus:outline-none"
+      >
+        <i class="fa-solid fa-book text-yellow-500 text-2xl mb-1"></i>
+        <span class="text-sm text-gray-700">Bankbook</span>
+      </button>
+      <button id="type-identity"
+              class="flex flex-col items-center justify-center w-20 h-20 bg-white rounded-full shadow-md cursor-pointer transition
+                       hover:shadow-xl active:scale-95 focus:ring-2 focus:ring-pink-300 focus:outline-none"
+      >
+        <i class="fa-solid fa-id-card text-pink-500 text-2xl mb-1"></i>
+        <span class="text-sm text-gray-700">Identity</span>
+      </button>
+      <button id="type-security"
+              class="flex flex-col items-center justify-center w-20 h-20 bg-white rounded-full shadow-md cursor-pointer transition
+                       hover:shadow-xl active:scale-95 focus:ring-2 focus:ring-green-300 focus:outline-none"
+      >
+        <i class="fa-solid fa-shield-alt text-green-500 text-2xl mb-1"></i>
+        <span class="text-sm text-gray-700">Security</span>
+      </button>
+      <button id="type-website"
+              class="flex flex-col items-center justify-center w-20 h-20 bg-white rounded-full shadow-md cursor-pointer transition
+                       hover:shadow-xl active:scale-95 focus:ring-2 focus:ring-blue-300 focus:outline-none"
+      >
+        <i class="fa-solid fa-globe text-blue-600 text-2xl mb-1"></i>
+        <span class="text-sm text-gray-700">Website</span>
+      </button>
+      <button id="type-card"
+              class="flex flex-col items-center justify-center w-20 h-20 bg-white rounded-full shadow-md cursor-pointer transition
+                       hover:shadow-xl active:scale-95 focus:ring-2 focus:ring-teal-300 focus:outline-none"
+      >
+        <i class="fa-solid fa-credit-card text-teal-500 text-2xl mb-1"></i>
+        <span class="text-sm text-gray-700">Card</span>
+      </button>
+    </div>
+
+    <!-- 3) 선택된 유형에 따라 동적으로 표시될 폼 영역 -->
+    <form id="dynamicForm" class="space-y-4"></form>
+
+    <!-- 4) 버튼 그룹 (취소 & 저장) -->
+    <div class="flex justify-end space-x-2 pt-4">
+      <button type="button" id="cancelBtn"
+              class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 focus:outline-none"
+      >
+        취소
+      </button>
+      <button type="button" id="saveBtn"
+              class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 focus:outline-none"
+      >
+        저장
+      </button>
+    </div>
+  </div>
+</div>
+<!-- ─── 모달 끝 ─── -->
+
+
+<!-- ───────────────────────────────────────────────────────────────────────── -->
+<!-- 외부 JS 로직 불러오기 순서:                                        -->
+<!--  1) home_renderer.js → Home 전용 스크립트 로직                         -->
+<!--  2) shared_renderer.js → 공통 네비 하이라이트, goTo(page) 함수          -->
+<!-- ───────────────────────────────────────────────────────────────────────── -->
+<script src="./home_renderer.js"></script>
+<script src="../../shared/shared_renderer.js"></script>
 </body>
 </html>

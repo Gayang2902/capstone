@@ -21,10 +21,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // 마스터 키 인증 요청
     postMasterKey:    (master_key, file_path) =>
                        ipcRenderer.invoke('postMasterKey', { master_key, file_path }),
+    // CSV 파일 경로 설정
+    setFilePath:      path => ipcRenderer.send('set-file-path', path),
     // 비밀번호 항목 생성
     createEntry:      data => ipcRenderer.invoke('createEntry', data),
     // 비밀번호 항목 수정
     updateEntry:      data => ipcRenderer.invoke('updateEntry', data),
     // 비밀번호 항목 삭제
     deleteEntry:      uid  => ipcRenderer.invoke('deleteEntry', { uid }),
+    // 비밀번호 경로 조회
+    getFilePath: () => ipcRenderer.invoke('getFilePath'),
 });

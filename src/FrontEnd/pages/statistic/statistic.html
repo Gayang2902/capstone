@@ -1,44 +1,130 @@
 <!DOCTYPE html>
-<html lang="kr">
+<html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>Statistic</title>
-  <link rel="stylesheet" href="../../shared/shared_sidebar.css">
-  <style>
-    body {
-      display: flex;
-      margin: 0;
-    }
-    nav {
-      width: 200px;
-      background-color: #f4f4f4;
-      height: 100vh;
-      padding: 20px;
-    }
-    main {
-      flex-grow: 1;
-      padding: 20px;
-    }
-    button {
-      display: block;
-      margin-bottom: 10px;
-      width: 100%;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Statistics - Password Manager</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 </head>
-<body>
-<nav>
-  <button onclick="goTo('home')">🏠 홈</button>
-  <button onclick="goTo('statistic')">📊 통계</button>
-  <button onclick="goTo('group')">👥 그룹</button>
-  <button onclick="goTo('setting')">⚙️ 설정</button>
-  <button onclick="goTo('start')">🔒 로그아웃</button>
-</nav>
-<main>
-  <h1>통계 페이지</h1>
-  <p>이곳은 통계입니다.</p>
-</main>
+
+<body data-page="statistic" class="flex h-screen bg-gray-100 text-gray-800 font-sans">
+
+<!-- ─── 사이드바 시작 ─── -->
+<aside class="w-64 flex-shrink-0 pt-10 px-6 pb-6 bg-white/30 backdrop-blur-xl border-r border-white/40 flex flex-col space-y-6">
+  <!-- 상단 로고 영역 -->
+  <div class="flex items-center mb-6">
+    <i class="fa-solid fa-key text-indigo-700 text-xl mr-2"></i>
+    <span class="text-base font-semibold text-gray-700">Password Manager</span>
+  </div>
+
+  <!-- 네비게이션 버튼 (icon + text) -->
+  <nav class="space-y-3">
+    <button
+            id="navHome"
+            onclick="goTo('home')"
+            class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl
+               hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition"
+    >
+      <i class="fa-solid fa-house text-indigo-600 text-lg mr-3"></i>
+      <span class="text-base">Home</span>
+    </button>
+
+    <button
+            id="navStatistic"
+            onclick="goTo('statistic')"
+            class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl
+               hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition"
+    >
+      <i class="fa-solid fa-chart-line text-indigo-600 text-lg mr-3"></i>
+      <span class="text-base">Statistics</span>
+    </button>
+
+    <button
+            id="navGroup"
+            onclick="goTo('group')"
+            class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl
+               hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition"
+    >
+      <i class="fa-solid fa-users text-indigo-600 text-lg mr-3"></i>
+      <span class="text-base">Group</span>
+    </button>
+
+    <button
+            id="navSetting"
+            onclick="goTo('setting')"
+            class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl
+               hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition"
+    >
+      <i class="fa-solid fa-cog text-indigo-600 text-lg mr-3"></i>
+      <span class="text-base">Setting</span>
+    </button>
+  </nav>
+</aside>
+<!-- ─── 사이드바 끝 ─── -->
+
+
+<!-- ─── 메인 영역 시작 ─── -->
+<div class="flex-1 p-8 overflow-auto">
+<!--  <h1 class="text-2xl font-semibold mb-6">Statistics</h1>-->
+
+  <!-- 요약 카드 섹션 -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white/60 backdrop-blur-md rounded-2xl p-6 shadow-lg">
+      <p class="text-sm text-gray-500">총 비밀번호</p>
+      <p class="text-2xl font-semibold text-gray-900" id="totalCount">0개</p>
+    </div>
+    <div class="bg-white/60 backdrop-blur-md rounded-2xl p-6 shadow-lg">
+      <p class="text-sm text-red-500">취약 비밀번호</p>
+      <p class="text-2xl font-semibold text-red-600" id="weakCount">0개</p>
+    </div>
+    <div class="bg-white/60 backdrop-blur-md rounded-2xl p-6 shadow-lg">
+      <p class="text-sm text-green-500">보안된 비밀번호</p>
+      <p class="text-2xl font-semibold text-green-600" id="secureCount">0개</p>
+    </div>
+    <div class="bg-white/60 backdrop-blur-md rounded-2xl p-6 shadow-lg">
+      <p class="text-sm text-yellow-500">중복된 암호</p>
+      <p class="text-2xl font-semibold text-yellow-600" id="dupCount">0개</p>
+    </div>
+  </div>
+
+  <!-- 차트 섹션 -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <div class="bg-white/60 backdrop-blur-md rounded-2xl p-6 shadow-lg">
+      <canvas id="barChart" class="w-full h-64"></canvas>
+    </div>
+    <div class="bg-white/60 backdrop-blur-md rounded-2xl p-6 shadow-lg">
+      <canvas id="pieChart" class="w-full h-64"></canvas>
+    </div>
+  </div>
+
+  <!-- 액션 리스트 -->
+  <div class="space-y-4">
+    <div class="bg-white/60 backdrop-blur-md rounded-2xl p-4 shadow-lg flex justify-between items-center">
+      <span class="text-gray-900">재생성된 비밀번호</span>
+      <button id="btnViewRecreated" class="text-blue-600 hover:underline">조회하기</button>
+    </div>
+    <div class="bg-white/60 backdrop-blur-md rounded-2xl p-4 shadow-lg flex justify-between items-center">
+      <span class="text-gray-900">유출된 비밀번호</span>
+      <button id="btnManageLeaked" class="text-red-600 hover:underline">관리하기</button>
+    </div>
+    <div class="bg-white/60 backdrop-blur-md rounded-2xl p-4 shadow-lg flex justify-between items-center">
+      <span class="text-gray-900">만료 임박 비밀번호</span>
+      <button id="btnManageExpiring" class="text-yellow-600 hover:underline">관리하기</button>
+    </div>
+  </div>
+</div>
+<!-- ─── 메인 영역 끝 ─── -->
+
+<script src="../../shared/shared_renderer.js"></script>
 <script src="./statistic_renderer.js"></script>
-<script type="module" src="../../shared/shared_renderer.js"></script>
 </body>
 </html>
