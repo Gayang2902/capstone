@@ -31,4 +31,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     deleteEntry:      uid  => ipcRenderer.invoke('deleteEntry', { uid }),
     // 비밀번호 경로 조회
     getFilePath: () => ipcRenderer.invoke('getFilePath'),
+    // 마스터 비밀번호 변경
+    updateMasterKey: (old_master_key, new_master_key) =>
+        ipcRenderer.invoke('updateMasterKey', { old_master_key, new_master_key }),
 });

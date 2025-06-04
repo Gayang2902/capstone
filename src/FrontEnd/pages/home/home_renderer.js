@@ -1,7 +1,8 @@
 // File: pages/home/home_renderer.js
 
 // ─────────────────────────────────────────────────────────────
-// 0) 전역 변수: navigation 버튼들 (shared_renderer.js에서 goTo를 지원)
+// ======== 0) 전역 변수 ========
+// 전역 변수: navigation 버튼들 (shared_renderer.js에서 goTo를 지원)
 // ─────────────────────────────────────────────────────────────
 const navHome    = document.getElementById('navHome');
 const navStats   = document.getElementById('navStats');
@@ -12,8 +13,10 @@ const mainContent = document.getElementById('main-content');
 // “스크린샷 방지” 버튼
 const btnScreenshotPrevent = document.getElementById('btnScreenshotPrevent');
 
+
 // ─────────────────────────────────────────────────────────────
-// 1) 페이지 초기화: Home 화면 로드, 네비 하이라이트 & 스크린샷 토글
+// ======== 1) 페이지 초기화 ========
+// 페이지 초기화: Home 화면 로드, 네비 하이라이트 & 스크린샷 토글
 // ─────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
   // 네비 하이라이트
@@ -39,8 +42,9 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+
 // ─────────────────────────────────────────────────────────────
-// 2) 네비 버튼 하이라이트 & 페이지 로드 함수
+// ======== 2) 네비 버튼 하이라이트 & 페이지 로드 함수 ========
 // ─────────────────────────────────────────────────────────────
 function setActiveButton(btn) {
   document.querySelectorAll('.nav-btn').forEach(b => {
@@ -80,8 +84,8 @@ function loadHome() {
         <div class="flex items-center space-x-2">
           <button
             id="filterAddBtnInner"
-            class="p-3 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-full shadow-md transition
-                   hover:from-indigo-600 hover:to-indigo-800 active:scale-95 focus:outline-none"
+            class="w-12 h-12 flex items-center justify-center bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-full shadow-md transition 
+               hover:from-indigo-600 hover:to-indigo-800 active:scale-95 focus:outline-none"
             title="새 비밀번호 추가"
           >
             <i class="fa-solid fa-plus text-white text-lg"></i>
@@ -138,8 +142,9 @@ navStats.addEventListener('click', () => goTo('statistic'));
 navGroup.addEventListener('click', () => goTo('group'));
 navSetting.addEventListener('click', () => goTo('setting'));
 
+
 // ─────────────────────────────────────────────────────────────
-// 3) “비밀번호 추가” 모달 열기/닫기 & 동적 폼 로직
+// ======== 3) “비밀번호 추가” 모달 열기/닫기 & 동적 폼 로직 ========
 // ─────────────────────────────────────────────────────────────
 const addModal      = document.getElementById('addPasswordModal');
 const modalBox      = document.getElementById('modalBox');
@@ -313,7 +318,7 @@ const formTemplates = {
              placeholder="웹사이트 비밀번호" />
     </div>
     <div>
-      <label class="block text-sm font-medium text-gray-700">Email</label>
+      <label class="block 텍스트-sm font-medium text-gray-700">Email</label>
       <input type="email" id="website-email" required
              class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 focus:outline-none"
              placeholder="이메일 주소" />
@@ -377,7 +382,10 @@ backBtn.addEventListener('click', () => {
   backBtn.classList.add('hidden');
 });
 
-// 저장 버튼 클릭 시 (실제 저장 로직)
+// ─────────────────────────────────────────────────────────────
+// ======== 4) “저장” 버튼 클릭 시 ========
+// “저장” 버튼 클릭 시 (실제 저장 로직)
+// ─────────────────────────────────────────────────────────────
 saveBtn.addEventListener('click', async () => {
   if (!selectedType) {
     alert('우선 유형을 선택해주세요.');
@@ -447,8 +455,9 @@ saveBtn.addEventListener('click', async () => {
   }
 });
 
+
 // ─────────────────────────────────────────────────────────────
-// 4) 전체 비밀번호 가져와서 필터링 후 렌더링
+// ======== 5) 전체 비밀번호 가져와서 렌더링 ========
 // ─────────────────────────────────────────────────────────────
 async function loadAndRenderList(query = '') {
   const pwList   = document.getElementById('pw-list');

@@ -155,11 +155,22 @@ ipcMain.handle('createFile', async () => {
     }
 });
 
+
 ipcMain.handle('postMasterKey', async (_evt, { master_key, file_path }) => {
     try {
         return MOCK_BACKEND
             ? { status: true }
             : await sendToBackend('postMasterKey', { master_key, file_path });
+    } catch (err) {
+        return { status: false, error_message: err.message };
+    }
+});
+
+ipcMain.handle('updateMasterKey', async (_evt, { old_master_key, new_master_key }) => {
+    try {
+        return MOCK_BACKEND
+            ? { status: true }
+            : await sendToBackend('updateMasterKey', { old_master_key, new_master_key });
     } catch (err) {
         return { status: false, error_message: err.message };
     }

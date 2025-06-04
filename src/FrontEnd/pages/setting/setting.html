@@ -25,19 +25,42 @@
 
     <!-- 네비게이션 버튼 (아이콘 + 텍스트) -->
     <nav class="space-y-3">
-        <button id="navHome" class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition" onclick="goTo('home')">
+        <button
+                id="navHome"
+                class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl
+               hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition"
+                onclick="goTo('home')"
+        >
             <i class="fa-solid fa-house text-indigo-600 text-lg mr-3"></i>
             <span class="text-base">Home</span>
         </button>
-        <button id="navStats" class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition" onclick="goTo('statistic')">
+
+        <button
+                id="navStats"
+                class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl
+               hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition"
+                onclick="goTo('statistic')"
+        >
             <i class="fa-solid fa-chart-line text-indigo-600 text-lg mr-3"></i>
             <span class="text-base">Statistics</span>
         </button>
-        <button id="navGroup" class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition" onclick="goTo('group')">
+
+        <button
+                id="navGroup"
+                class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl
+               hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition"
+                onclick="goTo('group')"
+        >
             <i class="fa-solid fa-users text-indigo-600 text-lg mr-3"></i>
             <span class="text-base">Group</span>
         </button>
-        <button id="navSetting" class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition" onclick="goTo('setting')">
+
+        <button
+                id="navSetting"
+                class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl
+               hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition"
+                onclick="goTo('setting')"
+        >
             <i class="fa-solid fa-cog text-indigo-600 text-lg mr-3"></i>
             <span class="text-base">Setting</span>
         </button>
@@ -51,7 +74,8 @@
     <header class="flex items-center justify-between px-8 py-4 bg-white/30 backdrop-blur-xl shadow-sm z-10 flex-shrink-0">
         <!-- 상단 왼쪽 + 버튼: 기능 제거, 단순 데코 -->
         <button
-                class="p-3 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-full shadow-md transition hover:from-indigo-600 hover:to-indigo-800 active:scale-95 focus:outline-none"
+                class="w-11 h-11 flex items-center justify-center bg-indigo-500 rounded-full shadow-md transition
+               hover:bg-indigo-600 active:scale-95 focus:outline-none"
                 title="새 비밀번호 추가"
         >
             <i class="fa-solid fa-plus text-white text-lg"></i>
@@ -61,7 +85,8 @@
         <div class="flex items-center space-x-4">
             <button
                     id="btnScreenshotPrevent"
-                    class="p-3 bg-indigo-50 rounded-full shadow-md transition hover:bg-indigo-100 active:scale-95 focus:outline-none"
+                    class="w-12 h-12 flex items-center justify-center bg-indigo-50 rounded-full shadow-md transition
+                 hover:bg-indigo-100 active:scale-95 focus:outline-none"
                     title="스크린샷 방지"
             >
                 <i class="fa-solid fa-shield-halved text-indigo-700 text-lg"></i>
@@ -69,14 +94,16 @@
 
             <button
                     id="btnHelp"
-                    class="p-3 bg-rose-50 rounded-full shadow-md transition hover:bg-rose-100 active:scale-95 focus:outline-none"
+                    class="w-12 h-12 flex items-center justify-center bg-rose-50 rounded-full shadow-md transition
+                 hover:bg-rose-100 active:scale-95 focus:outline-none"
                     title="도움말"
             >
                 <i class="fa-solid fa-question text-rose-600 text-lg"></i>
             </button>
 
             <button
-                    class="p-3 bg-emerald-50 rounded-full shadow-md transition hover:bg-emerald-100 active:scale-95 focus:outline-none"
+                    class="w-12 h-12 flex items-center justify-center bg-emerald-50 rounded-full shadow-md transition
+                 hover:bg-emerald-100 active:scale-95 focus:outline-none"
                     title="언어 전환"
             >
                 <i class="fa-solid fa-earth-asia text-emerald-600 text-lg"></i>
@@ -87,7 +114,9 @@
                         type="text"
                         id="input-search"
                         placeholder="검색..."
-                        class="w-full pl-12 pr-4 py-3 bg-white/50 backdrop-blur-md border border-indigo-200 rounded-full text-gray-700 placeholder-indigo-400 shadow-sm transition focus:bg-white/70 focus:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                        class="w-full pl-12 pr-4 py-3 bg-white/50 backdrop-blur-md border border-indigo-200
+                   rounded-full text-gray-700 placeholder-indigo-400 shadow-sm transition
+                   focus:bg-white/70 focus:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-200"
                 />
                 <div class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-600">
                     <i class="fa-solid fa-magnifying-glass"></i>
@@ -95,52 +124,99 @@
             </div>
 
             <button
-                    class="p-3 bg-gray-50 rounded-full shadow-md transition hover:bg-gray-100 active:scale-95 focus:outline-none"
+                    class="w-12 h-12 flex items-center justify-center bg-gray-50 rounded-full shadow-md transition
+                 hover:bg-gray-100 active:scale-95 focus:outline-none"
                     title="다크모드 토글"
             >
                 <i class="fa-solid fa-moon text-gray-700 text-lg"></i>
             </button>
         </div>
     </header>
-    <!-- ─── 헤더 끝 ─── -->
 
     <!-- ─── Setting 콘텐츠 영역 시작 ─── -->
     <div class="flex-1 overflow-auto px-8 py-4">
-        <h1 class="text-2xl font-semibold mb-6">Setting</h1>
-
         <div class="max-w-3xl mx-auto space-y-8">
-            <!-- 데이터베이스 설정 카드 -->
+
+            <!-- ─── 데이터베이스 설정 카드 ─── -->
             <div class="relative bg-white/60 backdrop-blur-md rounded-2xl p-6 shadow-lg">
                 <h2 class="text-lg font-semibold mb-4">데이터베이스 설정</h2>
                 <div class="absolute top-6 right-6 flex space-x-4 text-gray-600">
-                    <button>
-                        <i class="fa-solid fa-plus hover:text-gray-800"></i>
-                    </button>
-                    <button>
-                        <i class="fa-solid fa-folder-open hover:text-gray-800"></i>
-                    </button>
-                    <button>
-                        <i class="fa-solid fa-floppy-disk hover:text-gray-800"></i>
-                    </button>
+                    <button title="새 DB"><i class="fa-solid fa-plus hover:text-gray-800"></i></button>
+                    <button title="DB 폴더 열기"><i class="fa-solid fa-folder-open hover:text-gray-800"></i></button>
+                    <button title="저장"><i class="fa-solid fa-floppy-disk hover:text-gray-800"></i></button>
                 </div>
+
                 <div class="space-y-4">
+                    <!-- 1) 비밀번호 저장 DB 경로 -->
                     <div class="flex items-center space-x-4">
-                        <label class="w-44 font-medium">파일 경로</label>
+                        <label class="w-44 font-medium">비밀번호 저장 DB:</label>
                         <input
-                                type="text"
                                 id="dbPathInput"
+                                type="text"
                                 class="flex-1 bg-white/80 border border-gray-300 rounded-lg p-2 outline-none"
                                 readonly
                         />
                     </div>
-                    <div class="flex items-center space-x-4">
-                        <label class="w-44 font-medium">마스터 비밀번호 변경:</label>
-                        <button class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-sm hover:shadow focus:outline-none">
-                            변경
-                        </button>
+
+                    <!-- 2) 마스터 비밀번호 변경 폼 -->
+                    <div class="space-y-4 pt-4 border-t border-gray-200">
+                        <h3 class="text-md font-medium text-gray-700">마스터 비밀번호 변경</h3>
+
+                        <!-- 2-1) 기존 마스터 비밀번호 입력 -->
+                        <div class="flex items-center space-x-4">
+                            <label class="w-44 font-medium">기존 비밀번호:</label>
+                            <div class="relative flex-1">
+                                <input
+                                        id="oldMasterInput"
+                                        type="password"
+                                        placeholder="기존 비밀번호를 입력하세요"
+                                        class="w-full bg-white/80 border border-gray-300 rounded-lg p-2 pr-10 outline-none"
+                                />
+                                <button
+                                        id="toggleOldMasterBtn"
+                                        type="button"
+                                        class="absolute inset-y-0 right-2 flex items-center text-gray-500 hover:text-gray-700 focus:outline-none"
+                                        title="비밀번호 보기/숨기기"
+                                >
+                                    <i id="oldMasterIcon" class="fa-solid fa-eye-slash"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 2-2) 새 마스터 비밀번호 입력 -->
+                        <div class="flex items-center space-x-4">
+                            <label class="w-44 font-medium">새 비밀번호:</label>
+                            <div class="relative flex-1">
+                                <input
+                                        id="newMasterInput"
+                                        type="password"
+                                        placeholder="새 비밀번호를 입력하세요"
+                                        class="w-full bg-white/80 border border-gray-300 rounded-lg p-2 pr-10 outline-none"
+                                />
+                                <button
+                                        id="toggleNewMasterBtn"
+                                        type="button"
+                                        class="absolute inset-y-0 right-2 flex items-center text-gray-500 hover:text-gray-700 focus:outline-none"
+                                        title="비밀번호 보기/숨기기"
+                                >
+                                    <i id="newMasterIcon" class="fa-solid fa-eye-slash"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 2-3) 변경 버튼 -->
+                        <div class="flex justify-end">
+                            <button
+                                    id="changeMasterBtn"
+                                    class="px-4 py-2 bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-lg shadow-sm hover:shadow-lg focus:outline-none"
+                            >
+                                변경
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
+            <!-- ──────────────────────────────────────────────── -->
 
             <!-- 앱 잠금 카드 -->
             <div class="bg-white/60 backdrop-blur-md rounded-2xl p-6 shadow-lg">
@@ -152,6 +228,8 @@
                         <option value="5">5분 후</option>
                         <option value="10">10분 후</option>
                         <option value="30">30분 후</option>
+                        <!-- 테스트용 3초 옵션 추가 -->
+                        <option value="0.05">3초 테스트</option>
                     </select>
                 </div>
                 <p class="text-sm text-gray-500">
@@ -164,6 +242,7 @@
 </div>
 <!-- ─── 메인 영역 끝 ─── -->
 
+<!-- 공통 스크립트 호출 -->
 <script src="../../shared/shared_renderer.js"></script>
 <script src="./setting_renderer.js"></script>
 </body>
