@@ -117,9 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // IPC로 메인 프로세스에 전달
         try {
-            // 현재 설정된 DB 경로를 함께 전달
-            const filePath = dbInput.value;
-            const res = await window.electronAPI.updateMasterKey(oldPwd, newPwd, filePath);
+            const res = await window.electronAPI.updateMasterKey(oldPwd, newPwd);
             if (!res.status) {
                 alert('변경 중 오류가 발생했습니다: ' + (res.error_message || '알 수 없는 오류'));
                 return;
@@ -142,5 +140,15 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('updateMasterKey 호출 중 오류:', err);
             alert('변경 중 오류가 발생했습니다.');
         }
+    });
+
+    const btnExportCsv = document.getElementById('btnExportCsv');
+    btnExportCsv?.addEventListener('click', async () => {
+        const res = await window.electronAPI.exportCsv();
+        if (!res.status) {
+            alert('내보내기에 실패했습니다: ' + res.error_message);
+            return;
+        }
+        // alert('CSV 파일로 내보내기 완료:\n' + res.file_path);
     });
 });

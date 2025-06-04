@@ -1,4 +1,4 @@
-// main.js
+// File: main.js
 const { app, BrowserWindow, ipcMain, dialog, screen } = require('electron');
 const { spawn } = require('child_process');
 const fs   = require('fs');
@@ -6,7 +6,7 @@ const path = require('path');
 
 const MOCK_BACKEND = true;
 let currentPwds = [];
-let currentFilePath = '';   // <— 새로 추가: 현재 선택된 파일 경로를 저장할 변수
+let currentFilePath = '';   // 현재 선택된 CSV 파일 경로
 
 let mainWindow;
 let backendProcess;
@@ -61,12 +61,12 @@ function sendToBackend(oper, data) {
 
 /** 3) 윈도우 생성 */
 function createMainWindow() {
-    // 1) 화면 실제 사용 영역 크기 가져오기
+    // 화면 실제 사용 영역 크기 가져오기
     const { width: sw } = screen.getPrimaryDisplay().workAreaSize;
 
-    // 2) 너비를 화면 너비의 75%로, 최소 1024px, 최대 1366px로 제한
+    // 너비를 화면 너비의 75%로, 최소 1024px, 최대 1366px로 제한
     let winWidth = Math.min(Math.max(Math.floor(sw * 0.75), 1024), 1366);
-    // 3) 16:9 비율에 맞춰 높이 계산
+    // 16:9 비율에 맞춰 높이 계산
     let winHeight = Math.round(winWidth * 9 / 16);
 
     mainWindow = new BrowserWindow({
@@ -114,20 +114,83 @@ ipcMain.on('allow-screenshot',    () => mainWindow.setContentProtection(false));
 ipcMain.on('user-active', () => { /* 필요 시 처리 */ });
 
 /**
- * 신규 추가: 렌더러로부터 'clear-browser-storage' 요청이 오면
+ * 세션 만료: 렌더러로부터 'clear-browser-storage' 요청이 오면
  * 해당 창의 세션/로컬 스토리지를 완전히 비웁니다.
  */
 ipcMain.on('clear-browser-storage', async () => {
     try {
         // 세션 스토리지 및 로컬 스토리지 데이터 삭제
         await mainWindow.webContents.session.clearStorageData();
-        // 선택적으로 캐시까지 삭제하려면 아래 줄을 활성화
+        // 선택적으로 캐시까지 삭제
         await mainWindow.webContents.session.clearCache();
     } catch (err) {
         console.error('Storage clear error:', err);
     }
 });
 
+/**
+ * CSV 내보내기 핸들러
+ * - MOCK_BACKEND=true: currentPwds 배열 사용
+ * - MOCK_BACKEND=false: 백엔드에 getAllPwds 요청 후 결과로 CSV 생성
+ */
+ipcMain.handle('export-csv', async () => {
+    let allPwds;
+
+    if (MOCK_BACKEND) {
+        // 테스트 모드: 로컬 캐시된 currentPwds 사용
+        allPwds = currentPwds;
+    } else {
+        // 실제 백엔드 모드: 백엔드에 전체 비밀번호 요청
+        try {
+            const resp = await sendToBackend('getAllPwds', {});
+            if (!resp.status) {
+                return { status: false, error_message: resp.error_message || '백엔드 조회 실패' };
+            }
+            allPwds = resp.data;
+        } catch (err) {
+            return { status: false, error_message: err.message };
+        }
+    }
+
+    // 컬럼 헤더 (uid,label,type,userId,password)
+    const header = ['uid', 'label', 'type', 'userId', 'password'];
+    const lines = [header.join(',')];
+
+    // 전체 비밀번호 데이터를 CSV 형식으로 변환
+    allPwds.forEach(entry => {
+        const row = [
+            entry.uid || '',
+            entry.label || '',
+            entry.type || '',
+            entry.userId || '',
+            entry.password || ''
+        ];
+        lines.push(row.join(','));
+    });
+
+    const csvContent = lines.join('\n');
+
+    // 사용자에게 "저장" 다이얼로그 띄우기
+    const { canceled, filePath } = await dialog.showSaveDialog(mainWindow, {
+        title: 'CSV로 내보내기',
+        defaultPath: 'exported_passwords.csv',
+        filters: [{ name: 'CSV', extensions: ['csv'] }],
+    });
+
+    if (canceled || !filePath) {
+        return { status: false, error_message: '내보내기를 취소했습니다.' };
+    }
+
+    try {
+        fs.writeFileSync(filePath, csvContent, 'utf8');
+        return { status: true, file_path: filePath };
+    } catch (err) {
+        console.error('CSV 내보내기 오류:', err);
+        return { status: false, error_message: err.message };
+    }
+});
+
+// 나머지 IPC 핸들러: getAllPwds, openFile, createFile, postMasterKey, updateMasterKey 등
 ipcMain.handle('getAllPwds', async () => {
     if (MOCK_BACKEND) {
         return { status: true, data: currentPwds };
@@ -190,7 +253,7 @@ ipcMain.handle('updateMasterKey', async (_evt, { old_master_key, new_master_key 
 });
 
 ipcMain.on('set-file-path', (_evt, filePath) => {
-    currentFilePath = filePath;   // <— 파일 경로를 전역 변수에 저장
+    currentFilePath = filePath;
     if (MOCK_BACKEND) {
         try {
             const content = fs.readFileSync(filePath, 'utf8');

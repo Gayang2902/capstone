@@ -36,4 +36,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
         ipcRenderer.invoke('updateMasterKey', { old_master_key, new_master_key }),
     // 세션 만료
     clearBrowserStorage: () => ipcRenderer.send('clear-browser-storage'),
+    // 파일 내보내기
+    exportCsv: () => ipcRenderer.invoke('export-csv'),
 });
