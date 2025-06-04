@@ -14,23 +14,34 @@ function getInactivityLimit() {
 let logoutTimer;
 
 // ─────────────────────────────────────────────────────────────
-// 1) 앱 잠금 로직
+// 1) 세션 만료(자동 로그아웃) 처리
 // ─────────────────────────────────────────────────────────────
 function clearSensitiveData() {
+    // 전역에 저장된 민감 데이터를 모두 지워야 합니다.
     if (window.sessionData) {
         window.sessionData.password = '';
         window.sessionData.token = '';
         window.sessionData = null;
     }
+
+    // 로컬/세션 스토리지도 모두 클리어
     localStorage.clear();
     sessionStorage.clear();
+
+    // 메모리 캐시된 비밀번호 목록이 있다면 초기화
     if (window.cachedPasswords) {
         window.cachedPasswords = [];
     }
 }
 
 function autoLogout() {
+    // 민감 데이터 클리어
     clearSensitiveData();
+
+    // 메인 프로세스 쪽으로 저장소도 지우도록 요청
+    window.electronAPI.clearBrowserStorage();
+
+    // “start” 페이지로 이동
     window.electronAPI.navigate('start');
 }
 
@@ -46,6 +57,7 @@ function resetInactivityTimer() {
 const activityEvents = ['click', 'mousemove', 'keydown', 'scroll', 'touchstart'];
 activityEvents.forEach(eventName => {
     window.addEventListener(eventName, () => {
+        // 메인 프로세스에 유저 활동 알림을 전달 (필요 시)
         window.electronAPI.userActive?.();
         resetInactivityTimer();
     });
@@ -55,7 +67,7 @@ activityEvents.forEach(eventName => {
 resetInactivityTimer();
 
 // ─────────────────────────────────────────────────────────────
-// 3) 공통 사이드바 제어 함수
+// 3) 공통 네비게이션 제어 함수
 // ─────────────────────────────────────────────────────────────
 function setActiveNav(page) {
     document.querySelectorAll('nav button').forEach(btn => {

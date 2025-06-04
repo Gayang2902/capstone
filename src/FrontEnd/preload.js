@@ -34,4 +34,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // 마스터 비밀번호 변경
     updateMasterKey: (old_master_key, new_master_key) =>
         ipcRenderer.invoke('updateMasterKey', { old_master_key, new_master_key }),
+    // 세션 만료
+    clearBrowserStorage: () => ipcRenderer.send('clear-browser-storage'),
 });

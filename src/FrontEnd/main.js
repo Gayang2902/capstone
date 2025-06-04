@@ -8,10 +8,6 @@ const MOCK_BACKEND = true;
 let currentPwds = [];
 let currentFilePath = '';   // <— 새로 추가: 현재 선택된 파일 경로를 저장할 변수
 
-
-// Mock backend mode: true면 모의, false면 실제 C 프로세스 사용
-// const MOCK_BACKEND = true;
-
 let mainWindow;
 let backendProcess;
 let stdoutBuffer = '';
@@ -104,15 +100,33 @@ app.on('window-all-closed', () => {
 });
 
 // --- IPC 핸들러 ---
+
 // 페이지 전환
 ipcMain.on('navigate', (_evt, page) => {
     mainWindow.loadFile(path.join(__dirname, 'pages', page, `${page}.html`));
 });
+
 // 스크린샷 토글
 ipcMain.on('prevent-screenshot', () => mainWindow.setContentProtection(true));
 ipcMain.on('allow-screenshot',    () => mainWindow.setContentProtection(false));
+
 // 사용자 활동
 ipcMain.on('user-active', () => { /* 필요 시 처리 */ });
+
+/**
+ * 신규 추가: 렌더러로부터 'clear-browser-storage' 요청이 오면
+ * 해당 창의 세션/로컬 스토리지를 완전히 비웁니다.
+ */
+ipcMain.on('clear-browser-storage', async () => {
+    try {
+        // 세션 스토리지 및 로컬 스토리지 데이터 삭제
+        await mainWindow.webContents.session.clearStorageData();
+        // 선택적으로 캐시까지 삭제하려면 아래 줄을 활성화
+        await mainWindow.webContents.session.clearCache();
+    } catch (err) {
+        console.error('Storage clear error:', err);
+    }
+});
 
 ipcMain.handle('getAllPwds', async () => {
     if (MOCK_BACKEND) {
@@ -154,7 +168,6 @@ ipcMain.handle('createFile', async () => {
         return { status: false, error_message: err.message };
     }
 });
-
 
 ipcMain.handle('postMasterKey', async (_evt, { master_key, file_path }) => {
     try {
