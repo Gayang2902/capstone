@@ -129,3 +129,116 @@ window.addEventListener('DOMContentLoaded', () => {
         btn.classList.add('bg-blue-100', 'text-blue-800', 'shadow-lg');
     }
 });
+
+//─────────────────────────────────────────────────────────────────────────
+// === Generator 팝업 기능 추가 (아래 부분만 그대로) ===
+
+// 슬라이더(pwdLength) 값이 바뀔 때마다 옆 숫자 업데이트
+const pwdLength      = document.getElementById('pwdLength');
+const pwdLengthValue = document.getElementById('pwdLengthValue');
+pwdLength.addEventListener('input', () => {
+    pwdLengthValue.textContent = pwdLength.value;
+});
+
+// 비밀번호 생성 로직 (예시: 필요에 맞게 수정 가능)
+function simpleGeneratePassword(length, options) {
+    const lower   = 'abcdefghijklmnopqrstuvwxyz';
+    const upper   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const numbers = '0123456789';
+    const symbols = '!@#$%^&*()-_=+[]{}|;:,.<>?';
+    let pool = '';
+
+    if (options.number)      pool += numbers;
+    if (options.upper)       pool += upper;
+    if (options.symbol)      pool += symbols;
+    if (options.randomWord)  pool += 'secret'; // 예시 단어
+
+    if (!pool) pool = lower + numbers + symbols + upper;
+
+    let pwd = '';
+    for (let i = 0; i < length; i++) {
+        pwd += pool.charAt(Math.floor(Math.random() * pool.length));
+    }
+    return pwd;
+}
+
+// 강도 표시 로직 (예시: 필요에 맞게 수정 가능)
+function updateStrength(password) {
+    let score = 0;
+    if (password.length > 8)          score += 1;
+    if (/[A-Z]/.test(password))        score += 1;
+    if (/[0-9]/.test(password))        score += 1;
+    if (/[^A-Za-z0-9]/.test(password)) score += 1;
+
+    const percentages = [20, 40, 60, 80, 100];
+    const texts       = ['매우 약함', '약함', '보통', '양호', '매우 양호'];
+    const idx = Math.min(score, 4);
+
+    const strengthBar  = document.getElementById('strengthBar');
+    const strengthText = document.getElementById('strengthText');
+
+    strengthBar.style.width = `${percentages[idx]}%`;
+    strengthBar.className = `h-2 rounded ${
+        idx < 2
+            ? 'bg-red-500'
+            : idx < 3
+                ? 'bg-yellow-500'
+                : idx < 4
+                    ? 'bg-green-500'
+                    : 'bg-indigo-600'
+    }`;
+    strengthText.textContent = texts[idx];
+}
+
+// “생성하기” 버튼 클릭 → 비밀번호 생성 + 강도 표시
+const generateBtn       = document.getElementById('generateBtn');
+const generatedPassword = document.getElementById('generatedPassword');
+generateBtn.addEventListener('click', () => {
+    const length  = parseInt(document.getElementById('pwdLength').value, 10);
+    const options = {
+        number:      document.getElementById('optionNumber').checked,
+        upper:       document.getElementById('optionUpper').checked,
+        symbol:      document.getElementById('optionSymbol').checked,
+        randomWord:  document.getElementById('optionRandomWord').checked
+        // 단어 기반(optionWord)이나 커스텀(optionCustom)은 필요에 맞게 추가 처리하세요.
+    };
+
+    const newPwd = simpleGeneratePassword(length, options);
+    generatedPassword.value = newPwd;
+    updateStrength(newPwd);
+});
+
+// 복사 버튼 클릭 → 클립보드 복사
+const copyPasswordBtn = document.getElementById('copyPasswordBtn');
+copyPasswordBtn.addEventListener('click', () => {
+    const pwd = document.getElementById('generatedPassword').value;
+    if (!pwd) return;
+    navigator.clipboard.writeText(pwd).then(() => {
+        alert('클립보드에 복사되었습니다.');
+    });
+});
+
+// 새로고침 버튼 클릭 → 즉시 비밀번호 재생성
+const refreshPasswordBtn = document.getElementById('refreshPasswordBtn');
+refreshPasswordBtn.addEventListener('click', () => {
+    generateBtn.click();
+});
+
+// “+” 버튼 클릭 → Generator 모달 열기
+const openGeneratorBtn = document.getElementById('openGeneratorBtn');
+openGeneratorBtn.addEventListener('click', () => {
+    document.getElementById('generatorModal').classList.remove('hidden');
+});
+
+// 모달 닫기(x) 버튼 클릭 → Generator 모달 닫기
+document.getElementById('generatorClose').addEventListener('click', () => {
+    document.getElementById('generatorModal').classList.add('hidden');
+});
+
+// 모달 바깥 검은 영역 클릭 시에도 모달 닫기
+document.getElementById('generatorModal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('generatorModal')) {
+        document.getElementById('generatorModal').classList.add('hidden');
+    }
+});
+//─────────────────────────────────────────────────────────────────────────

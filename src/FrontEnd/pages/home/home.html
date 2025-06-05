@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Password Manager</title>
 
   <!-- Tailwind CSS 유틸리티 클래스 -->
@@ -39,7 +39,7 @@
   <nav class="space-y-3">
     <button id="navHome"
             class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl
-                 hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition"
+                     hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition"
     >
       <i class="fa-solid fa-house text-indigo-600 text-lg mr-3"></i>
       <span class="text-base">Home</span>
@@ -47,7 +47,7 @@
 
     <button id="navStats"
             class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl
-                 hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition"
+                     hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition"
     >
       <i class="fa-solid fa-chart-line text-indigo-600 text-lg mr-3"></i>
       <span class="text-base">Statistics</span>
@@ -55,7 +55,7 @@
 
     <button id="navGroup"
             class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl
-                 hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition"
+                     hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition"
     >
       <i class="fa-solid fa-users text-indigo-600 text-lg mr-3"></i>
       <span class="text-base">Group</span>
@@ -63,7 +63,7 @@
 
     <button id="navSetting"
             class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl
-                 hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition"
+                     hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition"
     >
       <i class="fa-solid fa-cog text-indigo-600 text-lg mr-3"></i>
       <span class="text-base">Setting</span>
@@ -78,11 +78,12 @@
 
   <!-- ─── 헤더 시작 (아이콘 및 검색창 오른쪽 정렬) ─── -->
   <header class="flex items-center justify-between px-8 py-4 bg-white/30 backdrop-blur-xl shadow-sm z-10 flex-shrink-0">
-    <!-- 상단 왼쪽 + 버튼: 기능 제거, 단순 데코 -->
+    <!-- 상단 왼쪽 + 버튼: Generator 열기 -->
     <button
+            id="openGeneratorBtn"
             class="w-11 h-11 flex items-center justify-center bg-indigo-500 rounded-full shadow-md transition
                hover:bg-indigo-600 active:scale-95 focus:outline-none"
-            title="새 비밀번호 추가"
+            title="새 비밀번호 생성기 열기"
     >
       <i class="fa-solid fa-plus text-white text-lg"></i>
     </button>
@@ -144,7 +145,7 @@
   <!-- ─── 동적 콘텐츠 영역 시작 ─── -->
   <div id="main-content"
        class="flex-1 overflow-y-scroll px-8 py-4 mx-8 my-6 bg-white/20 backdrop-blur-lg
-                  rounded-2xl shadow-inner space-y-6 min-h-0"
+                    rounded-2xl shadow-inner space-y-6 min-h-0"
   >
     <!-- 초기 로딩 시 loadHome()이 삽입됨 -->
   </div>
@@ -152,6 +153,54 @@
 
 </div>
 <!-- ─── 메인 영역 끝 ─── -->
+
+
+<!-- ───────────────────────────────────────────────────────────────────────── -->
+<!-- Generator Modal (처음엔 숨겨진 상태)                                        -->
+<!-- “+” 버튼을 누르면 열려서 비밀번호 생성 UI가 나타납니다.                       -->
+<!-- ───────────────────────────────────────────────────────────────────────── -->
+<div id="generatorModal"
+     class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden flex items-center justify-center"
+>
+  <div class="bg-white rounded-lg p-6 w-96">
+    <div class="flex justify-between items-center">
+      <h2 class="text-xl font-semibold">비밀번호 생성기</h2>
+      <button id="generatorClose" class="text-gray-500 hover:text-gray-800">×</button>
+    </div>
+    <div class="mt-4 space-y-4">
+      <!-- 길이 선택 슬라이더 -->
+      <div>
+        <label for="pwdLength">길이: <span id="pwdLengthValue">8</span></label>
+        <input id="pwdLength" type="range" min="4" max="32" value="8" class="w-full" />
+      </div>
+
+      <!-- 옵션 체크박스 -->
+      <div class="flex flex-col space-y-1">
+        <label><input id="optionNumber" type="checkbox" checked /> 숫자 포함</label>
+        <label><input id="optionUpper" type="checkbox" checked /> 대문자 포함</label>
+        <label><input id="optionSymbol" type="checkbox" /> 특수문자 포함</label>
+        <label><input id="optionRandomWord" type="checkbox" /> 랜덤 단어 포함</label>
+      </div>
+
+      <!-- 생성된 비밀번호 표시 및 강도바 -->
+      <div>
+        <input id="generatedPassword" type="text" readonly class="w-full border rounded px-2 py-1" />
+        <div class="w-full bg-gray-200 h-2 rounded mt-2">
+          <div id="strengthBar" class="h-2 w-0 rounded bg-red-500"></div>
+        </div>
+        <p id="strengthText" class="mt-1 text-sm text-gray-600">강도 표시</p>
+      </div>
+
+      <!-- 버튼들 -->
+      <div class="flex justify-between space-x-2">
+        <button id="generateBtn" class="flex-1 bg-blue-500 text-white rounded py-1">생성하기</button>
+        <button id="refreshPasswordBtn" class="flex-1 bg-green-500 text-white rounded py-1">새로고침</button>
+        <button id="copyPasswordBtn" class="flex-1 bg-gray-500 text-white rounded py-1">복사</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ─── Generator Modal 끝 ─── -->
 
 
 <!-- ───────────────────────────────────────────────────────────────────────── -->
@@ -179,49 +228,49 @@
     <div id="type-selection" class="grid grid-cols-4 gap-6 mb-6">
       <button id="type-wifi"
               class="flex flex-col items-center justify-center w-20 h-20 bg-white rounded-full shadow-md cursor-pointer transition
-                         hover:shadow-xl active:scale-95 focus:ring-2 focus:ring-indigo-300 focus:outline-none"
+                           hover:shadow-xl active:scale-95 focus:ring-2 focus:ring-indigo-300 focus:outline-none"
       >
         <i class="fa-solid fa-wifi text-indigo-500 text-2xl mb-1"></i>
         <span class="text-sm text-gray-700">Wi-Fi</span>
       </button>
       <button id="type-server"
               class="flex flex-col items-center justify-center w-20 h-20 bg-white rounded-full shadow-md cursor-pointer transition
-                         hover:shadow-xl active:scale-95 focus:ring-2 focus:ring-blue-300 focus:outline-none"
+                           hover:shadow-xl active:scale-95 focus:ring-2 focus:ring-blue-300 focus:outline-none"
       >
         <i class="fa-solid fa-server text-blue-500 text-2xl mb-1"></i>
         <span class="text-sm text-gray-700">Server</span>
       </button>
       <button id="type-bankbook"
               class="flex flex-col items-center justify-center w-20 h-20 bg-white rounded-full shadow-md cursor-pointer transition
-                         hover:shadow-xl active:scale-95 focus:ring-2 focus:ring-yellow-300 focus:outline-none"
+                           hover:shadow-xl active:scale-95 focus:ring-2 focus:ring-yellow-300 focus:outline-none"
       >
         <i class="fa-solid fa-book text-yellow-500 text-2xl mb-1"></i>
         <span class="text-sm text-gray-700">Bankbook</span>
       </button>
       <button id="type-identity"
               class="flex flex-col items-center justify-center w-20 h-20 bg-white rounded-full shadow-md cursor-pointer transition
-                         hover:shadow-xl active:scale-95 focus:ring-2 focus:ring-pink-300 focus:outline-none"
+                           hover:shadow-xl active:scale-95 focus:ring-2 focus:ring-pink-300 focus:outline-none"
       >
         <i class="fa-solid fa-id-card text-pink-500 text-2xl mb-1"></i>
         <span class="text-sm text-gray-700">Identity</span>
       </button>
       <button id="type-security"
               class="flex flex-col items-center justify-center w-20 h-20 bg-white rounded-full shadow-md cursor-pointer transition
-                         hover:shadow-xl active:scale-95 focus:ring-2 focus:ring-green-300 focus:outline-none"
+                           hover:shadow-xl active:scale-95 focus:ring-2 focus:ring-green-300 focus:outline-none"
       >
         <i class="fa-solid fa-shield-alt text-green-500 text-2xl mb-1"></i>
         <span class="text-sm text-gray-700">Security</span>
       </button>
       <button id="type-website"
               class="flex flex-col items-center justify-center w-20 h-20 bg-white rounded-full shadow-md cursor-pointer transition
-                         hover:shadow-xl active:scale-95 focus:ring-2 focus:ring-blue-300 focus:outline-none"
+                           hover:shadow-xl active:scale-95 focus:ring-2 focus:ring-blue-300 focus:outline-none"
       >
         <i class="fa-solid fa-globe text-blue-600 text-2xl mb-1"></i>
         <span class="text-sm text-gray-700">Website</span>
       </button>
       <button id="type-card"
               class="flex flex-col items-center justify-center w-20 h-20 bg-white rounded-full shadow-md cursor-pointer transition
-                         hover:shadow-xl active:scale-95 focus:ring-2 focus:ring-teal-300 focus:outline-none"
+                           hover:shadow-xl active:scale-95 focus:ring-2 focus:ring-teal-300 focus:outline-none"
       >
         <i class="fa-solid fa-credit-card text-teal-500 text-2xl mb-1"></i>
         <span class="text-sm text-gray-700">Card</span>
@@ -248,11 +297,10 @@
 </div>
 <!-- ─── 모달 끝 ─── -->
 
-
 <!-- ───────────────────────────────────────────────────────────────────────── -->
 <!-- 외부 JS 로직 불러오기 순서:                                        -->
 <!--  1) home_renderer.js → Home 전용 스크립트 로직                         -->
-<!--  2) shared_renderer.js → 공통 네비 하이라이트, goTo(page) 함수          -->
+<!--  2) shared_renderer.js → 공통 네비 하이라이트, Generator 로직 포함      -->
 <!-- ───────────────────────────────────────────────────────────────────────── -->
 <script src="./home_renderer.js"></script>
 <script src="../../shared/shared_renderer.js"></script>

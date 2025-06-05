@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <title>Start - Password Manager</title>
     <link rel="stylesheet" href="../styles/styles.css" />
+    <!-- 스크립트를 head가 아닌 body 맨 아래에 넣어도 되지만, defer 속성으로 여전히 안전하게 로딩됩니다. -->
     <script defer src="./start_renderer.js"></script>
 </head>
 <body class="bg-gray-100 h-screen flex items-center justify-center p-4">
@@ -11,26 +12,20 @@
     <h1 class="text-2xl font-bold text-center">비밀번호 파일 관리</h1>
 
     <div class="flex justify-between space-x-2">
-        <button id="btn-open-file" class="flex-1 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+        <button id="btn-open-file"
+                class="flex-1 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
             파일 열기
         </button>
-        <button id="btn-create-file" class="flex-1 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+        <button id="btn-create-file"
+                class="flex-1 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
             새 파일 생성
         </button>
     </div>
 
     <!-- 파일 리스트: 선택된 항목 옆에만 “삭제” 버튼이 나타납니다 -->
-    <ul id="file-list" class="border rounded p-2 h-32 overflow-auto bg-gray-50 space-y-1">
-        <!-- 예시: 선택 안 됐을 때 -->
+    <ul id="file-list"
+        class="border rounded p-2 h-32 overflow-auto bg-gray-50 space-y-1">
         <li class="text-gray-500 italic">선택된 파일이 없습니다.</li>
-
-        <!-- 예시: 선택된 파일이 있을 때 li 구조 -->
-        <!--
-        <li class="flex items-center justify-between p-2 rounded cursor-pointer hover:bg-blue-100">
-          <span class="">/path/to/your.csv</span>
-          <button class="ml-2 px-2 py-1 bg-red-500 text-white rounded">삭제</button>
-        </li>
-        -->
     </ul>
 
     <div class="flex space-x-2">
