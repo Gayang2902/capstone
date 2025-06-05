@@ -330,3 +330,20 @@ ipcMain.handle('deleteEntry', async (_evt, { uid }) => {
         }
     }
 });
+
+ipcMain.handle('request-backend', async (_evt, { oper, data }) => {
+    if (MOCK_BACKEND) {
+        // MOCK_BACKEND=true 인 경우, 테스트용 데이터나 다른 로직으로 처리
+        // 예: openFile 동작 시 data.file_path를 currentFilePath에 저장하거나
+        // 실제 C 프로세스가 아닌 간단히 status:true 리턴
+        console.log(`MOCK_BACKEND: oper="${oper}", data=`, data);
+        return { status: true, data: null };
+    }
+
+    try {
+        const resp = await sendToBackend(oper, data);
+        return resp;
+    } catch (err) {
+        return { status: false, error_message: err.message };
+    }
+});

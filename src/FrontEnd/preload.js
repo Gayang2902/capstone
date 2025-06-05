@@ -38,4 +38,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     clearBrowserStorage: () => ipcRenderer.send('clear-browser-storage'),
     // 파일 내보내기
     exportCsv: () => ipcRenderer.invoke('export-csv'),
+    // 백이랑 연동
+    requestBackend: (oper, data) => {
+        return ipcRenderer.invoke('request-backend', { oper, data });
+    },
 });

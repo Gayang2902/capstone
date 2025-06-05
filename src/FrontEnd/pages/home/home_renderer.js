@@ -524,3 +524,38 @@ async function loadAndRenderList(query = '') {
     pwList.append(tr);
   });
 }
+
+// =-=-----=-==--=-==--==-=-----=-==--=-==--==-=-----=-==--=-==--==-=-----=-==--=-==--==-=-----=-==--=-==--=
+// File: pages/home/home_renderer.js
+
+// 예시: “openFile” 작업을 백엔드로 전달하는 함수
+async function sendOpenFileToBackend(filePath) {
+  try {
+    // oper = 'openFile', data = { file_path: filePath }
+    const response = await window.electronAPI.requestBackend('openFile', {
+      file_path: filePath
+    });
+
+    if (!response.status) {
+      console.error('백엔드에 openFile 요청 실패:', response.error_message);
+      alert('파일 열기 요청에 실패했습니다: ' + response.error_message);
+      return;
+    }
+
+    console.log('백엔드 openFile 응답:', response);
+    // 필요하다면 여기서 응답 데이터 처리
+  } catch (err) {
+    console.error('requestBackend 호출 중 예외 발생:', err);
+  }
+}
+
+// 예시 버튼에 바인딩 (가령 “파일 경로 입력 후 백엔드에 전송” 용)
+const btnSendPath = document.getElementById('btnSendPath');
+btnSendPath?.addEventListener('click', () => {
+  const inputPath = document.getElementById('inputFilePath').value.trim();
+  if (!inputPath) {
+    alert('경로를 입력해주세요.');
+    return;
+  }
+  sendOpenFileToBackend(inputPath);
+});
