@@ -467,8 +467,8 @@ async function loadAndRenderList(query = '') {
   pwList.innerHTML = '';
   emptyMsg.textContent = '로딩 중...';
 
-  // IPC 호출: getAllPwds
-  const res = await window.electronAPI.getAllPwds();
+  // IPC 호출: getAllPasswords
+  const res = await window.electronAPI.getAllPasswords();
   if (!res.status) {
     emptyMsg.textContent = '불러오기 실패: ' + res.error_message;
     return;

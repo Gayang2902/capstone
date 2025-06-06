@@ -28,7 +28,6 @@ function startBackend() {
     const exePath = path.join(
         __dirname,
         '..',
-        'BackEnd',
         'backend',
         'build',
         'mac',
@@ -130,7 +129,7 @@ function sendToBackend(oper, data) {
         };
 
         const rawPayload = { oper, data };
-        console.log('[DEBUG] 프론트 → 백 payload (id 제외):', JSON.stringify(rawPayload));
+        console.log('[DEBUG] 프론트 → 백 payload :', JSON.stringify(rawPayload));
 
         backendProcess.stdin.write(JSON.stringify(rawPayload) + '\n');
 
@@ -215,15 +214,15 @@ ipcMain.handle('request-backend', async (_evt, { oper, data }) => {
 });
 
 /** (2) 전체 비밀번호 조회 */
-ipcMain.handle('getAllPwds', async () => {
+ipcMain.handle('getAllPasswords', async () => {
     if (!currentFilePath) {
         return { status: false, error_message: '파일이 선택되지 않았습니다.' };
     }
     try {
-        const resp = await sendToBackend('getAllPwds', { file_path: currentFilePath });
+        const resp = await sendToBackend('getAllPasswords', { file_path: currentFilePath });
         return resp;
     } catch (err) {
-        console.error('getAllPwds 오류:', err);
+        console.error('getAllPasswords 오류:', err);
         return { status: false, error_message: err.message };
     }
 });
@@ -232,7 +231,7 @@ ipcMain.handle('getAllPwds', async () => {
 ipcMain.handle('openFile', async () => {
     try {
         const { canceled, filePaths } = await dialog.showOpenDialog(mainWindow, {
-            title: 'TXT 파일 선택',
+            title: 'txt 파일 선택',
             properties: ['openFile'],
             filters: [{ name: '텍스트 파일', extensions: ['txt'] }],
         });
@@ -323,7 +322,7 @@ ipcMain.handle('export-csv', async () => {
     }
 
     try {
-        const resp = await sendToBackend('getAllPwds', { file_path: currentFilePath });
+        const resp = await sendToBackend('getAllPasswords', { file_path: currentFilePath });
         if (!resp.status) {
             return { status: false, error_message: resp.error_message || '백엔드 조회 실패' };
         }
@@ -344,7 +343,7 @@ ipcMain.handle('export-csv', async () => {
         const txtContent = lines.join('\n');
 
         const { canceled, filePath } = await dialog.showSaveDialog(mainWindow, {
-            title: 'TXT로 내보내기',
+            title: 'txt로 내보내기',
             defaultPath: 'exported_passwords.txt',
             filters: [{ name: '텍스트 파일', extensions: ['txt'] }],
         });
