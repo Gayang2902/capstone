@@ -1,0 +1,7 @@
+﻿  database.cpp
+C:\Users\millet\Desktop\capstone_backend\database.cpp(17,10): error C1083: 포함 파일을 열 수 없습니다. 'sodium.h': No such file or directory
+  handler.cpp
+C:\Users\millet\Desktop\capstone_backend\handler.cpp(1,1): warning C4819: 현재 코드 페이지(949)에서 표시할 수 없는 문자가 파일에 들어 있습니다. 데이터가 손실되지 않게 하려면 해당 파일을 유니코드 형식으로 저장하십시오.
+  main.cpp
+  utils.cpp
+  코드를 생성하고 있습니다...

@@ -1,0 +1,220 @@
+/* ──────────────────────────────────────────────────────────────────────────────── */
+/* styles.css                                                                    */
+/* 역할: 전체 앱 레이아웃, 글래스모피즘, 애니메이션, 필터바, 테이블, 플로팅 액션 버튼 */
+/* ──────────────────────────────────────────────────────────────────────────────── */
+
+/* ─── 1. 커스텀 프로퍼티 (CSS 변수) ─── */
+:root {
+  /* 주요 색상 */
+  --color-primary: #22c55e;       /* 기본 녹색 */
+  --color-primary-dark: #16a34a;  /* 어두운 녹색 */
+  /* 배경 그라데이션 색상 */
+  --color-bg-start: #eef8ff;
+  --color-bg-end: #ffffff;
+  /* 블러 강도 */
+  --blur-strength: 12px;
+  /* 전환 속도 */
+  --transition-fast: 0.25s ease-out;
+  /* 메인 폰트 */
+  --font-main: 'Inter', sans-serif;
+}
+
+/* ─── 2. 전체 배경 그라디언트 애니메이션 ─── */
+@keyframes bg-slide {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-main);
+  /* 3색 선형 그라데이션 */
+  background: linear-gradient(135deg,
+    var(--color-bg-start),
+    var(--color-bg-end),
+    #f0fcff
+  );
+  background-size: 300% 300%;
+  /* 무한 애니메이션 */
+  animation: bg-slide 15s ease infinite;
+  color: #334155; /* 기본 텍스트 색 */
+}
+
+/* ─── 3. 사이드바: 글래스모피즘 ─── */
+aside {
+  width: 240px;
+  height: 100vh;
+  position: fixed;
+  top: 0; left: 0;
+  padding: 2rem 1rem;
+  /* 반투명 배경 + 블러 */
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(var(--blur-strength));
+  border-right: 1px solid rgba(255,255,255,0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+aside h1 {
+  font-size: 1.75rem;
+  color: var(--color-primary-dark);
+  margin-bottom: 2rem;
+}
+aside nav button {
+  width: 100%;
+  background: transparent;
+  border: none;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  color: #1e293b;
+  border-radius: 0.75rem;
+  transition:
+    background var(--transition-fast),
+    transform  var(--transition-fast);
+}
+aside nav button:hover {
+  background: rgba(255,255,255,0.6);
+  transform: translateX(4px);
+}
+
+/* ─── 4. 헤더 ─── */
+main > header {
+  /* 사이드바 너비만큼 왼쪽 여백 */
+  margin-left: 240px;
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+main > header h2 {
+  font-size: 2rem;
+  color: #1e293b;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+main > header .icon-btn {
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255,255,255,0.5);
+  backdrop-filter: blur(var(--blur-strength));
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.7);
+  transition:
+    transform  var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+main > header .icon-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* ─── 5. 필터 & 액션바 ─── */
+.filter-bar {
+  margin-left: 240px; /* sidebar offset */
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.filter-bar .btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition:
+    background var(--transition-fast),
+    transform  var(--transition-fast);
+}
+.filter-bar .btn.active,
+.filter-bar .btn:hover {
+  background: var(--color-primary);
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* ─── 6. “+추가순” 버튼 ─── */
+.btn-add-order {
+  margin-left: auto;
+  padding: 0.6rem 1.2rem;
+  background: var(--color-primary);
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  transition:
+    background var(--transition-fast),
+    transform  var(--transition-fast);
+}
+.btn-add-order:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-3px);
+}
+
+/* ─── 7. 테이블 컨테이너 ─── */
+.table-container {
+  margin: 2rem;
+  margin-left: 240px; /* sidebar offset */
+  background: rgba(255,255,255,0.6);
+  backdrop-filter: blur(var(--blur-strength));
+  border-radius: 1rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+.table-container table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.table-container thead th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #334155;
+  border-bottom: 2px solid var(--color-primary);
+}
+.table-container tbody tr {
+  transition:
+    background var(--transition-fast),
+    transform  var(--transition-fast);
+}
+.table-container tbody tr:nth-child(even) {
+  background: rgba(255,255,255,0.8);
+}
+.table-container tbody tr:hover {
+  background: rgba(255,255,255,1);
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+.table-container td {
+  padding: 0.75rem 1rem;
+  color: #1e293b;
+}
+
+/* ─── 8. 플로팅 액션 버튼 (FAB) ─── */
+.fab {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 4rem;
+  height: 4rem;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.fab:hover {
+  transform: scale(1.15);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+}

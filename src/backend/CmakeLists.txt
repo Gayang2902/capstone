@@ -1,0 +1,71 @@
+cmake_minimum_required(VERSION 3.10)
+
+project(capstone_backend LANGUAGES CXX)
+
+# C++17 설정
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# 소스 파일
+set(SRC_FILES
+    main.cpp
+    handler.cpp
+    database.cpp
+    utils.cpp
+)
+
+# 기본 include 디렉터리
+include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+# 플랫폼별 구분 및 라이브러리 설정
+if(WIN32)
+    message(WARNING "Windows: Visual Studio 솔루션(.sln)을 사용하세요.")
+
+elseif(APPLE)
+    set(PLATFORM_DIR "mac")
+
+    find_path(SODIUM_INCLUDE_DIR sodium.h PATHS /opt/homebrew/include /usr/local/include)
+    find_library(SODIUM_LIB NAMES sodium PATHS /opt/homebrew/lib /usr/local/lib)
+
+    find_path(CRYPTOPP_INCLUDE_DIR cryptopp/cryptlib.h PATHS /opt/homebrew/include /usr/local/include)
+    find_library(CRYPTOPP_LIB NAMES cryptopp PATHS /opt/homebrew/lib /usr/local/lib)
+
+    if(NOT SODIUM_LIB OR NOT SODIUM_INCLUDE_DIR)
+        message(FATAL_ERROR "libsodium not found. brew install libsodium")
+    endif()
+    if(NOT CRYPTOPP_LIB OR NOT CRYPTOPP_INCLUDE_DIR)
+        message(FATAL_ERROR "cryptopp not found. brew install cryptopp")
+    endif()
+
+    include_directories(${SODIUM_INCLUDE_DIR} ${CRYPTOPP_INCLUDE_DIR})
+    link_libraries(${SODIUM_LIB} ${CRYPTOPP_LIB})
+
+elseif(UNIX)
+    set(PLATFORM_DIR "linux")
+
+    find_path(SODIUM_INCLUDE_DIR sodium.h PATHS /usr/include /usr/local/include)
+    find_library(SODIUM_LIB NAMES sodium PATHS /usr/lib /usr/local/lib)
+
+    find_path(CRYPTOPP_INCLUDE_DIR cryptopp/cryptlib.h PATHS /usr/include /usr/local/include)
+    find_library(CRYPTOPP_LIB NAMES cryptopp PATHS /usr/lib /usr/local/lib)
+
+    if(NOT SODIUM_LIB OR NOT SODIUM_INCLUDE_DIR)
+        message(FATAL_ERROR "libsodium not found. sudo apt install libsodium-dev")
+    endif()
+    if(NOT CRYPTOPP_LIB OR NOT CRYPTOPP_INCLUDE_DIR)
+        message(FATAL_ERROR "cryptopp not found. sudo apt install libcrypto++-dev")
+    endif()
+
+    include_directories(${SODIUM_INCLUDE_DIR} ${CRYPTOPP_INCLUDE_DIR})
+    link_libraries(${SODIUM_LIB} ${CRYPTOPP_LIB})
+endif()
+
+if(DEFINED PLATFORM_DIR)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PLATFORM_DIR})
+endif()
+
+# 실행 파일 생성
+add_executable(main ${SRC_FILES})

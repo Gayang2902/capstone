@@ -1,0 +1,81 @@
+﻿  handler.cpp
+C:\Users\millet\capstone\src\backend\handler.cpp(1,1): warning C4819: 현재 코드 페이지(949)에서 표시할 수 없는 문자가 파일에 들어 있습니다. 데이터가 손실되지 않게 하려면 해당 파일을 유니코드 형식으로 저장하십시오.
+  main.cpp
+  코드를 생성하고 있습니다.
+  21 of 3230 functions ( 0.7%) were compiled, the rest were copied from previous compilation.
+    2 functions were new in current compilation
+    6 functions had inline decision re-evaluated but remain unchanged
+  코드를 생성했습니다.
+cryptlib.lib(cryptlib.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(cryptlib.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(modes.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(modes.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(filters.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(filters.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(algparam.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(algparam.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(rijndael.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(rijndael.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(allocate.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(allocate.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(integer.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(integer.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(misc.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(misc.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(queue.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(queue.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(fips140.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(fips140.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(pch.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(pch.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(mqueue.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(mqueue.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(cpu.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(cpu.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(rijndael_simd.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(rijndael_simd.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(rdtables.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(rdtables.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(dll.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(dll.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(nbtheory.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(nbtheory.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(asn.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(asn.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(pubkey.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(pubkey.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(iterhash.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(iterhash.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(sha.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(sha.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(gfpcrypt.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(gfpcrypt.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(hmac.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(hmac.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(gf2n.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(gf2n.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(ec2n.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(ec2n.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(ecp.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(ecp.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(basecode.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(basecode.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(hex.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(hex.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(rng.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(rng.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(osrng.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(osrng.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(primetab.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(primetab.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(sha_simd.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(sha_simd.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(randpool.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(randpool.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(gf2n_simd.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(gf2n_simd.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+cryptlib.lib(hrtimer.obj) : warning LNK4099: '' PDB를 'cryptlib.lib(hrtimer.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(core.obj) : warning LNK4099: '' PDB를 'libsodium.lib(core.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(crypto_pwhash.obj) : warning LNK4099: '' PDB를 'libsodium.lib(crypto_pwhash.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(randombytes.obj) : warning LNK4099: '' PDB를 'libsodium.lib(randombytes.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(runtime.obj) : warning LNK4099: '' PDB를 'libsodium.lib(runtime.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(utils.obj) : warning LNK4099: '' PDB를 'libsodium.lib(utils.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(generichash_blake2b.obj) : warning LNK4099: '' PDB를 'libsodium.lib(generichash_blake2b.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(onetimeauth_poly1305.obj) : warning LNK4099: '' PDB를 'libsodium.lib(onetimeauth_poly1305.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(argon2-core.obj) : warning LNK4099: '' PDB를 'libsodium.lib(argon2-core.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(scalarmult_curve25519.obj) : warning LNK4099: '' PDB를 'libsodium.lib(scalarmult_curve25519.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(stream_chacha20.obj) : warning LNK4099: '' PDB를 'libsodium.lib(stream_chacha20.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(stream_salsa20.obj) : warning LNK4099: '' PDB를 'libsodium.lib(stream_salsa20.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(pwhash_argon2i.obj) : warning LNK4099: '' PDB를 'libsodium.lib(pwhash_argon2i.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(pwhash_argon2id.obj) : warning LNK4099: '' PDB를 'libsodium.lib(pwhash_argon2id.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(randombytes_sysrandom.obj) : warning LNK4099: '' PDB를 'libsodium.lib(randombytes_sysrandom.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(blake2b-ref.obj) : warning LNK4099: '' PDB를 'libsodium.lib(blake2b-ref.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(poly1305_donna.obj) : warning LNK4099: '' PDB를 'libsodium.lib(poly1305_donna.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(argon2-fill-block-ref.obj) : warning LNK4099: '' PDB를 'libsodium.lib(argon2-fill-block-ref.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(argon2-fill-block-avx2.obj) : warning LNK4099: '' PDB를 'libsodium.lib(argon2-fill-block-avx2.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(argon2-fill-block-ssse3.obj) : warning LNK4099: '' PDB를 'libsodium.lib(argon2-fill-block-ssse3.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(blake2b-long.obj) : warning LNK4099: '' PDB를 'libsodium.lib(blake2b-long.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(x25519_ref10.obj) : warning LNK4099: '' PDB를 'libsodium.lib(x25519_ref10.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(chacha20_ref.obj) : warning LNK4099: '' PDB를 'libsodium.lib(chacha20_ref.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(chacha20_dolbeau-avx2.obj) : warning LNK4099: '' PDB를 'libsodium.lib(chacha20_dolbeau-avx2.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(chacha20_dolbeau-ssse3.obj) : warning LNK4099: '' PDB를 'libsodium.lib(chacha20_dolbeau-ssse3.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(salsa20_ref.obj) : warning LNK4099: '' PDB를 'libsodium.lib(salsa20_ref.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(salsa20_xmm6int-sse2.obj) : warning LNK4099: '' PDB를 'libsodium.lib(salsa20_xmm6int-sse2.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(salsa20_xmm6int-avx2.obj) : warning LNK4099: '' PDB를 'libsodium.lib(salsa20_xmm6int-avx2.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(argon2.obj) : warning LNK4099: '' PDB를 'libsodium.lib(argon2.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(argon2-encoding.obj) : warning LNK4099: '' PDB를 'libsodium.lib(argon2-encoding.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(blake2b-compress-ref.obj) : warning LNK4099: '' PDB를 'libsodium.lib(blake2b-compress-ref.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(blake2b-compress-ssse3.obj) : warning LNK4099: '' PDB를 'libsodium.lib(blake2b-compress-ssse3.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(blake2b-compress-sse41.obj) : warning LNK4099: '' PDB를 'libsodium.lib(blake2b-compress-sse41.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(blake2b-compress-avx2.obj) : warning LNK4099: '' PDB를 'libsodium.lib(blake2b-compress-avx2.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(verify.obj) : warning LNK4099: '' PDB를 'libsodium.lib(verify.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(ed25519_ref10.obj) : warning LNK4099: '' PDB를 'libsodium.lib(ed25519_ref10.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(core_salsa_ref.obj) : warning LNK4099: '' PDB를 'libsodium.lib(core_salsa_ref.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+libsodium.lib(codecs.obj) : warning LNK4099: '' PDB를 'libsodium.lib(codecs.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+  capstone_backend.vcxproj -> C:\Users\millet\capstone\src\backend\x64\Release\capstone_backend.exe
