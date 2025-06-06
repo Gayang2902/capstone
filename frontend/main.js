@@ -24,15 +24,21 @@ function startBackend() {
         backendReadyResolve = resolve;
     });
 
-    // ▶ 백엔드 바이너리 경로
-    const exePath = path.join(
-        __dirname,
-        '..',
-        'backend',
-        'build',
-        'mac',
-        'main'
-    );
+    // KDU - 운영체제별 테스트 자동 경로
+    let exePath;
+    switch (process.platform) {
+        case 'darwin': // macOS
+            exePath = path.join(__dirname, '..', 'backend', 'build', 'mac', 'main');
+            break;
+        case 'win32': // Windows
+            exePath = path.join(__dirname, '..', 'backend', 'x64', 'Release', 'capstone_backend.exe');
+            break;
+        case 'linux': // Linux
+            exePath = path.join(__dirname, '..', 'backend', 'build', 'linux', 'main');
+            break;
+        default:
+            throw new Error(`지원하지 않는 플랫폼: ${process.platform}`);
+    }
 
     // C++ 백엔드 실행 (cwd 옵션은 필요 없거나 exePath에 맞춰 조정)
     backendProcess = spawn(exePath, [], {
