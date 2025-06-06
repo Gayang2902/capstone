@@ -34,11 +34,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // 비밀번호 항목 생성 (oper="createPasswordEntry", data={ file_path, ...entry })
     createPasswordEntry:        data => ipcRenderer.invoke('createPasswordEntry', data),
 
-    // 비밀번호 항목 수정 (oper="updateEntry", data={ file_path, ...updateData })
-    updateEntry:        data => ipcRenderer.invoke('updateEntry', data),
+    // 비밀번호 항목 수정 (oper="updatePasswordEntry", data={ file_path, ...updateData })
+    updatePasswordEntry:        data => ipcRenderer.invoke('updatePasswordEntry', data),
 
-    // 비밀번호 항목 삭제 (oper="deleteEntry", data={ file_path, uid })
-    deleteEntry:        uid  => ipcRenderer.invoke('deleteEntry', { uid }),
+    // 비밀번호 항목 삭제 (oper="deletePasswordEntry", data={ file_path, uid })
+    // deletePasswordEntry:        uid  => ipcRenderer.invoke('deletePasswordEntry', { uid }),
+    deletePasswordEntry: uid => ipcRenderer.invoke('deletePasswordEntry', { UID: uid }),
 
     // 비밀번호 파일 경로 조회
     getFilePath:        () => ipcRenderer.invoke('getFilePath'),
