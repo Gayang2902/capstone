@@ -3,6 +3,7 @@ beautiful/useful password manager
 
 ## Supported Platforms
 아래의 환경에서 작동을 보장합니다.
+
 **Windows 10/11**
 - Visual Studio 2022
 - x64
