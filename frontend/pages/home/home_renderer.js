@@ -388,11 +388,11 @@ saveBtn.addEventListener('click', async () => {
       }
       break;
     case 'bankbook':
-      data.accountNum = document.getElementById('bankbook-account-num').value.trim();
-      data.accountPwd = document.getElementById('bankbook-account-pwd').value.trim();
-      data.bankName   = document.getElementById('bankbook-bank-name').value.trim();
+      data.num = document.getElementById('bankbook-account-num').value.trim();
+      data.pwd = document.getElementById('bankbook-account-pwd').value.trim();
+      data.bank_name   = document.getElementById('bankbook-bank-name').value.trim();
       data.master     = document.getElementById('bankbook-master').value.trim();
-      if (!data.accountNum || !data.accountPwd || !data.bankName || !data.master) {
+      if (!data.num || !data.pwd || !data.bank_name || !data.master) {
         alert('모든 필드를 입력해주세요.');
         return;
       }
@@ -400,10 +400,10 @@ saveBtn.addEventListener('click', async () => {
     case 'identity':
       data.citizen   = document.getElementById('identity-citizen').value.trim();
       data.name      = document.getElementById('identity-name').value.trim();
-      data.engName   = document.getElementById('identity-eng-name').value.trim();
+      data.eng_name   = document.getElementById('identity-eng-name').value.trim();
       data.address   = document.getElementById('identity-address').value.trim();
-      data.birthDate = document.getElementById('identity-birth-date').value;
-      if (!data.citizen || !data.name || !data.engName || !data.address || !data.birthDate) {
+      data.birth_date = document.getElementById('identity-birth-date').value;
+      if (!data.citizen || !data.name || !data.eng_name || !data.address || !data.birth_date) {
         alert('모든 필드를 입력해주세요.');
         return;
       }
@@ -426,13 +426,13 @@ saveBtn.addEventListener('click', async () => {
       }
       break;
     case 'card':
-      data.cardNumber = document.getElementById('card-number').value.trim();
+      data.card_number = document.getElementById('card-number').value.trim();
       data.cvc        = document.getElementById('card-cvc').value.trim();
-      data.expiry     = document.getElementById('card-expiry').value;
-      data.cardBank   = document.getElementById('card-bank-name').value.trim();
-      data.cardPwd    = document.getElementById('card-pwd').value.trim();
-      data.cardName   = document.getElementById('card-name').value.trim();
-      if (!data.cardNumber || !data.cvc || !data.expiry || !data.cardBank || !data.cardPwd || !data.cardName) {
+      data.last_day     = document.getElementById('card-expiry').value;
+      data.bank_name   = document.getElementById('card-bank-name').value.trim();
+      data.pwd    = document.getElementById('card-pwd').value.trim();
+      data.name   = document.getElementById('card-name').value.trim();
+      if (!data.card_number || !data.cvc || !data.last_day || !data.bank_name || !data.pwd || !data.name) {
         alert('모든 필드를 입력해주세요.');
         return;
       }
@@ -457,126 +457,158 @@ saveBtn.addEventListener('click', async () => {
 // ─────────────────────────────────────────────────────────────
 // ===== 5) 전체 비밀번호 가져와서 렌더링 =====
 // ─────────────────────────────────────────────────────────────
-// ───── (1) 비밀번호 리스트를 가져오는 함수 ─────
+// ===== 5) 전체 비밀번호 가져와서 카드로 렌더링 =====
 async function loadAndRenderList(query = '') {
-  const pwList   = document.getElementById('pw-list');      // <tbody> 요소
-  const emptyMsg = document.getElementById('empty-msg');     // 빈 메시지 td
-
-  // 1) 초기화: “로딩 중...” 텍스트 표시
-  pwList.innerHTML = '';
+  const container = document.getElementById('card-container');
+  const emptyMsg  = document.getElementById('empty-msg');
+  container.innerHTML = '';
   emptyMsg.textContent = '로딩 중...';
   emptyMsg.style.display = '';
 
   let res;
   try {
-    // IPC를 통해 백엔드로부터 모든 비밀번호를 가져온다
     res = await window.electronAPI.getAllPasswords();
   } catch (err) {
     emptyMsg.textContent = '불러오기 예외: ' + err.message;
     return;
   }
-
-  // 2) 응답 검사
   if (!res.status) {
     emptyMsg.textContent = '불러오기 실패: ' + res.error_message;
     return;
   }
 
-  // 3) 실제 비밀번호 배열은 res.data.data에 들어있다
-  //    (백엔드에서 { data: { data: [ … ] }, status: true } 형태로 반환되었기 때문)
-  const dataArray = Array.isArray(res.data?.data) ? res.data.data : [];
-
-  // 4) 검색 필터(선택 사항)
-  let entries = dataArray;
+  let entries = Array.isArray(res.data?.data) ? res.data.data : [];
   if (query) {
     const lower = query.toLowerCase();
-    entries = entries.filter(entry =>
-        // entry의 모든 값 중 하나라도 검색어를 포함하면 필터링 통과
-        Object.values(entry).some(val =>
-            String(val).toLowerCase().includes(lower)
-        )
+    entries = entries.filter(e =>
+        Object.values(e).some(v => String(v).toLowerCase().includes(lower))
     );
   }
-
-  // 5) 데이터가 없으면 “저장된 비밀번호가 없습니다.” 표시 후 종료
-  if (entries.length === 0) {
+  if (!entries.length) {
     emptyMsg.textContent = '저장된 비밀번호가 없습니다.';
     return;
   }
-
-  // 6) 데이터가 있으면 “로딩 중” 메시지 숨기고, 테이블에 행을 추가
   emptyMsg.style.display = 'none';
 
   entries.forEach(entry => {
-    // ─── 6.1) <tr> 요소 생성 ───
-    const tr = document.createElement('tr');
+    // 7개 컬럼: icon(48px) | label/sub(200px) | field1(150px) | field2(150px) | field3(150px) | type(100px) | delete(80px)
+    const card = document.createElement('div');
+    card.className =
+        'grid grid-cols-[48px,100px,150px,150px,150px,100px,80px] items-center ' +
+        'p-4 bg-white rounded-lg shadow w-full gap-x-4'; // 간격 설정
 
-    // ─── 6.2) Label 컬럼 ───
-    const tdLabel = document.createElement('td');
-    tdLabel.className = 'border px-4 py-2';
-    tdLabel.textContent = entry.label || '';
-    tr.appendChild(tdLabel);
+    // ① 아이콘 셀
+    const iconCell = document.createElement('div');
+    iconCell.className = 'w-12 h-12';
+    let iconEl;
+    if (entry.type === 'website') {
+      iconEl = document.createElement('div');
+      iconEl.id = 'favicon';
+      iconEl.className = 'w-full h-full object-contain';
+    } else {
+      iconEl = document.createElement('img');
+      iconEl.src = `../icon/${entry.type === 'wifi' ? 'wifi' : entry.type}.png`;
+      iconEl.alt = entry.type;
+      iconEl.className = 'w-full h-full object-contain';
+    }
+    iconCell.appendChild(iconEl);
+    card.appendChild(iconCell);
 
-    // ─── 6.3) Type 컬럼 (필요 없으면 이 부분을 삭제해도 됩니다) ───
-    const tdType = document.createElement('td');
-    tdType.className = 'border px-4 py-2';
-    tdType.textContent = entry.type || '';
-    tr.appendChild(tdType);
+    // ② 레이블 + 서브텍스트 셀
+    const labelCell = document.createElement('div');
+    labelCell.className = 'flex flex-col';
+    const lbl = document.createElement('span');
+    lbl.className = 'font-semibold';
+    lbl.textContent = entry.type === 'card' ? entry.bank_name : entry.label;
+    const sub = document.createElement('span');
+    sub.className = 'text-xs text-gray-500';
+    switch (entry.type) {
+      case 'website':   sub.textContent = entry.url; break;
+      case 'server':    sub.textContent = `Host: ${entry.host} Port: ${entry.port}`; break;
+      case 'bankbook':  sub.textContent = `Bank: ${entry.bankName}`; break;
+      case 'identity':  sub.textContent = `Eng: ${entry.eng_name}`; break;
+      case 'card':      sub.textContent = `CVC: ${entry.cvc}`; break;
+      default:          sub.textContent = '';
+    }
+    labelCell.append(lbl, sub);
+    card.appendChild(labelCell);
 
-    // ─── 6.4) Details 컬럼: “UID, created_at, modified_at, favorite, type” 제외 ───
-    const tdDetails = document.createElement('td');
-    tdDetails.className = 'border px-4 py-2';
+    // 준비: 필드 값 배열 (최대 3)
+    const mask = () => '****';
+    let fields = [];
+    if (entry.type === 'website') {
+      fields = [
+        ['ID:', entry.id],
+        ['PWD:', mask()],
+        ['E-Mail:', entry.email]
+      ];
+    } else if (entry.type === 'server') {
+      fields = [
+        ['ID:', entry.id],
+        ['PWD:', mask()],
+        ['', '']
+      ];
+    } else if (entry.type === 'bankbook') {
+      fields = [
+        ['Num:', entry.accountNum],
+        ['PWD:', mask()],
+        ['', '']
+      ];
+    } else if (entry.type === 'identity') {
+      fields = [
+        ['Name:', entry.name],
+        ['Citizen:', entry.citizen],
+        ['', '']
+      ];
+    } else if (entry.type === 'card') {
+      fields = [
+        ['Num:', entry.card_number],
+        ['PWD:', mask()],
+        ['', '']
+      ];
+    } else if (entry.type === 'wifi') {
+      fields = [
+        ['ID:', entry.id],
+        ['PWD:', mask()],
+        ['', '']
+      ];
+    } else if (entry.type === 'security') {
+      fields = [
+        ['', entry.content],
+        ['', ''],
+        ['', '']
+      ];
+    }
 
-    // 출력하지 않을 필드 키 배열 (대문자 UID, created_at 등)
-    const hiddenKeys = ['UID', 'created_at', 'modified_at', 'favorite', 'type', 'label'];
+    // ③~⑤ 필드 셀
+    for (let i = 0; i < 3; i++) {
+      const [key, val] = fields[i] || ['', ''];
+      const cell = document.createElement('div');
+      if (key) cell.innerHTML = `<strong>${key}</strong> ${val}`;
+      card.appendChild(cell);
+    }
 
-    const detailLines = [];
-    Object.entries(entry).forEach(([key, val]) => {
-      if (hiddenKeys.includes(key)) return;
-      // 예: key="host", val="redsnowz.kr"
-      detailLines.push(`<strong>${key}:</strong> ${val}`);
-    });
+    // ⑥ 타입 셀
+    const typeCell = document.createElement('span');
+    typeCell.className = 'text-xs text-gray-400';
+    typeCell.textContent = `Type: ${entry.type}`;
+    card.appendChild(typeCell);
 
-    tdDetails.innerHTML = detailLines.join('<br>');
-    tr.appendChild(tdDetails);
-
-    // ─── 6.5) Actions 컬럼 (수정 / 삭제 버튼) ───
-    const tdActions = document.createElement('td');
-    tdActions.className = 'border px-4 py-2 space-x-2';
-    tdActions.innerHTML = `
-      <button class="btn-edit px-2 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600">
-        수정
-      </button>
-      <button class="btn-del px-2 py-1 bg-red-500 text-white rounded-md hover:bg-red-600">
-        삭제
-      </button>
-    `;
-    tr.appendChild(tdActions);
-
-    // ─── 6.6) 삭제 버튼 클릭 시 ───
-    tr.querySelector('.btn-del').addEventListener('click', async () => {
+    // ⑦ 삭제 버튼 셀
+    const btnCell = document.createElement('div');
+    const delBtn = document.createElement('button');
+    delBtn.className = 'text-red-500 hover:underline';
+    delBtn.textContent = '삭제';
+    delBtn.addEventListener('click', async e => {
+      e.stopPropagation();
       if (!confirm('정말 삭제하시겠습니까?')) return;
-
-      // 수정된 형태: uid를 문자열 그대로 넘김
       await window.electronAPI.deletePasswordEntry(entry.UID);
-
       loadAndRenderList(query);
     });
+    btnCell.appendChild(delBtn);
+    card.appendChild(btnCell);
 
-
-    // ─── 6.7) 수정 버튼 클릭 시 (레이블만 변경하는 예시) ───
-    tr.querySelector('.btn-edit').addEventListener('click', async () => {
-      const newLabel = prompt('새 레이블을 입력하세요', entry.label);
-      if (newLabel === null) return;
-      await window.electronAPI.updatePasswordEntry({ uid: entry.UID, label: newLabel });
-      loadAndRenderList(query);
-    });
-
-    pwList.appendChild(tr);
+    card.addEventListener('click', () => openEditModal(entry));
+    container.appendChild(card);
   });
 }
-
-// 페이지 로드 시 한 번 실행
-window.addEventListener('DOMContentLoaded', () => {
-  loadAndRenderList();
-});

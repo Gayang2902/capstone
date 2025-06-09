@@ -150,14 +150,9 @@ function sendToBackend(oper, data) {
 
 /** 3) 메인 윈도우 생성 */
 function createMainWindow() {
-    const { width: sw } = screen.getPrimaryDisplay().workAreaSize;
-
-    let winWidth = Math.min(Math.max(Math.floor(sw * 0.75), 1024), 1366);
-    let winHeight = Math.round(winWidth * 9 / 16);
-
     mainWindow = new BrowserWindow({
-        width: winWidth,
-        height: winHeight,
+        width: 1200,
+        height: 800,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             contextIsolation: true,
@@ -305,64 +300,103 @@ ipcMain.handle('postMasterKey', async (_evt, { master_key }) => {
     }
 });
 
-/** (6) 마스터 비밀번호 변경 */
+// /** (6) 마스터 비밀번호 변경 */
+// ipcMain.handle('updateMasterKey', async (_evt, { old_master_key, new_master_key }) => {
+//     if (!currentFilePath) {
+//         return { status: false, error_message: '파일이 선택되지 않았습니다.' };
+//     }
+//     try {
+//         const resp = await sendToBackend('updateMasterKey', {
+//             old_master_key,
+//             new_master_key,
+//             file_path: currentFilePath
+//         });
+//         return resp;
+//     } catch (err) {
+//         console.error('updateMasterKey 오류:', err);
+//         return { status: false, error_message: err.message };
+//     }
+// });
+
 ipcMain.handle('updateMasterKey', async (_evt, { old_master_key, new_master_key }) => {
-    if (!currentFilePath) {
-        return { status: false, error_message: '파일이 선택되지 않았습니다.' };
-    }
-    try {
-        const resp = await sendToBackend('updateMasterKey', {
-            old_master_key,
-            new_master_key,
-            file_path: currentFilePath
-        });
-        return resp;
-    } catch (err) {
-        console.error('updateMasterKey 오류:', err);
-        return { status: false, error_message: err.message };
-    }
+    const resp = await sendToBackend('updateMasterKey', {
+        old_master_key,
+        new_master_key,
+        file_path: currentFilePath
+    });
+    return resp;
 });
 
-/** TXT 내보내기 */
+// File: src/main.js
+
+/** TXT 내보내기 — 모든 비밀번호 항목의 모든 필드를 포함 (일부 메타 필드 제외) */
 ipcMain.handle('export-csv', async () => {
     if (!currentFilePath) {
         return { status: false, error_message: '파일이 선택되지 않았습니다.' };
     }
 
     try {
+        // 1) 전체 비밀번호 조회
         const resp = await sendToBackend('getAllPasswords', { file_path: currentFilePath });
-        if (!resp.status) {
+        if (!resp.status || !Array.isArray(resp.data.data)) {
             return { status: false, error_message: resp.error_message || '백엔드 조회 실패' };
         }
-        const allPwds = resp.data;
+        const allEntries = resp.data.data;
 
-        const header = ['uid', 'label', 'type', 'userId', 'password'];
-        const lines = [header.join(',')];
-        allPwds.forEach(entry => {
-            const row = [
-                entry.uid || '',
-                entry.label || '',
-                entry.type || '',
-                entry.userId || '',
-                entry.password || ''
-            ];
+        if (allEntries.length === 0) {
+            return { status: false, error_message: '내보낼 비밀번호가 없습니다.' };
+        }
+
+        // 2) 모든 키 수집 (메타 필드 제외)
+        const exclude = new Set(['UID','type','created_at','modified_at','favorite']);
+        const fieldSet = new Set();
+        allEntries.forEach(entry => {
+            Object.keys(entry).forEach(key => {
+                if (!exclude.has(key)) fieldSet.add(key);
+            });
+        });
+
+        // 우선순위 필드 순서 지정
+        const priority = ['label','comments','host','port','url','email','id','password','userId'];
+        const headers = [];
+        for (const key of priority) {
+            if (fieldSet.has(key)) {
+                headers.push(key);
+                fieldSet.delete(key);
+            }
+        }
+        // 그 외 남은 필드 알파벳 순 추가
+        const rest = Array.from(fieldSet).sort();
+        headers.push(...rest);
+
+        // 3) CSV/텍스트 콘텐츠 생성
+        const lines = [ headers.join(',') ];
+        allEntries.forEach(entry => {
+            const row = headers.map(key => {
+                let v = entry[key] != null ? String(entry[key]) : '';
+                if (v.includes(',')) v = `"${v.replace(/"/g,'""')}"`;
+                return v;
+            });
             lines.push(row.join(','));
         });
         const txtContent = lines.join('\n');
 
+        // 4) 저장 대화상자
         const { canceled, filePath } = await dialog.showSaveDialog(mainWindow, {
-            title: 'txt로 내보내기',
-            defaultPath: 'exported_passwords.txt',
+            title: '모든 비밀번호 내보내기',
+            // defaultPath: '', // 기본 내보내기 이름
             filters: [{ name: '텍스트 파일', extensions: ['txt'] }],
         });
         if (canceled || !filePath) {
             return { status: false, error_message: '내보내기를 취소했습니다.' };
         }
 
+        // 5) 파일 쓰기
         fs.writeFileSync(filePath, txtContent, 'utf8');
         return { status: true, file_path: filePath };
+
     } catch (err) {
-        console.error('export-txt 오류:', err);
+        console.error('export-csv 오류:', err);
         return { status: false, error_message: err.message };
     }
 });
@@ -440,6 +474,64 @@ ipcMain.handle('deletePasswordEntry', async (_evt, { UID }) => {
         return resp;
     } catch (err) {
         console.error('deletePasswordEntry 오류:', err);
+        return { status: false, error_message: err.message };
+    }
+});
+
+/** (7) 검색된 비밀번호 조회 */
+ipcMain.handle('searchPasswordEntry', async (_evt, { query }) => {
+    console.log('[MAIN] searchPasswordEntry 호출, query =', query);
+    if (!currentFilePath) {
+        return { status: false, error_message: '파일이 선택되지 않았습니다.' };
+    }
+    try {
+        // C++ handler searchPasswordEntry expects only { query }
+        const resp = await sendToBackend('searchPasswordEntry', { query });
+        return resp;
+    } catch (err) {
+        console.error('searchPasswordEntry 오류:', err);
+        return { status: false, error_message: err.message };
+    }
+})
+
+ipcMain.handle('getVulnerablePasswords', async () => {
+    const resp = await sendToBackend('getVulnerablePasswords', { file_path: currentFilePath });
+    return resp;
+});
+ipcMain.handle('getOldPasswords', async () => {
+    const resp = await sendToBackend('getOldPasswords', { file_path: currentFilePath });
+    return resp;
+});
+ipcMain.handle('getReusedPasswords', async () => {
+    const resp = await sendToBackend('getReusedPasswords', { file_path: currentFilePath });
+    return resp;
+});
+
+/** (8) 총 비밀번호 개수 조회 */
+ipcMain.handle('getPasswordCount', async () => {
+    if (!currentFilePath) {
+        return { status: false, error_message: '파일이 선택되지 않았습니다.' };
+    }
+    try {
+        const resp = await sendToBackend('getPasswordCount', { file_path: currentFilePath });
+        return resp;
+    } catch (err) {
+        console.error('getPasswordCount 오류:', err);
+        return { status: false, error_message: err.message };
+    }
+});
+
+// 비밀번호 상세 조회 핸들러
+ipcMain.handle('getPasswordDetail', async (_evt, { UID }) => {
+    if (!currentFilePath) {
+        return { status: false, error_message: '파일이 선택되지 않았습니다.' };
+    }
+    try {
+        // C++ 백엔드로 oper="getPasswordDetail", data={ UID } 요청
+        const resp = await sendToBackend('getPasswordDetail', { UID });
+        return resp;  // { status: true, data: { pwd: '...' } } 형태로 반환됨
+    } catch (err) {
+        console.error('getPasswordDetail 오류:', err);
         return { status: false, error_message: err.message };
     }
 });

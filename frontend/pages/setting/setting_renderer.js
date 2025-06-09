@@ -1,9 +1,7 @@
-// File: pages/setting/setting_renderer.js
+// File: src/pages/setting/setting_renderer.js
 
 document.addEventListener('DOMContentLoaded', () => {
-    // ───────────────────────────────────────────────────────────
-    // 1) 스크린샷 방지 토글
-    // ───────────────────────────────────────────────────────────
+    // ── 1) 스크린샷 방지 토글 ──
     const btnSnap = document.getElementById('btnScreenshotPrevent');
     let blocked = true;
     window.electronAPI.preventScreenshot();
@@ -20,32 +18,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ───────────────────────────────────────────────────────────
-    // 2) Start 페이지에서 선택한 “DB 경로” 가져와서 Input에 채워주기
-    // ───────────────────────────────────────────────────────────
+    // ── 2) DB 경로 표시 (Start 페이지에서 선택된 파일) ──
     const dbInput = document.getElementById('dbPathInput');
     window.electronAPI.getFilePath()
         .then(res => {
             if (res.status && res.file_path) {
                 dbInput.value = res.file_path;
+            } else {
+                console.error('getFilePath 오류:', res.error_message);
+                dbInput.value = '경로 불러오기 실패';
             }
         })
-        .catch(err => {
-            console.error('DB 경로를 가져오는 중 오류:', err);
-        });
+        .catch(err => console.error('getFilePath 호출 오류:', err));
 
-    // ───────────────────────────────────────────────────────────
-    // 3) “자동 잠금” 드롭다운 설정 로드 및 변경 처리
-    // ───────────────────────────────────────────────────────────
+    // ── 3) 자동 잠금 설정 ──
     const select = document.getElementById('autoLockSelect');
-    // 이전에 저장된 값이 있으면 초기화
     const saved = localStorage.getItem('autoLockMinutes');
     if (saved && select.querySelector(`option[value="${saved}"]`)) {
         select.value = saved;
-    } else if (!saved) {
+    } else {
         localStorage.setItem('autoLockMinutes', '5');
     }
-    // 값 변경 시 로컬스토리지에 저장 및 타이머 리셋
     select.addEventListener('change', () => {
         const minutes = select.value;
         localStorage.setItem('autoLockMinutes', minutes);
@@ -54,101 +47,82 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ───────────────────────────────────────────────────────────
-    // 4) “마스터 비밀번호 입력” 토글 및 변경 버튼 이벤트 연결
-    // ───────────────────────────────────────────────────────────
-    const oldMasterInput   = document.getElementById('oldMasterInput');
-    const toggleOldMasterBtn  = document.getElementById('toggleOldMasterBtn');
-    const oldMasterIcon    = document.getElementById('oldMasterIcon');
-
-    const newMasterInput   = document.getElementById('newMasterInput');
-    const toggleNewMasterBtn  = document.getElementById('toggleNewMasterBtn');
-    const newMasterIcon    = document.getElementById('newMasterIcon');
-
-    const changeMasterBtn  = document.getElementById('changeMasterBtn');
-
-    // (1) 기존 비밀번호 토글
+    // ── 4) 마스터 비밀번호 보기/숨기기 토글 ──
+    const oldMasterInput    = document.getElementById('oldMasterInput');
+    const toggleOldMasterBtn = document.getElementById('toggleOldMasterBtn');
+    const oldMasterIcon     = document.getElementById('oldMasterIcon');
     if (oldMasterInput && toggleOldMasterBtn && oldMasterIcon) {
-        let maskedOld = true;
+        let hidden = true;
         toggleOldMasterBtn.addEventListener('click', () => {
-            maskedOld = !maskedOld;
-            if (maskedOld) {
-                oldMasterInput.setAttribute('type', 'password');
-                oldMasterIcon.classList.remove('fa-eye');
-                oldMasterIcon.classList.add('fa-eye-slash');
-            } else {
-                oldMasterInput.setAttribute('type', 'text');
-                oldMasterIcon.classList.remove('fa-eye-slash');
-                oldMasterIcon.classList.add('fa-eye');
-            }
+            hidden = !hidden;
+            oldMasterInput.type = hidden ? 'password' : 'text';
+            oldMasterIcon.classList.toggle('fa-eye');
+            oldMasterIcon.classList.toggle('fa-eye-slash');
         });
     }
 
-    // (2) 새 비밀번호 토글
+    const newMasterInput    = document.getElementById('newMasterInput');
+    const toggleNewMasterBtn = document.getElementById('toggleNewMasterBtn');
+    const newMasterIcon     = document.getElementById('newMasterIcon');
     if (newMasterInput && toggleNewMasterBtn && newMasterIcon) {
-        let maskedNew = true;
+        let hidden = true;
         toggleNewMasterBtn.addEventListener('click', () => {
-            maskedNew = !maskedNew;
-            if (maskedNew) {
-                newMasterInput.setAttribute('type', 'password');
-                newMasterIcon.classList.remove('fa-eye');
-                newMasterIcon.classList.add('fa-eye-slash');
-            } else {
-                newMasterInput.setAttribute('type', 'text');
-                newMasterIcon.classList.remove('fa-eye-slash');
-                newMasterIcon.classList.add('fa-eye');
-            }
+            hidden = !hidden;
+            newMasterInput.type = hidden ? 'password' : 'text';
+            newMasterIcon.classList.toggle('fa-eye');
+            newMasterIcon.classList.toggle('fa-eye-slash');
         });
     }
 
-    // (3) “변경” 버튼 클릭 처리
-    changeMasterBtn?.addEventListener('click', async () => {
+    // ── 5) 마스터 비밀번호 변경 처리 ──
+    const changeBtn = document.getElementById('changeMasterBtn');
+    const messageEl = document.getElementById('settingMessage');
+    changeBtn?.addEventListener('click', async () => {
         const oldPwd = oldMasterInput.value.trim();
         const newPwd = newMasterInput.value.trim();
+        messageEl.textContent = '';
+        messageEl.className = 'mt-2 text-sm';
 
         if (!oldPwd) {
-            alert('기존 마스터 비밀번호를 입력해주세요.');
+            messageEl.textContent = '기존 마스터 비밀번호를 입력해주세요.';
+            messageEl.classList.add('text-red-600');
             return;
         }
         if (!newPwd) {
-            alert('새 마스터 비밀번호를 입력해주세요.');
+            messageEl.textContent = '새 마스터 비밀번호를 입력해주세요.';
+            messageEl.classList.add('text-red-600');
             return;
         }
 
-        // IPC로 메인 프로세스에 전달
         try {
             const res = await window.electronAPI.updateMasterKey(oldPwd, newPwd);
-            if (!res.status) {
-                alert('변경 중 오류가 발생했습니다: ' + (res.error_message || '알 수 없는 오류'));
-                return;
-            }
-            alert('마스터 비밀번호가 성공적으로 변경되었습니다.');
-            oldMasterInput.value = '';
-            newMasterInput.value = '';
-            // 마스킹 상태로 되돌리기
-            if (oldMasterInput.getAttribute('type') !== 'password') {
-                oldMasterInput.setAttribute('type', 'password');
-                oldMasterIcon.classList.remove('fa-eye');
-                oldMasterIcon.classList.add('fa-eye-slash');
-            }
-            if (newMasterInput.getAttribute('type') !== 'password') {
-                newMasterInput.setAttribute('type', 'password');
-                newMasterIcon.classList.remove('fa-eye');
-                newMasterIcon.classList.add('fa-eye-slash');
+            if (res.status) {
+                messageEl.textContent = '마스터 비밀번호가 성공적으로 변경되었습니다.';
+                messageEl.classList.add('text-green-600');
+                oldMasterInput.value = '';
+                newMasterInput.value = '';
+                // 보기 토글 초기화
+                if (oldMasterInput.type === 'text') toggleOldMasterBtn.click();
+                if (newMasterInput.type === 'text') toggleNewMasterBtn.click();
+            } else {
+                throw new Error(res.error_message || '변경 실패');
             }
         } catch (err) {
-            console.error('updateMasterKey 호출 중 오류:', err);
-            alert('변경 중 오류가 발생했습니다.');
+            console.error('updateMasterKey 오류:', err);
+            messageEl.textContent = `오류: ${err.message}`;
+            messageEl.classList.add('text-red-600');
         }
     });
 
-    const btnExportCsv = document.getElementById('btnExportCsv');
-    btnExportCsv?.addEventListener('click', async () => {
+    // ── 6) CSV 내보내기 ──
+    const exportBtn = document.getElementById('btnExportCsv');
+    exportBtn?.addEventListener('click', async () => {
+        // "모든 비밀번호" 내보내기 호출
         const res = await window.electronAPI.exportCsv();
-        if (!res.status) {
-            alert('내보내기에 실패했습니다: ' + res.error_message);
-            return;
-        }
-        // alert('CSV 파일로 내보내기 완료:\n' + res.file_path);
+        // if (res.status) {
+        //     alert(`내보내기 완료:\n${res.file_path}`);
+        // } else {
+        //     alert(`내보내기 오류: ${res.error_message}`);
+        // }
     });
 });
