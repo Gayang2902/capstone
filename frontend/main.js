@@ -167,6 +167,8 @@ function createMainWindow() {
     });
 
     mainWindow.loadFile(path.join(__dirname, 'pages', 'start', 'start.html'));
+
+    // mainWindow.webContents.openDevTools({ mode: 'right' }); // 개발자 모드
 }
 
 // --- 앱 라이프사이클 ---
@@ -412,35 +414,32 @@ ipcMain.handle('createPasswordEntry', async (_evt, entry) => {
 });
 
 /** 비밀번호 항목 수정 */
-ipcMain.handle('updateEntry', async (_evt, updateData) => {
+ipcMain.handle('updatePasswordEntry', async (_evt, updateData) => {
     if (!currentFilePath) {
         return { status: false, error_message: '파일이 선택되지 않았습니다.' };
     }
     try {
-        const resp = await sendToBackend('updateEntry', {
+        const resp = await sendToBackend('updatePasswordEntry', {
             file_path: currentFilePath,
             ...updateData
         });
         return resp;
     } catch (err) {
-        console.error('updateEntry 오류:', err);
+        console.error('updatePasswordEntry 오류:', err);
         return { status: false, error_message: err.message };
     }
 });
 
 /** 비밀번호 항목 삭제 */
-ipcMain.handle('deleteEntry', async (_evt, { uid }) => {
+ipcMain.handle('deletePasswordEntry', async (_evt, { UID }) => {
     if (!currentFilePath) {
         return { status: false, error_message: '파일이 선택되지 않았습니다.' };
     }
     try {
-        const resp = await sendToBackend('deleteEntry', {
-            file_path: currentFilePath,
-            uid
-        });
+        const resp = await sendToBackend('deletePasswordEntry', { UID });
         return resp;
     } catch (err) {
-        console.error('deleteEntry 오류:', err);
+        console.error('deletePasswordEntry 오류:', err);
         return { status: false, error_message: err.message };
     }
 });
