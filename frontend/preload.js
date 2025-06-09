@@ -59,4 +59,23 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
     // 백엔드 일반 호출(oper/data) – 특별히 필요 시
     requestBackend:     (oper, data) => ipcRenderer.invoke('request-backend', { oper, data }),
+
+    // 검색된 비밀번호 조회 (oper="searchPasswordEntry")
+    // searchPasswordEntry: (q) => ipcRenderer.invoke('search-password-entry', q),
+    searchPasswordEntry:        query => ipcRenderer.invoke('searchPasswordEntry', { query }),
+
+    getVulnerablePasswords: () => ipcRenderer.invoke('getVulnerablePasswords'),
+    getOldPasswords:       () => ipcRenderer.invoke('getOldPasswords'),
+    getReusedPasswords:    () => ipcRenderer.invoke('getReusedPasswords'),
+
+    // 총 비밀번호 개수 조회
+    getPasswordCount:      () => ipcRenderer.invoke('getPasswordCount'),
+
+    // 비밀번호 상세 조회 (oper="getPasswordDetail", data={ UID })
+    getPasswordDetail: args =>
+        ipcRenderer.invoke('request-backend', {
+            oper: 'getPasswordDetail',
+            data: args
+        }),
+
 });

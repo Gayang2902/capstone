@@ -18,7 +18,7 @@ const typeSelection = document.getElementById('type-selection');
 const formContainer = document.getElementById('dynamicForm');
 const saveBtn       = document.getElementById('saveBtn');
 
-// “favorite” 상태 추적 (별 아이콘 토글용)
+// “favorite” 상태 추적
 let favorite = false;
 let selectedType = null;
 
@@ -28,7 +28,7 @@ window.addEventListener('DOMContentLoaded', () => {
   // (1) 네비게이션 버튼 하이라이트
   setActiveButton(navHome);
 
-  // (2) 스크린샷 방지 기본 적용
+  // (2) 스크린샷 방지 적용
   let screenshotBlocked = true;
   window.electronAPI.preventScreenshot();
   btnScreenshotPrevent?.addEventListener('click', () => {
@@ -44,17 +44,14 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // (3) 페이지 로드 직후 비밀번호 목록을 가져와서 테이블을 채운다
+  // (3) 비밀번호 목록 로드
   loadAndRenderList();
 
-  // (4) “+” 버튼 누르면 모달 열기
+  // (4) 모달 열기 버튼
   const addBtnInHome = document.getElementById('filterAddBtnInner');
-  if (addBtnInHome) {
-    addBtnInHome.addEventListener('click', openModal);
-  }
+  if (addBtnInHome) addBtnInHome.addEventListener('click', openModal);
 });
 
-// ─────────────────────────────────────────────────────────────
 // ======== 2) 네비 버튼 하이라이트 ========
 function setActiveButton(btn) {
   document.querySelectorAll('.nav-btn').forEach(b => {
@@ -63,20 +60,18 @@ function setActiveButton(btn) {
   btn.classList.add('bg-indigo-100', 'text-indigo-800', 'shadow-lg');
 }
 
-// 네비게이션 클릭 시
+// 네비게이션 클릭
 navHome.addEventListener('click', () => { goTo('home'); loadAndRenderList(); });
 navStats.addEventListener('click', () => goTo('statistic'));
 navGroup.addEventListener('click', () => goTo('group'));
 navSetting.addEventListener('click', () => goTo('setting'));
 
-// ─────────────────────────────────────────────────────────────
-// ======== 3) “비밀번호 추가” 모달 열기/닫기 & 동적 폼 로직 ========
+// ======== 3) 모달 열기/닫기 & 동적 폼 ========
 function openModal() {
-  favorite = false;  // 기본값 false
-  addModal.classList.remove('opacity-0', 'pointer-events-none');
+  favorite = false;
+  addModal.classList.remove('opacity-0','pointer-events-none');
   addModal.classList.add('opacity-100');
-  modalBox.classList.remove('scale-95');
-  modalBox.classList.add('scale-100');
+  modalBox.classList.remove('scale-95'); modalBox.classList.add('scale-100');
   typeSelection.classList.remove('hidden');
   formContainer.innerHTML = '';
   backBtn.classList.add('hidden');
@@ -84,19 +79,12 @@ function openModal() {
 }
 
 function closeModal() {
-  modalBox.classList.remove('scale-100');
-  modalBox.classList.add('scale-95');
-  addModal.classList.remove('opacity-100');
-  addModal.classList.add('opacity-0');
-  setTimeout(() => {
-    addModal.classList.add('pointer-events-none');
-  }, 200);
+  modalBox.classList.remove('scale-100'); modalBox.classList.add('scale-95');
+  addModal.classList.remove('opacity-100'); addModal.classList.add('opacity-0');
+  setTimeout(()=>addModal.classList.add('pointer-events-none'),200);
 }
-
 cancelBtn.addEventListener('click', closeModal);
-addModal.addEventListener('click', (e) => {
-  if (e.target === addModal) closeModal();
-});
+addModal.addEventListener('click', e => { if(e.target===addModal) closeModal(); });
 
 // 유형별 버튼 참조
 const typeButtons = {
@@ -448,7 +436,7 @@ saveBtn.addEventListener('click', async () => {
       return;
     }
     closeModal();
-    loadAndRenderList();
+    await loadAndRenderList();
   } catch (err) {
     alert('저장 중 오류가 발생했습니다:\n' + (err.message || err));
   }
@@ -460,7 +448,8 @@ saveBtn.addEventListener('click', async () => {
 // ───── (1) 비밀번호 리스트를 가져오는 함수 ─────
 async function loadAndRenderList(query = '') {
   const pwList   = document.getElementById('pw-list');      // <tbody> 요소
-  const emptyMsg = document.getElementById('empty-msg');     // 빈 메시지 td
+  const emptyMsgElement = document.getElementById('empty-msg'); // 빈 메시지 td
+  const emptyMsg = emptyMsgElement || { style: {}, textContent: '' };
 
   // 1) 초기화: “로딩 중...” 텍스트 표시
   pwList.innerHTML = '';
@@ -557,10 +546,18 @@ async function loadAndRenderList(query = '') {
     tr.querySelector('.btn-del').addEventListener('click', async () => {
       if (!confirm('정말 삭제하시겠습니까?')) return;
 
-      // 수정된 형태: uid를 문자열 그대로 넘김
-      await window.electronAPI.deletePasswordEntry(entry.UID);
-
-      loadAndRenderList(query);
+      try {
+        const res = await window.electronAPI.deletePasswordEntry(entry.UID);
+        if (!res.status) {
+          alert('삭제에 실패했습니다: ' + res.error_message);
+          return;
+        }
+        // 삭제 성공 후 목록을 다시 불러와 업데이트
+        await loadAndRenderList(query);
+      } catch (err) {
+        console.error('deletePasswordEntry 오류:', err);
+        alert('삭제 중 오류가 발생했습니다: ' + (err.message || err));
+      }
     });
 
 
@@ -569,7 +566,7 @@ async function loadAndRenderList(query = '') {
       const newLabel = prompt('새 레이블을 입력하세요', entry.label);
       if (newLabel === null) return;
       await window.electronAPI.updatePasswordEntry({ uid: entry.UID, label: newLabel });
-      loadAndRenderList(query);
+      await loadAndRenderList(query);
     });
 
     pwList.appendChild(tr);
