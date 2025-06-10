@@ -494,7 +494,7 @@ async function loadAndRenderList(query = '') {
     // 7개 컬럼: icon(48px) | label/sub(200px) | field1(150px) | field2(150px) | field3(150px) | type(100px) | delete(80px)
     const card = document.createElement('div');
     card.className =
-        'grid grid-cols-[48px,100px,150px,150px,150px,100px,80px] items-center ' +
+        'grid grid-cols-[48px,110px,140px,150px,150px,100px,80px] items-center ' +
         'p-4 bg-white rounded-lg shadow w-full gap-x-4'; // 간격 설정
 
     // ① 아이콘 셀
