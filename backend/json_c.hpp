@@ -1,4 +1,6 @@
-﻿//     __ _____ _____ _____
+﻿#pragma once
+
+//     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.12.0
 // |_____|_____|_____|_|___|  https://github.com/nlohmann/json

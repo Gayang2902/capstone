@@ -13,6 +13,10 @@ set(SRC_FILES
     handler.cpp
     database.cpp
     utils.cpp
+
+    old.cpp
+    reuse.cpp
+    vuln.cpp
 )
 
 # 기본 include 디렉터리

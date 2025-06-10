@@ -11,7 +11,7 @@ using json = nlohmann::json;
 int main(int argc, char** argv) {
     initHandlers();
 
-    cout << "RUNNING!!!" << "\n" << flush;
+    //cout << "RUNNING!!!" << "\n" << flush;
 
     while (true) {
         string raw;

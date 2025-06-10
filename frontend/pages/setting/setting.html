@@ -41,17 +41,70 @@
 <!-- ─── 메인 영역 시작 ─── -->
 <div class="flex-1 flex flex-col min-h-0">
     <!-- ─── 헤더 ─── -->
-    <header class="flex items-center justify-between px-8 py-4 bg-white/30 backdrop-blur-xl shadow-sm">
-        <span class="text-lg font-semibold">Settings</span>
+    <!-- ─── 헤더 시작 ─── -->
+    <header class="flex items-center justify-between px-8 py-4 bg-white/30 backdrop-blur-xl shadow-sm z-10 flex-shrink-0">
+        <!-- 상단 왼쪽 + 버튼: Generator 열기 -->
+        <button
+                id="openGeneratorBtn"
+                class="w-11 h-11 flex items-center justify-center bg-indigo-500 rounded-full shadow-md transition
+               hover:bg-indigo-600 active:scale-95 focus:outline-none"
+                title="새 비밀번호 생성기 열기"
+        >
+            <i class="fa-solid fa-plus text-white text-lg"></i>
+        </button>
+
+        <!-- 오른쪽 아이콘 그룹 -->
         <div class="flex items-center space-x-4">
-            <button id="btnScreenshotPrevent" class="w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center hover:bg-indigo-100 transition" title="스크린샷 방지">
-                <i class="fa-solid fa-shield-halved text-indigo-700"></i>
+            <button
+                    id="btnScreenshotPrevent"
+                    class="w-12 h-12 flex items-center justify-center bg-indigo-50 rounded-full shadow-md transition
+                 hover:bg-indigo-100 active:scale-95 focus:outline-none"
+                    title="스크린샷 방지"
+            >
+                <i class="fa-solid fa-shield-halved text-indigo-700 text-lg"></i>
             </button>
-            <button id="btnHelp" class="w-12 h-12 bg-rose-50 rounded-full flex items-center justify-center hover:bg-rose-100 transition" title="도움말">
-                <i class="fa-solid fa-question text-rose-600"></i>
+
+            <button
+                    id="btnHelp"
+                    class="w-12 h-12 flex items-center justify-center bg-rose-50 rounded-full shadow-md transition
+                 hover:bg-rose-100 active:scale-95 focus:outline-none"
+                    title="도움말"
+            >
+                <i class="fa-solid fa-question text-rose-600 text-lg"></i>
+            </button>
+
+            <button
+                    class="w-12 h-12 flex items-center justify-center bg-emerald-50 rounded-full shadow-md transition
+                 hover:bg-emerald-100 active:scale-95 focus:outline-none"
+                    title="언어 전환"
+            >
+                <i class="fa-solid fa-earth-asia text-emerald-600 text-lg"></i>
+            </button>
+
+            <div class="relative w-72">
+                <input
+                        type="text"
+                        id="input-search"
+                        placeholder="검색..."
+                        class="w-full pl-12 pr-4 py-3 bg-white/50 backdrop-blur-md border border-indigo-200
+                   rounded-full text-gray-700 placeholder-indigo-400 shadow-sm transition
+                   focus:bg-white/70 focus:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                />
+                <div class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-600">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+            </div>
+
+            <button
+                    class="w-12 h-12 flex items-center justify-center bg-gray-50 rounded-full shadow-md transition
+                 hover:bg-gray-100 active:scale-95 focus:outline-none"
+                    title="다크모드 토글"
+            >
+                <i class="fa-solid fa-moon text-gray-700 text-lg"></i>
             </button>
         </div>
     </header>
+    <!-- ─── 헤더 끝 ─── -->
 
     <!-- ─── Setting 콘텐츠 영역 시작 ─── -->
     <div class="flex-1 overflow-auto px-8 py-4">

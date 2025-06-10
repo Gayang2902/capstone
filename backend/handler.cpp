@@ -8,10 +8,15 @@
 #include <sstream>
 #include <cctype>
 
+#include "global.hpp"
 #include "handler.hpp"
 #include "response.hpp"
 #include "database.hpp"
 #include "utils.hpp"
+
+#include "vuln.hpp"
+#include "old.hpp"
+#include "reuse.hpp"
 
 using namespace std;
 
@@ -19,20 +24,9 @@ using namespace std;
 using HandlerFunc = function<void(const unordered_map<string, string>&)>;
 // 정적 매핑 사용
 static unordered_map<string, HandlerFunc> handlerMap;
-// 전역 인스턴스
-static Database* db = nullptr;
-static string pending_path;
 
 // ==== 헬퍼 함수들 ====
 
-// DB 초기화 여부 확인
-static bool ensureDbInitialized() {
-	if (!db) {
-		respondError("Database not initialized.");
-		return false;
-	}
-	return true;
-}
 // 필수 파라미터 검증
 static bool checkRequiredArgs(const unordered_map<string, string>& args,
 	const vector<string>& required_keys,
@@ -46,73 +40,6 @@ static bool checkRequiredArgs(const unordered_map<string, string>& args,
 	}
 
 	return true;
-}
-
-// PasswordEntry to JSON 
-static json entryToJson(const PasswordEntry& entry, bool include_pwd) {
-	json data;
-	data["UID"] = entry.UID;
-	data["UID"] = entry.UID;
-	data["label"] = entry.label;
-	data["created_at"] = entry.created_at;
-	data["modified_at"] = entry.modified_at;
-	data["comments"] = entry.comments;
-	data["favorite"] = entry.favorite;
-	data["type"] = entry.type;
-
-	if (!entry.name.empty())        
-		data["name"] = entry.name;
-	if (include_pwd && !entry.pwd.empty()) 
-		data["pwd"] = entry.pwd;
-	if (!entry.id.empty())          
-		data["id"] = entry.id;
-	if (!entry.host.empty())        
-		data["host"] = entry.host;
-	if (!entry.port.empty())        
-		data["port"] = entry.port;
-	if (!entry.num.empty())         
-		data["num"] = entry.num;
-	if (!entry.master.empty())      
-		data["master"] = entry.master;
-	if (!entry.citizen.empty())     
-		data["citizen"] = entry.citizen;
-	if (!entry.eng_name.empty())    
-		data["eng_name"] = entry.eng_name;
-	if (!entry.address.empty())     
-		data["address"] = entry.address;
-	if (!entry.birth_date.empty())  
-		data["birth_date"] = entry.birth_date;
-	if (!entry.content.empty())     
-		data["content"] = entry.content;
-	if (!entry.url.empty())         
-		data["url"] = entry.url;
-	if (!entry.email.empty())       
-		data["email"] = entry.email;
-	if (!entry.card_number.empty()) 
-		data["card_number"] = entry.card_number;
-	if (!entry.cvc.empty())         
-		data["cvc"] = entry.cvc;
-	if (!entry.last_day.empty())    
-		data["last_day"] = entry.last_day;
-	if (!entry.bank_name.empty())   
-		data["bank_name"] = entry.bank_name;
-
-	return data;
-}
-
-// 취약 비밀번호 점검
-static bool isVulnerablePassword(const std::string& pwd) {
-	if (pwd.size() < 8) {
-		return true;
-	}
-	bool hasUpper = false, hasLower = false, hasDigit = false, hasSpecial = false;
-	for (unsigned char ch : pwd) {
-		if (isupper(ch))       hasUpper = true;
-		else if (islower(ch))  hasLower = true;
-		else if (isdigit(ch))  hasDigit = true;
-		else                   hasSpecial = true;
-	}
-	return !(hasUpper && hasLower && hasDigit && hasSpecial);
 }
 
 void onOpenFile(const unordered_map<string, string>& args) {
@@ -161,23 +88,6 @@ void onPostMasterKey(const unordered_map<string, string>& args) {
 	}
 
 	respondSuccess();
-}
-
-// 모든 비밀번호 엔트리 출력
-void onGetAllPasswords(const std::unordered_map<string, string>&) {
-	if (!ensureDbInitialized()) return;
-
-	vector<PasswordEntry> entries = db->getAllData();
-	vector<json> rst;
-	rst.reserve(entries.size());
-
-	for (auto& e : entries) {
-		rst.push_back(entryToJson(e, false));
-	}
-
-	json data;
-	data["data"] = move(rst);
-	respondSuccess(data);
 }
 
 void onCreatePasswordEntry(const unordered_map<string, string>& args) {
@@ -374,79 +284,20 @@ void onUpdateMasterKey(const unordered_map<string, string>& args) {
 	respondSuccess();
 }
 
-void onGetReusedPasswords(const unordered_map<string, string>&) {
+// 모든 비밀번호 엔트리 출력
+void onGetAllPasswords(const std::unordered_map<string, string>&) {
 	if (!ensureDbInitialized()) return;
 
 	vector<PasswordEntry> entries = db->getAllData();
-	unordered_map<string, int> countMap;
+	vector<json> rst;
+	rst.reserve(entries.size());
+
 	for (auto& e : entries) {
-		if (!e.pwd.empty()) {
-			countMap[e.pwd]++;
-		}
+		rst.push_back(entryToJson(e, false));
 	}
 
-	unordered_set<string> reusedSet;
-	for (auto& kv : countMap) {
-		if (kv.second > 1) {
-			reusedSet.insert(kv.first);
-		}
-	}
-
-	vector<json> result;
-	for (auto& e : entries) {
-		if (!e.pwd.empty() && reusedSet.count(e.pwd)) {
-			result.push_back(entryToJson(e, false));
-		}
-	}
 	json data;
-	data["data"] = move(result);
-	respondSuccess(data);
-}
-
-//// 일단 수정한지 30일이 지났다면 오래된 비밀번호로 판단.
-void onGetOldPasswords(const unordered_map<string, string>&) {
-	if (!ensureDbInitialized()) return;
-
-	vector<PasswordEntry> entries = db->getAllData();
-	vector<json> result;
-
-	auto now = chrono::system_clock::now();
-	auto cutoffTp = now - chrono::hours(24 * 30);
-	time_t cutoff = chrono::system_clock::to_time_t(cutoffTp);
-
-	auto parseDate = [&](const string& s) -> time_t {
-		tm tm = {};
-		istringstream iss(s);
-		iss >> get_time(&tm, "%Y-%m-%d");
-		tm.tm_isdst = -1;
-		return mktime(&tm);
-		};
-
-	for (auto& e : entries) {
-		time_t t_mod = parseDate(e.modified_at);
-		if (t_mod < cutoff) {
-			// 오래된 항목에는 비밀번호 포함
-			result.push_back(entryToJson(e, true));
-		}
-	}
-	json data;
-	data["data"] = move(result);
-	respondSuccess(data);
-}
-
-void onGetVulnerablePasswords(const unordered_map<string, string>&) {
-	if (!ensureDbInitialized()) return;
-
-	vector<PasswordEntry> entries = db->getAllData();
-	vector<json> result;
-	for (auto& e : entries) {
-		if (!e.pwd.empty() && isVulnerablePassword(e.pwd)) {
-			// 취약 항목에는 비밀번호 포함
-			result.push_back(entryToJson(e, false));
-		}
-	}
-	json data;
-	data["data"] = move(result);
+	data["data"] = move(rst);
 	respondSuccess(data);
 }
 
@@ -460,18 +311,25 @@ void initHandlers() {
 	handlerMap["updatePasswordEntry"] = onUpdatePasswordEntry;
 	handlerMap["deletePasswordEntry"] = onDeletePasswordEntry;
 	handlerMap["searchPasswordEntry"] = onSearchPasswordEntry;
-	
+	// 
 	handlerMap["getPasswordCount"] = onGetPasswordCount;
 	handlerMap["getPasswordsByTag"] = onGetPasswordsByTag;
 
 	handlerMap["getPasswordDetail"] = onGetPasswordDetail;
-
+	handlerMap["getPasswordCount"] = onGetPasswordCount;
 	// REUSED.
 	handlerMap["getReusedPasswords"] = onGetReusedPasswords;
+	handlerMap["getReusedCount"] = onGetReusedCount;
 	// OUTDATED.
 	handlerMap["getOldPasswords"] = onGetOldPasswords;
+	handlerMap["getOldCount"] = onGetOldCount;
 	// VULN.
-	handlerMap["getVulnerablePasswords"] = onGetVulnerablePasswords;
+	handlerMap["getVulnerablePasswordsStrong"] = onGetVulnerablePasswordsStrong;
+	handlerMap["getStrongCount"] = onGetStrongCount;
+	handlerMap["getVulnerablePasswordsNormal"] = onGetVulnerablePasswordsNormal;
+	handlerMap["getNormalCount"] = onGetNormalCount;
+	handlerMap["getVulnerablePasswordsWeak"] = onGetVulnerablePasswordsWeak;
+	handlerMap["getWeakCount"] = onGetWeakCount;
 
 	//// SETTINGS.
 	handlerMap["updateMasterKey"] = onUpdateMasterKey;

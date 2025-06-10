@@ -151,8 +151,8 @@ function sendToBackend(oper, data) {
 /** 3) 메인 윈도우 생성 */
 function createMainWindow() {
     mainWindow = new BrowserWindow({
-        width: 1200,
-        height: 800,
+        width: 1500,
+        height: 900,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             contextIsolation: true,

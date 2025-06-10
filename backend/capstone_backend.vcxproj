@@ -118,7 +118,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;SODIUM_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\millet\capstone\src\backend\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\millet\capstone\backend\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -127,7 +127,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\millet\capstone\src\backend\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\millet\capstone\backend\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>cryptlib.lib;libsodium.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -135,14 +135,21 @@
     <ClCompile Include="database.cpp" />
     <ClCompile Include="handler.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="old.cpp" />
+    <ClCompile Include="reuse.cpp" />
     <ClCompile Include="utils.cpp" />
+    <ClCompile Include="vuln.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="database.hpp" />
+    <ClInclude Include="global.hpp" />
     <ClInclude Include="handler.hpp" />
     <ClInclude Include="json_c.hpp" />
+    <ClInclude Include="old.hpp" />
     <ClInclude Include="response.hpp" />
+    <ClInclude Include="reuse.hpp" />
     <ClInclude Include="utils.hpp" />
+    <ClInclude Include="vuln.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
