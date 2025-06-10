@@ -1,0 +1,79 @@
+<!-- src/setting.html -->
+<!-- 데이터베이스 설정 카드 -->
+<div class="relative bg-white/60 backdrop-blur-md rounded-2xl p-6 shadow-lg">
+  <h2 class="text-lg font-semibold mb-4">데이터베이스 설정</h2>
+  <div class="absolute top-6 right-6 flex space-x-4 text-gray-600">
+    <button title="New DB"><i class="fa-solid fa-plus hover:text-gray-800"></i></button>
+    <button title="Open DB Folder"><i class="fa-solid fa-folder-open hover:text-gray-800"></i></button>
+    <button title="Save DB"><i class="fa-solid fa-floppy-disk hover:text-gray-800"></i></button>
+  </div>
+  <div class="space-y-4">
+    <!-- 비밀번호 저장 DB -->
+    <div class="flex items-center space-x-4">
+      <label class="w-44 font-medium">비밀번호 저장 DB:</label>
+      <div class="relative flex-1">
+        <input
+          id="dbPathInput"
+          type="password"
+          placeholder="DB 경로를 입력하세요..."
+          class="w-full bg-white/80 border border-gray-300 rounded-lg p-2 pr-10 outline-none"
+          value=""
+        />
+        <button
+          id="toggleDbMaskBtn"
+          type="button"
+          class="absolute inset-y-0 right-2 flex items-center text-gray-500 hover:text-gray-700 focus:outline-none"
+          title="Show / Hide"
+        >
+          <i id="dbMaskIcon" class="fa-solid fa-eye-slash"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- 비밀번호 내보기 -->
+    <div class="flex items-center space-x-4">
+      <label class="w-44 font-medium">비밀번호 내보기:</label>
+      <div class="relative flex-1">
+        <input
+          id="viewPwdInput"
+          type="password"
+          placeholder="비밀번호를 입력하세요..."
+          class="w-full bg-white/80 border border-gray-300 rounded-lg p-2 pr-10 outline-none"
+        />
+        <button
+          id="toggleViewPwdBtn"
+          type="button"
+          class="absolute inset-y-0 right-2 flex items-center text-gray-500 hover:text-gray-700 focus:outline-none"
+          title="Show / Hide"
+        >
+          <i id="viewPwdIcon" class="fa-solid fa-eye-slash"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- 마스터 비밀번호 변경 -->
+    <div class="flex items-center space-x-4">
+      <label class="w-44 font-medium">마스터 비밀번호 변경:</label>
+      <button class="px-4 py-2 bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-lg shadow-md hover:shadow-lg focus:outline-none">
+        변경
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 앱 잠금 카드 -->
+<div class="bg-white/60 backdrop-blur-md rounded-2xl p-6 shadow-lg mt-6">
+  <h2 class="text-lg font-semibold mb-4">앱 잠금</h2>
+  <div class="flex items-center space-x-4 mb-2">
+    <label class="w-44 font-medium">자동 잠금:</label>
+    <select id="autoLockSelect" class="bg-white/80 border border-gray-300 rounded-lg p-2 outline-none">
+      <option>1분 후</option>
+      <option>5분 후</option>
+      <option>10분 후</option>
+      <option>30분 후</option>
+    </select>
+  </div>
+  <p class="text-sm text-gray-500">
+    설정된 시간 이후 화면과 비밀번호 입력이 잠금됩니다.
+  </p>
+</div>

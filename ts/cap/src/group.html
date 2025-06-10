@@ -1,0 +1,218 @@
+<!-- src/group.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Group - Password Manager</title>
+
+  <!-- 기존 Tailwind 등 스타일시트 -->
+  <link rel="stylesheet" href="styles.css"/>
+
+  <!-- 오버레이·팝업·플립 카드 CSS -->
+  <style>
+    .hidden { display: none; }
+
+    /* 오버레이 */
+    #card-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+    }
+
+    /* 팝업 컨테이너 (3D 컨텍스트) */
+    #card-popup {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 300px;
+      max-width: 90%;
+      perspective: 1000px;
+      z-index: 1001;
+    }
+
+    /* 플립 카드 내부 */
+    .flip-card-inner {
+      position: relative;
+      width: 100%; height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.6s;
+    }
+    .flip-card-inner.flipped {
+      transform: rotateY(180deg);
+    }
+
+    /* 앞면/뒷면 공통 */
+    .flip-card-front,
+    .flip-card-back {
+      position: absolute;
+      width: 100%; height: 100%;
+      backface-visibility: hidden;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    /* 뒷면은 180도 회전시켜 뒤로 감춤 */
+    .flip-card-back {
+      transform: rotateY(180deg);
+      overflow-y: auto;
+    }
+
+    /* 뒷면 세부항목 스타일 */
+    .detail-item {
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+  </style>
+
+  <!-- Font Awesome 아이콘 (자신의 kit ID로 교체!) -->
+  <script src="https://kit.fontawesome.com/yourkit.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="group-container p-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <!-- Wi-Fi -->
+      <div class="category-card bg-white rounded-lg p-6 shadow hover:shadow-lg cursor-pointer" data-category="wifi">
+        <i class="fa-solid fa-wifi text-indigo-500 text-3xl"></i>
+        <span class="mt-2 block font-medium">Wi-Fi</span>
+        <span class="text-sm text-gray-500 mt-1 block">0개</span>
+      </div>
+      <!-- Server account -->
+      <div class="category-card bg-white rounded-lg p-6 shadow hover:shadow-lg cursor-pointer" data-category="server">
+        <i class="fa-solid fa-server text-blue-500 text-3xl"></i>
+        <span class="mt-2 block font-medium">Server account</span>
+        <span class="text-sm text-gray-500 mt-1 block">0개</span>
+      </div>
+      <!-- Passbook -->
+      <div class="category-card bg-white rounded-lg p-6 shadow hover:shadow-lg cursor-pointer" data-category="passbook">
+        <i class="fa-solid fa-book text-yellow-500 text-3xl"></i>
+        <span class="mt-2 block font-medium">Passbook</span>
+        <span class="text-sm text-gray-500 mt-1 block">0개</span>
+      </div>
+      <!-- Identity -->
+      <div class="category-card bg-white rounded-lg p-6 shadow hover:shadow-lg cursor-pointer" data-category="identity">
+        <i class="fa-solid fa-id-card text-pink-500 text-3xl"></i>
+        <span class="mt-2 block font-medium">Identity</span>
+        <span class="text-sm text-gray-500 mt-1 block">0개</span>
+      </div>
+      <!-- Security -->
+      <div class="category-card bg-white rounded-lg p-6 shadow hover:shadow-lg cursor-pointer" data-category="security">
+        <i class="fa-solid fa-shield-alt text-green-500 text-3xl"></i>
+        <span class="mt-2 block font-medium">Security</span>
+        <span class="text-sm text-gray-500 mt-1 block">0개</span>
+      </div>
+      <!-- Web -->
+      <div class="category-card bg-white rounded-lg p-6 shadow hover:shadow-lg cursor-pointer" data-category="web">
+        <i class="fa-solid fa-globe text-blue-600 text-3xl"></i>
+        <span class="mt-2 block font-medium">Web</span>
+        <span class="text-sm text-gray-500 mt-1 block">0개</span>
+      </div>
+      <!-- Card -->
+      <div class="category-card bg-white rounded-lg p-6 shadow hover:shadow-lg cursor-pointer" data-category="card">
+        <i class="fa-solid fa-credit-card text-teal-500 text-3xl"></i>
+        <span class="mt-2 block font-medium">Card</span>
+        <span class="text-sm text-gray-500 mt-1 block">0개</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 오버레이 & 팝업 -->
+  <div id="card-overlay" class="hidden"></div>
+  <div id="card-popup" class="hidden"></div>
+
+  <!-- 통합 스크립트 -->
+  <script>
+    // 더미 데이터: 실제 API 연동 시 이곳을 AJAX/Fetch 로 교체하세요
+    const categoryDetails = {
+      wifi: [
+        { label: 'Home_WiFi', id: 'home123', password: '••••••••' },
+        { label: 'Office_WiFi', id: 'office456', password: '••••••••' }
+      ],
+      server: [
+        { label: 'root', id: 'root', password: '••••••••' },
+        { label: 'deploy', id: 'deploy', password: '••••••••' }
+      ],
+      passbook: [
+        { label: 'Savings', id: 'user01',    password: '••••••••' },
+        { label: 'Checking', id: 'user02',   password: '••••••••' }
+      ],
+      identity: [
+        { label: 'Driver License', id: 'DL1234', password: '••••••••' },
+        { label: 'Passport',       id: 'PP5678', password: '••••••••' }
+      ],
+      security: [
+        { label: '2FA Backup', id: 'backup1', password: '••••••••' },
+        { label: 'Master Key', id: 'master',  password: '••••••••' }
+      ],
+      web: [
+        { label: 'Google', id: 'google@mail.com', password: '••••••••' },
+        { label: 'GitHub', id: 'gituser',         password: '••••••••' }
+      ],
+      card: [
+        { label: 'Visa',       id: '4111 1111', password: '••••••••' },
+        { label: 'MasterCard', id: '5500 0000', password: '••••••••' }
+      ]
+    };
+
+    const overlay = document.getElementById('card-overlay');
+    const popup   = document.getElementById('card-popup');
+
+    document.querySelectorAll('.category-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const cat     = card.dataset.category;
+        const title   = card.querySelector('span.font-medium').innerText;
+        const details = categoryDetails[cat] || [];
+
+        popup.innerHTML = `
+          <div class="flip-card-inner">
+            <!-- 앞면 -->
+            <div class="flip-card-front flex flex-col items-center justify-center">
+              ${card.innerHTML}
+              <p class="mt-4 text-sm text-gray-500">카드를 뒤집으려면 클릭하세요</p>
+            </div>
+            <!-- 뒷면 -->
+            <div class="flip-card-back">
+              <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold">${title} 항목</h2>
+                <span id="close-popup" class="cursor-pointer">&times;</span>
+              </div>
+              ${details.map(d => `
+                <div class="detail-item">
+                  <p class="font-medium">${d.label}</p>
+                  <p class="text-sm">ID: ${d.id}</p>
+                  <p class="text-sm">PW: ${d.password}</p>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+
+        overlay.classList.remove('hidden');
+        popup.classList.remove('hidden');
+
+        // 플립 & 닫기 이벤트 바인딩
+        const inner = popup.querySelector('.flip-card-inner');
+        popup.querySelector('.flip-card-front')
+             .addEventListener('click', () => inner.classList.add('flipped'));
+        popup.querySelector('.flip-card-back')
+             .addEventListener('click', () => inner.classList.remove('flipped'));
+        popup.querySelector('#close-popup')
+             .addEventListener('click', hidePopup);
+      });
+    });
+
+    overlay.addEventListener('click', hidePopup);
+    function hidePopup() {
+      overlay.classList.add('hidden');
+      popup.classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
