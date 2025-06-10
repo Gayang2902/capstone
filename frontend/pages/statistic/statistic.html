@@ -37,29 +37,117 @@
 
   <!-- ─── 메인 영역 시작 ─── -->
   <div class="flex-1 flex flex-col min-h-0">
-    <!-- 헤더 -->
-    <header class="flex items-center justify-between px-8 py-4 bg-white/30 backdrop-blur-xl shadow-sm">
-      <button class="w-11 h-11 bg-indigo-500 rounded-full flex items-center justify-center hover:bg-indigo-600 transition">
+    <!-- ─── 헤더 시작 ─── -->
+    <header class="flex items-center justify-between px-8 py-4 bg-white/30 backdrop-blur-xl shadow-sm z-10 flex-shrink-0">
+      <!-- 상단 왼쪽 + 버튼: Generator 열기 -->
+      <button
+              id="openGeneratorBtn"
+              class="w-11 h-11 flex items-center justify-center bg-indigo-500 rounded-full shadow-md transition
+               hover:bg-indigo-600 active:scale-95 focus:outline-none"
+              title="새 비밀번호 생성기 열기"
+      >
         <i class="fa-solid fa-plus text-white text-lg"></i>
       </button>
+
+      <!-- 오른쪽 아이콘 그룹 -->
       <div class="flex items-center space-x-4">
-        <button id="btnScreenshotPrevent" class="w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center hover:bg-indigo-100 transition">
-          <i class="fa-solid fa-shield-halved text-indigo-700"></i>
+        <button
+                id="btnScreenshotPrevent"
+                class="w-12 h-12 flex items-center justify-center bg-indigo-50 rounded-full shadow-md transition
+                 hover:bg-indigo-100 active:scale-95 focus:outline-none"
+                title="스크린샷 방지"
+        >
+          <i class="fa-solid fa-shield-halved text-indigo-700 text-lg"></i>
         </button>
-        <button id="btnHelp" class="w-12 h-12 bg-rose-50 rounded-full flex items-center justify-center hover:bg-rose-100 transition">
-          <i class="fa-solid fa-question text-rose-600"></i>
+
+        <button
+                id="btnHelp"
+                class="w-12 h-12 flex items-center justify-center bg-rose-50 rounded-full shadow-md transition
+                 hover:bg-rose-100 active:scale-95 focus:outline-none"
+                title="도움말"
+        >
+          <i class="fa-solid fa-question text-rose-600 text-lg"></i>
         </button>
-        <button class="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center hover:bg-emerald-100 transition">
-          <i class="fa-solid fa-earth-asia text-emerald-600"></i>
+
+        <button
+                class="w-12 h-12 flex items-center justify-center bg-emerald-50 rounded-full shadow-md transition
+                 hover:bg-emerald-100 active:scale-95 focus:outline-none"
+                title="언어 전환"
+        >
+          <i class="fa-solid fa-earth-asia text-emerald-600 text-lg"></i>
         </button>
+
         <div class="relative w-72">
-          <input id="input-search" type="text" placeholder="검색..." class="w-full pl-12 pr-4 py-2 bg-white/50 backdrop-blur-md border border-indigo-200 rounded-full focus:border-indigo-300 transition" />
+          <input
+                  type="text"
+                  id="input-search"
+                  placeholder="검색..."
+                  class="w-full pl-12 pr-4 py-3 bg-white/50 backdrop-blur-md border border-indigo-200
+                   rounded-full text-gray-700 placeholder-indigo-400 shadow-sm transition
+                   focus:bg-white/70 focus:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+          />
           <div class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-600">
             <i class="fa-solid fa-magnifying-glass"></i>
           </div>
         </div>
+
+        <button
+                class="w-12 h-12 flex items-center justify-center bg-gray-50 rounded-full shadow-md transition
+                 hover:bg-gray-100 active:scale-95 focus:outline-none"
+                title="다크모드 토글"
+        >
+          <i class="fa-solid fa-moon text-gray-700 text-lg"></i>
+        </button>
       </div>
     </header>
+    <!-- ─── 헤더 끝 ─── -->
+
+    <!-- ───────────────────────────────────────────────────────────────────────── -->
+    <!-- Generator Modal (처음엔 숨겨진 상태)                                        -->
+    <!-- “+” 버튼을 누르면 열려서 비밀번호 생성 UI가 나타납니다.                       -->
+    <!-- ───────────────────────────────────────────────────────────────────────── -->
+    <div id="generatorModal"
+         class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden flex items-center justify-center"
+    >
+      <div class="bg-white rounded-lg p-6 w-96">
+        <div class="flex justify-between items-center">
+          <h2 class="text-xl font-semibold">비밀번호 생성기</h2>
+          <button id="generatorClose" class="text-gray-500 hover:text-gray-800">×</button>
+        </div>
+        <div class="mt-4 space-y-4">
+          <!-- 길이 선택 슬라이더 -->
+          <div>
+            <label for="pwdLength">길이: <span id="pwdLengthValue">8</span></label>
+            <input id="pwdLength" type="range" min="4" max="32" value="8" class="w-full" />
+          </div>
+
+          <!-- 옵션 체크박스 -->
+          <div class="flex flex-col space-y-1">
+            <label><input id="optionNumber" type="checkbox" checked /> 숫자 포함</label>
+            <label><input id="optionUpper" type="checkbox" checked /> 대문자 포함</label>
+            <label><input id="optionSymbol" type="checkbox" /> 특수문자 포함</label>
+            <label><input id="optionRandomWord" type="checkbox" /> 랜덤 단어 포함</label>
+          </div>
+
+          <!-- 생성된 비밀번호 표시 및 강도바 -->
+          <div>
+            <input id="generatedPassword" type="text" readonly class="w-full border rounded px-2 py-1" />
+            <div class="w-full bg-gray-200 h-2 rounded mt-2">
+              <div id="strengthBar" class="h-2 w-0 rounded bg-red-500"></div>
+            </div>
+            <p id="strengthText" class="mt-1 text-sm text-gray-600">강도 표시</p>
+          </div>
+
+          <!-- 버튼들 -->
+          <div class="flex justify-between space-x-2">
+            <button id="generateBtn" class="flex-1 bg-blue-500 text-white rounded py-1">생성하기</button>
+            <button id="refreshPasswordBtn" class="flex-1 bg-green-500 text-white rounded py-1">새로고침</button>
+            <button id="copyPasswordBtn" class="flex-1 bg-gray-500 text-white rounded py-1">복사</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ─── Generator Modal 끝 ─── -->
 
     <!-- 콘텐츠 -->
     <div class="flex-1 p-8 overflow-auto">
@@ -74,12 +162,12 @@
           <p id="weakCount" class="mt-1 text-xl font-semibold text-red-600">0개</p>
         </div>
         <div class="bg-white p-4 rounded-2xl shadow-lg">
-          <p class="text-sm text-green-500">강력한 비밀번호</p>
-          <p id="secureCount" class="mt-1 text-xl font-semibold text-green-600">0개</p>
-        </div>
-        <div class="bg-white p-4 rounded-2xl shadow-lg">
           <p class="text-sm text-yellow-500">보통 비밀번호</p>
           <p id="dupCount" class="mt-1 text-xl font-semibold text-yellow-600">0개</p>
+        </div>
+        <div class="bg-white p-4 rounded-2xl shadow-lg">
+          <p class="text-sm text-green-500">강력 비밀번호</p>
+          <p id="secureCount" class="mt-1 text-xl font-semibold text-green-600">0개</p>
         </div>
       </div>
 
