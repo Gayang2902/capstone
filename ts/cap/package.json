@@ -1,0 +1,15 @@
+{
+  "name": "password-manager-electron",
+  "version": "1.0.0",
+  "description": "Electron 기반의 Password Manager",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "electron": "^25.0.0"
+  },
+  "devDependencies": {},
+  "author": "",
+  "license": "MIT"
+}

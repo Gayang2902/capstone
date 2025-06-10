@@ -1,0 +1,58 @@
+<!-- src/statistics.html -->
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+  <div class="bg-white rounded-2xl p-4 shadow-lg">
+    <p class="text-sm text-gray-600">총 비밀번호</p>
+    <p class="mt-1 text-xl font-semibold text-gray-900">0개</p>
+  </div>
+  <div class="bg-white rounded-2xl p-4 shadow-lg">
+    <p class="text-sm text-red-500">취약 비밀번호</p>
+    <p class="mt-1 text-xl font-semibold text-red-600">0개</p>
+  </div>
+  <div class="bg-white rounded-2xl p-4 shadow-lg">
+    <p class="text-sm text-green-500">보안된 비밀번호</p>
+    <p class="mt-1 text-xl font-semibold text-green-600">0개</p>
+  </div>
+  <div class="bg-white rounded-2xl p-4 shadow-lg">
+    <p class="text-sm text-yellow-500">중복된 암호</p>
+    <p class="mt-1 text-xl font-semibold text-yellow-600">0개</p>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+  <div class="bg-white rounded-2xl h-52 shadow-lg flex items-center justify-center">
+    <p class="text-gray-400">차트 영역 (Account Stats)</p>
+  </div>
+  <div class="bg-white rounded-2xl h-52 shadow-lg flex items-center justify-center">
+    <p class="text-gray-400">차트 영역 (Strength Distribution)</p>
+  </div>
+</div>
+
+<div class="space-y-4">
+  <div class="flex justify-between items-center bg-white rounded-lg shadow p-3">
+    <span class="text-base font-medium">재사용된 비밀번호</span>
+    <button
+      id="viewRegeneratedBtn"
+      class="px-3 py-1 bg-blue-100 text-blue-600 font-semibold rounded hover:bg-blue-200 transition"
+    >
+      조회하기
+    </button>
+  </div>
+  <div class="flex justify-between items-center bg-white rounded-lg shadow p-3">
+    <span class="text-base font-medium">유출된 비밀번호</span>
+    <button
+      id="manageLeakedBtn"
+      class="px-3 py-1 bg-red-100 text-red-600 font-semibold rounded hover:bg-red-200 transition"
+    >
+      관리하기
+    </button>
+  </div>
+  <div class="flex justify-between items-center bg-white rounded-lg shadow p-3">
+    <span class="text-base font-medium">오래된 비밀번호</span>
+    <button
+      id="manageExpiredBtn"
+      class="px-3 py-1 bg-yellow-100 text-yellow-600 font-semibold rounded hover:bg-yellow-200 transition"
+    >
+      관리하기
+    </button>
+  </div>
+</div>

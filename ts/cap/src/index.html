@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Password Manager</title>
+
+  <!-- Tailwind CSS (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome (CDN) -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+
+  <!-- 외부 CSS (styles.css) -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body class="flex h-screen bg-gray-100 font-sans text-gray-800 overflow-hidden">
+   <!-- ① 오버레이와 팝업은 body 바로 안, 앱 전체 래퍼(#app-root) 바깥에 한 번만 둡니다 -->
+  <div id="card-overlay" class="hidden"></div>
+  <div id="card-popup"   class="hidden"></div>
+
+  <!-- ──────────────────────────────────────────────────────────────────────────────────────── -->
+  <!-- 사이드바 (원본 그대로, 수정 없음) -->
+  <aside class="w-64 flex-shrink-0 pt-10 px-6 pb-6 bg-white/30 backdrop-blur-xl border-r">
+    <div class="text-indigo-600 text-2xl font-bold flex items-center mb-8">
+      <i class="fa-solid fa-key mr-2"></i>
+      <span>Password Manager</span>
+    </div>
+    <nav class="space-y-4">
+      <button id="navHome"
+        class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl 
+               hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition"
+      >
+        <i class="fa-solid fa-house text-indigo-600 text-lg mr-3"></i>
+        <span class="text-base">Home</span>
+      </button>
+
+      <button id="navStats"
+        class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl 
+               hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition"
+      >
+        <i class="fa-solid fa-chart-line text-indigo-600 text-lg mr-3"></i>
+        <span class="text-base">Statistics</span>
+      </button>
+
+      <button id="navGroup"
+        class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl 
+               hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition"
+      >
+        <i class="fa-solid fa-users text-indigo-600 text-lg mr-3"></i>
+        <span class="text-base">Group</span>
+      </button>
+
+      <button id="navSetting"
+        class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl 
+               hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition"
+      >
+        <i class="fa-solid fa-cog text-indigo-600 text-lg mr-3"></i>
+        <span class="text-base">Setting</span>
+      </button>
+    </nav>
+  </aside>
+  <!-- 사이드바 끝 (원본 그대로) -->
+
+  <!-- ──────────────────────────────────────────────────────────────────────────────────────── -->
+  <!-- 메인 영역 -->
+  <div class="flex-1 flex flex-col min-h-0">
+    <!-- ─── 헤더 ─── -->
+    <header class="flex items-center justify-between px-8 py-4 bg-white/30 backdrop-blur-xl shadow-sm z-10 flex-shrink-0">
+      <!-- 왼쪽: Generator 팝업 전용 “+ 버튼” -->
+      <button
+        id="openGeneratorBtn"
+        class="w-12 h-12 flex items-center justify-center bg-indigo-500 rounded-full shadow-md transition 
+               hover:bg-indigo-600 active:scale-95 focus:outline-none"
+        title="비밀번호 생성기 열기"
+      >
+        <i class="fa-solid fa-plus text-white text-xl"></i>
+      </button>
+
+      <!-- 오른쪽 나머지 버튼들 (원본 그대로) -->
+      <div class="flex items-center space-x-4">
+        <button
+          id="btnScreenshotPrevent"
+          class="w-12 h-12 flex items-center justify-center bg-indigo-50 rounded-full shadow-md transition 
+                 hover:bg-indigo-100 active:scale-95 focus:outline-none"
+          title="스크린샷 방지"
+        >
+          <i class="fa-solid fa-shield-halved text-indigo-700 text-lg"></i>
+        </button>
+        <button
+          id="btnHelp"
+          class="w-12 h-12 flex items-center justify-center bg-rose-50 rounded-full shadow-md transition 
+                 hover:bg-rose-100 active:scale-95 focus:outline-none"
+          title="도움말"
+        >
+          <i class="fa-solid fa-question text-rose-600 text-lg"></i>
+        </button>
+        <button
+        id="btnHelp"
+          class="w-12 h-12 flex items-center justify-center bg-emerald-50 rounded-full shadow-md transition 
+                 hover:bg-emerald-100 active:scale-95 focus:outline-none"
+          title="언어 전환"
+        >
+          <i class="fa-solid fa-earth-asia text-emerald-600 text-lg"></i>
+        </button>
+        <div class="relative w-72">
+          <input
+            type="text"
+            placeholder="검색..."
+            class="w-full pl-12 pr-4 py-3 bg-white/50 backdrop-blur-md border border-indigo-200 
+                   rounded-full text-gray-700 placeholder-indigo-400 shadow-sm transition 
+                   focus:bg-white/70 focus:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+          />
+          <div class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-600">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </div>
+        </div>
+        <button
+          class="w-12 h-12 flex items-center justify-center bg-gray-50 rounded-full shadow-md transition 
+                 hover:bg-gray-100 active:scale-95 focus:outline-none"
+          title="다크모드 토글"
+        >
+          <i class="fa-solid fa-moon text-gray-700 text-lg"></i>
+        </button>
+      </div>
+    </header>
+    <!-- ─── 헤더 끝 ─── -->
+
+    <!-- ─── 동적 콘텐츠 영역 (#main-content) ─── -->
+    <div id="main-content"
+         class="flex-1 overflow-y-scroll px-8 py-4 mx-8 my-6 bg-white/20 backdrop-blur-lg 
+                rounded-2xl shadow-inner space-y-6 min-h-0"
+    >
+      <!-- 초기 로드 시 Home 콘텐츠가 삽입됩니다. -->
+    </div>
+    <!-- ─── 동적 콘텐츠 끝 ─── -->
+  </div>
+  <!-- 메인 영역 끝 -->
+
+  <!-- ──────────────────────────────────────────────────────────────────────────────────────── -->
+  <!-- 통계용 모달 (원본 그대로) -->
+  <div id="genericModal"
+       class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 opacity-0 pointer-events-none">
+    <div class="absolute inset-0"></div>
+    <div id="modalBox"
+         class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6 transform scale-95 relative z-10">
+      <div class="flex justify-between items-center mb-4 border-b border-gray-200 pb-2">
+        <h2 id="modalTitle" class="text-2xl font-semibold text-gray-800">제목</h2>
+        <button id="modalCloseBtn" class="text-gray-500 hover:text-gray-700 text-2xl font-bold leading-none focus:outline-none">
+          &times;
+        </button>
+      </div>
+      <div id="modalContent" class="space-y-4 text-gray-700">
+        <!-- 클릭된 버튼에 따라 동적으로 삽입됩니다 -->
+      </div>
+    </div>
+  </div>
+  <!-- 통계용 모달 끝 -->
+
+  <!-- ──────────────────────────────────────────────────────────────────────────────────────── -->
+  <!-- 추가 비밀번호 모달 (원본 그대로) -->
+  <div id="addPasswordModal"
+       class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 opacity-0 pointer-events-none">
+    <div id="addModalOverlay" class="absolute inset-0"></div>
+    <div id="addModalBox"
+         class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 p-6 transform scale-95 relative z-10">
+      <!-- 모달 헤더: 뒤로가기 + 제목 -->
+      <div class="flex items-center mb-6 border-b border-gray-200 pb-2">
+        <button id="resetIconGridBtn" class="mr-3 w-10 h-10 flex items-center justify-center bg-gray-100 rounded-full shadow-sm hover:shadow-md transition hidden focus:outline-none">
+          <i class="fa-solid fa-arrow-left text-gray-600"></i>
+        </button>
+        <h2 class="text-2xl font-semibold text-gray-800">새 비밀번호 추가</h2>
+      </div>
+
+      <!-- 1) 아이콘 그리드 영역 -->
+      <div id="iconSelectArea" class="icons-container grid grid-cols-3 gap-4">
+        <div class="icon-card flex flex-col items-center justify-center p-4 bg-white rounded-2xl shadow hover:shadow-lg transition cursor-pointer" data-category="wifi">
+          <i class="fa-solid fa-wifi text-indigo-500 text-2xl"></i>
+          <span class="mt-2 font-medium">Wi-Fi</span>
+          <span class="text-sm text-gray-500 mt-1">0개</span>
+        </div>
+        <div class="icon-card flex flex-col items-center justify-center p-4 bg-white rounded-2xl shadow hover:shadow-lg transition cursor-pointer" data-category="server">
+          <i class="fa-solid fa-server text-blue-500 text-2xl"></i>
+          <span class="mt-2 font-medium">Server</span>
+          <span class="text-sm text-gray-500 mt-1">0개</span>
+        </div>
+        <div class="icon-card flex flex-col items-center justify-center p-4 bg-white rounded-2xl shadow hover:shadow-lg transition cursor-pointer" data-category="passbook">
+          <i class="fa-solid fa-book text-yellow-500 text-2xl"></i>
+          <span class="mt-2 font-medium">Passbook</span>
+          <span class="text-sm text-gray-500 mt-1">0개</span>
+        </div>
+        <div class="icon-card flex flex-col items-center justify-center p-4 bg-white rounded-2xl shadow hover:shadow-lg transition cursor-pointer" data-category="identity">
+          <i class="fa-solid fa-id-card text-pink-500 text-2xl"></i>
+          <span class="mt-2 font-medium">Identity</span>
+          <span class="text-sm text-gray-500 mt-1">0개</span>
+        </div>
+        <div class="icon-card flex flex-col items-center justify-center p-4 bg-white rounded-2xl shadow hover:shadow-lg transition cursor-pointer" data-category="security">
+          <i class="fa-solid fa-shield-alt text-green-500 text-2xl"></i>
+          <span class="mt-2 font-medium">Security</span>
+          <span class="text-sm text-gray-500 mt-1">0개</span>
+        </div>
+        <div class="icon-card flex flex-col items-center justify-center p-4 bg-white rounded-2xl shadow hover:shadow-lg transition cursor-pointer" data-category="web">
+          <i class="fa-solid fa-globe text-blue-600 text-2xl"></i>
+          <span class="mt-2 font-medium">Web</span>
+          <span class="text-sm text-gray-500 mt-1">0개</span>
+        </div>
+        <div class="icon-card flex flex-col items-center justify-center p-4 bg-white rounded-2xl shadow hover:shadow-lg transition cursor-pointer" data-category="card">
+          <i class="fa-solid fa-credit-card text-teal-500 text-2xl"></i>
+          <span class="mt-2 font-medium">Card</span>
+          <span class="text-sm text-gray-500 mt-1">0개</span>
+        </div>
+      </div>
+
+      <!-- 2) 상세 입력 폼 영역 (초기에는 숨김) -->
+      <div id="detailFormArea" class="hidden mt-6"></div>
+    </div>
+  </div>
+  <!-- 추가 비밀번호 모달 끝 -->
+
+  <!-- ──────────────────────────────────────────────────────────────────────────────────────── -->
+  <!-- Generator 팝업 모달 (화이트 + 연한 보라/파랑 섞인 느낌) -->
+  <div
+    id="generatorModal"
+    class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50"
+  >
+    <div class="relative bg-white rounded-2xl w-11/12 max-w-md mx-auto p-6 shadow-xl ring-1 ring-purple-100">
+      <!-- 닫기 버튼 (모퉁이 사이에 깔끔하게 배치) -->
+      <button
+        id="generatorClose"
+        class="absolute top-0 right-0 transform translate-x-3 -translate-y-3 bg-white rounded-full p-1 text-gray-600 hover:text-gray-800 focus:outline-none shadow"
+        title="닫기"
+      >
+        <i class="fa-solid fa-xmark fa-lg"></i>
+      </button>
+
+      <!-- 1) 생성된 비밀번호 표시 영역 (이제 직접 입력 가능) -->
+      <div class="mb-6">
+        <div class="relative">
+          <input
+            type="text"
+            id="generatedPassword"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 pr-20 text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-200"
+          />
+          <!-- 아이콘 두 개를 우측에 나란히 배치 -->
+          <div class="absolute inset-y-0 right-0 flex items-center pr-2 space-x-2">
+            <button
+              id="copyPasswordBtn"
+              class="text-gray-600 hover:text-gray-800 focus:outline-none"
+              title="복사"
+            >
+              <i class="fa-regular fa-copy fa-lg"></i>
+            </button>
+            <button
+              id="refreshPasswordBtn"
+              class="text-gray-600 hover:text-gray-800 focus:outline-none"
+              title="새로고침"
+            >
+              <i class="fa-solid fa-arrow-rotate-right fa-lg"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2) 암호 강도 표시 -->
+      <div class="mb-6">
+        <div class="flex items-center mb-2">
+          <span class="text-sm text-gray-700">암호 강도:</span>
+          <div class="flex-1 h-2 bg-gray-200 rounded mx-2 overflow-hidden">
+            <div
+              id="strengthBar"
+              class="h-2 bg-purple-500"
+              style="width: 20%;"
+            ></div>
+          </div>
+          <span id="strengthText" class="text-sm text-gray-700">약함</span>
+        </div>
+        <div class="flex justify-between text-xs text-gray-500">
+          <span>매우 약함</span>
+          <span>약함</span>
+          <span>보통</span>
+          <span>양호</span>
+          <span>매우 양호</span>
+        </div>
+      </div>
+
+      <!-- 3) 비밀번호 길이 슬라이더 -->
+      <div class="mb-6">
+        <label for="pwdLength" class="block text-sm text-gray-700 mb-1">
+          비밀번호 길이: <span id="pwdLengthValue" class="font-medium">16</span>
+        </label>
+        <input
+          type="range"
+          id="pwdLength"
+          min="4"
+          max="64"
+          value="16"
+          class="w-full accent-purple-500 h-1 rounded-full focus:outline-none"
+        />
+      </div>
+
+      <!-- 4) 옵션 체크박스 + 커스텀 입력 -->
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <label class="inline-flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="optionWord"
+            class="form-checkbox h-5 w-5 accent-blue-500 focus:ring-blue-200"
+          />
+          <span class="text-gray-700">단어 기반</span>
+        </label>
+        <label class="inline-flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="optionNumber"
+            class="form-checkbox h-5 w-5 accent-blue-500 focus:ring-blue-200"
+          />
+          <span class="text-gray-700">숫자 조합</span>
+        </label>
+        <label class="inline-flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="optionUpper"
+            class="form-checkbox h-5 w-5 accent-blue-500 focus:ring-blue-200"
+          />
+          <span class="text-gray-700">대문자 조합</span>
+        </label>
+        <label class="inline-flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="optionSymbol"
+            class="form-checkbox h-5 w-5 accent-blue-500 focus:ring-blue-200"
+          />
+          <span class="text-gray-700">기호 조합</span>
+        </label>
+        <label class="inline-flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="optionRandomWord"
+            class="form-checkbox h-5 w-5 accent-blue-500 focus:ring-blue-200"
+          />
+          <span class="text-gray-700">무작위 단어</span>
+        </label>
+        <!-- 커스텀 문자 입력란 -->
+        <input
+          type="text"
+          id="optionCustom"
+          class="w-full border border-gray-300 rounded-lg px-3 py-1 focus:outline-none focus:ring-2 focus:ring-purple-200"
+          placeholder="커스텀 문자"
+        />
+      </div>
+
+      <!-- 5) 생성 버튼 -->
+      <button
+        id="generateBtn"
+        class="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition shadow-sm"
+      >
+        생성하기
+      </button>
+    </div>
+  </div>
+  <!-- Generator 팝업 모달 끝 (새 디자인) -->
+
+  <!-- ─── 외부 JS 연결 ─── -->
+  <script type="module" src="script.js"></script>
+</body>
+</html>
