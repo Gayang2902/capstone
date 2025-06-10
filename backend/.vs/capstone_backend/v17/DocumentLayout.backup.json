@@ -3,8 +3,20 @@
   "WorkspaceRootPath": "C:\\Users\\millet\\capstone\\backend\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|C:\\Users\\millet\\capstone\\backend\\database.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|solutionrelative:database.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|C:\\Users\\millet\\capstone\\backend\\database.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|solutionrelative:database.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|C:\\Users\\millet\\capstone\\backend\\handler.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|solutionrelative:handler.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|C:\\Users\\millet\\capstone\\backend\\utils.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|solutionrelative:utils.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
   "DocumentGroupContainers": [
@@ -19,12 +31,51 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "database.hpp",
+              "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\database.hpp",
+              "RelativeDocumentMoniker": "database.hpp",
+              "ToolTip": "C:\\Users\\millet\\capstone\\backend\\database.hpp",
+              "RelativeToolTip": "database.hpp",
+              "ViewState": "AgIAACQAAAAAAAAAAAAAAEYAAAAsAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-06-06T18:16:13.951Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "handler.cpp",
+              "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\handler.cpp",
+              "RelativeDocumentMoniker": "handler.cpp",
+              "ToolTip": "C:\\Users\\millet\\capstone\\backend\\handler.cpp",
+              "RelativeToolTip": "handler.cpp",
+              "ViewState": "AgIAAPYAAAAAAAAAAAAAAOQAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-06-06T18:15:56.476Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "utils.cpp",
+              "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\utils.cpp",
+              "RelativeDocumentMoniker": "utils.cpp",
+              "ToolTip": "C:\\Users\\millet\\capstone\\backend\\utils.cpp",
+              "RelativeToolTip": "utils.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-06-06T18:15:55.898Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "database.cpp",
               "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\database.cpp",
               "RelativeDocumentMoniker": "database.cpp",
               "ToolTip": "C:\\Users\\millet\\capstone\\backend\\database.cpp",
               "RelativeToolTip": "database.cpp",
-              "ViewState": "AgIAAIoBAAAAAAAAAAAWwKYBAAA4AAAAAAAAAA==",
+              "ViewState": "AgIAAGkAAAAAAAAAAAAAAJ4BAAAjAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2025-06-06T14:09:27.831Z",
               "EditorCaption": ""
