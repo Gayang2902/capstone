@@ -1,5 +1,11 @@
 // File: pages/home/home_renderer.js
 
+// 모달 관련 참조 (파일 상단에 추가)
+const editModal   = document.getElementById('editModal');
+const editForm    = document.getElementById('editForm');
+const saveEdit    = document.getElementById('saveEdit');
+const cancelEdit  = document.getElementById('cancelEdit');
+
 // ─────────────────────────────────────────────────────────────
 // ======== 0) 전역 변수 ========
 const navHome    = document.getElementById('navHome');
@@ -591,74 +597,159 @@ async function loadAndRenderList(query = '') {
     card.addEventListener('click', () => openEditModal(entry));
     container.appendChild(card);
   });
+
+  pwContainer.querySelectorAll('.pw-item').forEach(card => {
+    card.addEventListener('click', () => {
+      const uid = card.getAttribute('data-uid');
+      openEditModal(uid);
+    });
+  });
 }
 
 // =================================== 비밀번호 업데이트 ===================================
+// function openEditModal(entry) {
+//   // 모달 열기
+//   openModal();
+//
+//   // 타입 설정 및 폼 렌더링
+//   selectedType = entry.type;
+//   typeSelection.classList.add('hidden');
+//   backBtn.classList.remove('hidden');
+//   formContainer.innerHTML = wrapWithCommonFields(formTemplates[selectedType] || '');
+//
+//   // 공통 필드
+//   document.getElementById('entry-label').value    = entry.label;
+//   document.getElementById('entry-comments').value = entry.comments || '';
+//
+//   // 타입별 필드 채우기
+//   switch (selectedType) {
+//     case 'wifi':
+//       document.getElementById('wifi-name').value = entry.name;
+//       document.getElementById('wifi-pwd').value  = entry.pwd;
+//       break;
+//
+//     case 'server':
+//       document.getElementById('server-id').value   = entry.id;
+//       document.getElementById('server-pwd').value  = entry.pwd;
+//       document.getElementById('server-host').value = entry.host;
+//       document.getElementById('server-port').value = entry.port;
+//       break;
+//
+//     case 'bankbook':
+//       document.getElementById('bankbook-account-num').value = entry.num;
+//       document.getElementById('bankbook-account-pwd').value = entry.pwd;
+//       document.getElementById('bankbook-bank-name').value   = entry.bank_name;
+//       document.getElementById('bankbook-master').value      = entry.master;
+//       break;
+//
+//     case 'identity':
+//       document.getElementById('identity-citizen').value    = entry.citizen;
+//       document.getElementById('identity-name').value       = entry.name;
+//       document.getElementById('identity-eng-name').value   = entry.eng_name;
+//       document.getElementById('identity-address').value    = entry.address;
+//       document.getElementById('identity-birth-date').value = entry.birth_date;
+//       break;
+//
+//     case 'website':
+//       document.getElementById('website-url').value   = entry.url;
+//       document.getElementById('website-id').value    = entry.id;
+//       document.getElementById('website-pwd').value   = entry.pwd;
+//       document.getElementById('website-email').value = entry.email;
+//       break;
+//
+//     case 'card':
+//       document.getElementById('card-number').value    = entry.card_number;
+//       document.getElementById('card-cvc').value       = entry.cvc;
+//       document.getElementById('card-expiry').value    = entry.last_day;
+//       document.getElementById('card-bank-name').value = entry.bank_name;
+//       document.getElementById('card-pwd').value       = entry.pwd;
+//       document.getElementById('card-name').value      = entry.name;
+//       break;
+//
+//     case 'security':
+//       document.getElementById('security-content').value = entry.content;
+//       break;
+//   }
+//
+//   // 수정 대상 UID 저장
+//   formContainer.dataset.editingUid = entry.UID;
+// }
 
-function openEditModal(entry) {
-  // 모달 열기
-  openModal();
+function openEditModal(uid) {
+  const entry = currentEntries.find(e => (e.UID||e.id||e.uid) === uid);
+  if (!entry) return;
 
-  // 타입 설정 및 폼 렌더링
-  selectedType = entry.type;
-  typeSelection.classList.add('hidden');
-  backBtn.classList.remove('hidden');
-  formContainer.innerHTML = wrapWithCommonFields(formTemplates[selectedType] || '');
+  // 모달 보이기
+  editModal.classList.remove('hidden');
+  editForm.innerHTML = '';
 
-  // 공통 필드
-  document.getElementById('entry-label').value    = entry.label;
-  document.getElementById('entry-comments').value = entry.comments || '';
+  // 1) Label + Favorite 아이콘
+  const lblDiv = document.createElement('div');
+  lblDiv.className = 'mb-4 flex items-center space-x-2';
+  lblDiv.innerHTML = `
+    <input id="edit-label" type="text" value="${entry.label||''}"
+      class="flex-1 border rounded px-2 py-1" />
+    <i id="edit-fav-icon"
+       class="fa-star ${entry.favorite ? 'fa-solid text-yellow-500' : 'fa-regular text-gray-400'} cursor-pointer text-xl"></i>
+  `;
+  editForm.appendChild(lblDiv);
 
-  // 타입별 필드 채우기
-  switch (selectedType) {
-    case 'wifi':
-      document.getElementById('wifi-name').value = entry.name;
-      document.getElementById('wifi-pwd').value  = entry.pwd;
-      break;
+  // favorite 클릭 토글
+  const favIcon = document.getElementById('edit-fav-icon');
+  favIcon.addEventListener('click', () => {
+    entry.favorite = !entry.favorite;
+    favIcon.classList.toggle('fa-solid', entry.favorite);
+    favIcon.classList.toggle('fa-regular', !entry.favorite);
+    favIcon.classList.toggle('text-yellow-500', entry.favorite);
+    favIcon.classList.toggle('text-gray-400', !entry.favorite);
+  });
 
-    case 'server':
-      document.getElementById('server-id').value   = entry.id;
-      document.getElementById('server-pwd').value  = entry.pwd;
-      document.getElementById('server-host').value = entry.host;
-      document.getElementById('server-port').value = entry.port;
-      break;
+  // 2) Comments
+  const commentsDiv = document.createElement('div');
+  commentsDiv.className = 'mb-4';
+  commentsDiv.innerHTML = `
+    <label class="block text-sm font-medium">Comments</label>
+    <textarea id="edit-comments"
+      class="mt-1 w-full border rounded px-2 py-1"
+    >${entry.comments||''}</textarea>
+  `;
+  editForm.appendChild(commentsDiv);
 
-    case 'bankbook':
-      document.getElementById('bankbook-account-num').value = entry.num;
-      document.getElementById('bankbook-account-pwd').value = entry.pwd;
-      document.getElementById('bankbook-bank-name').value   = entry.bank_name;
-      document.getElementById('bankbook-master').value      = entry.master;
-      break;
+  // 3) ID, URL, PWD 필드
+  [['id','ID','text'], ['url','URL','text'], ['pwd','Password','password']].forEach(([key,label,type])=>{
+    const div = document.createElement('div');
+    div.className = 'mb-4';
+    div.innerHTML = `
+      <label class="block text-sm font-medium">${label}</label>
+      <input id="edit-${key}" type="${type}"
+        value="${entry[key]||''}"
+        class="mt-1 w-full border rounded px-2 py-1" />
+    `;
+    editForm.appendChild(div);
+  });
 
-    case 'identity':
-      document.getElementById('identity-citizen').value    = entry.citizen;
-      document.getElementById('identity-name').value       = entry.name;
-      document.getElementById('identity-eng-name').value   = entry.eng_name;
-      document.getElementById('identity-address').value    = entry.address;
-      document.getElementById('identity-birth-date').value = entry.birth_date;
-      break;
+  // 4) 저장 / 취소 이벤트
+  saveEdit.onclick = async () => {
+    const updated = {
+      UID:       uid,
+      label:     document.getElementById('edit-label').value.trim(),
+      comments:  document.getElementById('edit-comments').value.trim(),
+      id:        document.getElementById('edit-id').value.trim(),
+      url:       document.getElementById('edit-url').value.trim(),
+      pwd:       document.getElementById('edit-pwd').value,
+      favorite:  entry.favorite.toString()
+    };
+    try {
+      const res = await window.electronAPI.updatePasswordEntry(updated);
+      if (!res.status) throw new Error(res.error_message);
+      editModal.classList.add('hidden');
+      await loadAndRenderList();
+    } catch (err) {
+      alert('수정 실패: ' + err.message);
+    }
+  };
 
-    case 'website':
-      document.getElementById('website-url').value   = entry.url;
-      document.getElementById('website-id').value    = entry.id;
-      document.getElementById('website-pwd').value   = entry.pwd;
-      document.getElementById('website-email').value = entry.email;
-      break;
-
-    case 'card':
-      document.getElementById('card-number').value    = entry.card_number;
-      document.getElementById('card-cvc').value       = entry.cvc;
-      document.getElementById('card-expiry').value    = entry.last_day;
-      document.getElementById('card-bank-name').value = entry.bank_name;
-      document.getElementById('card-pwd').value       = entry.pwd;
-      document.getElementById('card-name').value      = entry.name;
-      break;
-
-    case 'security':
-      document.getElementById('security-content').value = entry.content;
-      break;
-  }
-
-  // 수정 대상 UID 저장
-  formContainer.dataset.editingUid = entry.UID;
+  cancelEdit.onclick = () => {
+    editModal.classList.add('hidden');
+  };
 }
