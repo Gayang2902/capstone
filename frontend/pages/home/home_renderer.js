@@ -496,19 +496,28 @@ async function loadAndRenderList(query = '') {
         'grid grid-cols-[5%,20%,20%,15%,20%,8%,7%] items-center ' +
         'p-4 bg-white rounded-lg shadow w-full gap-x-4';
 
-    // ① 아이콘 셀
+    // ① 아이콘 셀 (website 타입만 파비콘 로드)
     const iconCell = document.createElement('div');
-    iconCell.className = 'w-full h-12 flex items-center justify-center';
+    iconCell.className = 'w-12 h-12';
     let iconEl;
     if (entry.type === 'website') {
-      iconEl = document.createElement('div');
-      iconEl.id = 'favicon';
-      iconEl.className = 'w-10 h-10 object-contain';
+      // URL에서 호스트 추출
+      let domain;
+      try {
+        domain = new URL(entry.url).hostname;
+      } catch (e) {
+        domain = entry.url.replace(/^https?:\/\//, '').split('/')[0];
+      }
+      // Clearbit Logo API 사용
+      iconEl = document.createElement('img');
+      iconEl.src = `https://logo.clearbit.com/${domain}?size=64`;
+      iconEl.alt = 'favicon';
+      iconEl.className = 'w-full h-full object-contain';
     } else {
       iconEl = document.createElement('img');
       iconEl.src = `../icon/${entry.type === 'wifi' ? 'wifi' : entry.type}.png`;
       iconEl.alt = entry.type;
-      iconEl.className = 'w-10 h-10 object-contain';
+      iconEl.className = 'w-full h-full object-contain';
     }
     iconCell.appendChild(iconEl);
     card.appendChild(iconCell);
