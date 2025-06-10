@@ -5,6 +5,7 @@ const { spawn } = require('child_process');
 const fs   = require('fs');
 const path = require('path');
 
+
 let currentFilePath = '';   // 현재 선택된 TXT 파일 경로
 
 let mainWindow;
@@ -494,18 +495,18 @@ ipcMain.handle('searchPasswordEntry', async (_evt, { query }) => {
     }
 })
 
-ipcMain.handle('getVulnerablePasswords', async () => {
-    const resp = await sendToBackend('getVulnerablePasswords', { file_path: currentFilePath });
-    return resp;
-});
-ipcMain.handle('getOldPasswords', async () => {
-    const resp = await sendToBackend('getOldPasswords', { file_path: currentFilePath });
-    return resp;
-});
-ipcMain.handle('getReusedPasswords', async () => {
-    const resp = await sendToBackend('getReusedPasswords', { file_path: currentFilePath });
-    return resp;
-});
+// ipcMain.handle('getVulnerablePasswords', async () => {
+//     const resp = await sendToBackend('getVulnerablePasswords', { file_path: currentFilePath });
+//     return resp;
+// });
+// ipcMain.handle('getOldPasswords', async () => {
+//     const resp = await sendToBackend('getOldPasswords', { file_path: currentFilePath });
+//     return resp;
+// });
+// ipcMain.handle('getReusedPasswords', async () => {
+//     const resp = await sendToBackend('getReusedPasswords', { file_path: currentFilePath });
+//     return resp;
+// });
 
 /** (8) 총 비밀번호 개수 조회 */
 ipcMain.handle('getPasswordCount', async () => {
@@ -532,6 +533,42 @@ ipcMain.handle('getPasswordDetail', async (_evt, { UID }) => {
         return resp;  // { status: true, data: { pwd: '...' } } 형태로 반환됨
     } catch (err) {
         console.error('getPasswordDetail 오류:', err);
+        return { status: false, error_message: err.message };
+    }
+});
+
+// ipcMain.handle('getPasswordCount', async () => {
+//     try {
+//         const resp = await sendToBackend('getPasswordCount', {});
+//         return resp;
+//     } catch (err) {
+//         return { status: false, error_message: err.message };
+//     }
+// });
+
+ipcMain.handle('getStrongCount', async () => {
+    try {
+        const resp = await sendToBackend('getStrongCount', {});
+        return resp;
+    } catch (err) {
+        return { status: false, error_message: err.message };
+    }
+});
+
+ipcMain.handle('getNormalCount', async () => {
+    try {
+        const resp = await sendToBackend('getNormalCount', {});
+        return resp;
+    } catch (err) {
+        return { status: false, error_message: err.message };
+    }
+});
+
+ipcMain.handle('getWeakCount', async () => {
+    try {
+        const resp = await sendToBackend('getWeakCount', {});
+        return resp;
+    } catch (err) {
         return { status: false, error_message: err.message };
     }
 });

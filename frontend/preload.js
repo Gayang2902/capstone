@@ -64,12 +64,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // searchPasswordEntry: (q) => ipcRenderer.invoke('search-password-entry', q),
     searchPasswordEntry:        query => ipcRenderer.invoke('searchPasswordEntry', { query }),
 
-    getVulnerablePasswords: () => ipcRenderer.invoke('getVulnerablePasswords'),
-    getOldPasswords:       () => ipcRenderer.invoke('getOldPasswords'),
-    getReusedPasswords:    () => ipcRenderer.invoke('getReusedPasswords'),
+    // getVulnerablePasswords: () => ipcRenderer.invoke('getVulnerablePasswords'),
+    // getOldPasswords:       () => ipcRenderer.invoke('getOldPasswords'),
+    // getReusedPasswords:    () => ipcRenderer.invoke('getReusedPasswords'),
 
     // 총 비밀번호 개수 조회
-    getPasswordCount:      () => ipcRenderer.invoke('getPasswordCount'),
+    // getPasswordCount:      () => ipcRenderer.invoke('getPasswordCount'),
 
     // 비밀번호 상세 조회 (oper="getPasswordDetail", data={ UID })
     getPasswordDetail: args =>
@@ -78,4 +78,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
             data: args
         }),
 
+    getPasswordCount: ()       => ipcRenderer.invoke('getPasswordCount'),
+    getStrongCount:   ()       => ipcRenderer.invoke('getStrongCount'),
+    getNormalCount:   ()       => ipcRenderer.invoke('getNormalCount'),
+    getWeakCount:     ()       => ipcRenderer.invoke('getWeakCount'),
 });
