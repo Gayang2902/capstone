@@ -66,6 +66,6 @@ void onGetReusedCount(const unordered_map<string, string>&) {
     }
 
     json data;
-    data["count"] = cnt;
+    data["total"] = cnt;
     respondSuccess(data);
 }

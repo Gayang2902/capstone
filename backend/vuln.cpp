@@ -109,7 +109,7 @@ void onGetStrongCount(const unordered_map<string, string>&) {
 	}
 
 	json data;
-	data["count"] = cnt;
+	data["total"] = cnt;
 	respondSuccess(data);
 }
 
@@ -124,7 +124,7 @@ void onGetNormalCount(const unordered_map<string, string>&) {
 	}
 
 	json data;
-	data["count"] = cnt;
+	data["total"] = cnt;
 	respondSuccess(data);
 }
 
@@ -139,6 +139,6 @@ void onGetWeakCount(const unordered_map<string, string>&) {
 	}
 
 	json data;
-	data["count"] = cnt;
+	data["total"] = cnt;
 	respondSuccess(data);
 }

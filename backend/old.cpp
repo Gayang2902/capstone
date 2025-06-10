@@ -91,6 +91,6 @@ void onGetOldCount(const unordered_map<string, string>&) {
 
     // 5) 응답
     json data;
-    data["count"] = cnt;
+    data["total"] = cnt;
     respondSuccess(data);
 }
