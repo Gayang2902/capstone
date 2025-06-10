@@ -124,3 +124,4 @@ private:
         const std::string& iv_bytes,
         std::string& out_plaintext) const;
 };
+

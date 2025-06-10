@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>C:\Users\millet\capstone\src\backend\x64\Release\capstone_backend.exe</FullPath>
+      <FullPath>C:\Users\millet\capstone\backend\x64\Release\capstone_backend.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />
