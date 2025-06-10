@@ -96,3 +96,18 @@ bool ensureDbInitialized() {
 	}
 	return true;
 }
+
+// 필수 파라미터 검증
+bool checkRequiredArgs(const unordered_map<string, string>& args,
+	const vector<string>& required_keys,
+	string& missing_key) {
+
+	for (auto& key : required_keys) {
+		if (!args.count(key)) {
+			missing_key = key;
+			return false;
+		}
+	}
+
+	return true;
+}

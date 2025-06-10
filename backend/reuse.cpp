@@ -11,8 +11,22 @@
 using namespace std;
 using json = nlohmann::json;
 
+// 공통 필터링 로직 (재사용 비밀번호)
+static bool shouldConsiderPasswordForReused(const PasswordEntry& entry) {
+    // Check if password exists
+    if (entry.pwd.empty()) {
+        return false;
+    }
+
+    // Exclude specific tags from reused password consideration
+    const vector<string> except_tags = { "bankbook", "card", "wifi" };
+    if (find(except_tags.begin(), except_tags.end(), entry.type) != except_tags.end()) {
+        return false;
+    }
+    return true;
+}
 // ——————————————————————————————————————————
-// 재사용된 비밀번호 조회
+// 재사용된 비밀번호 조회 (그룹화됨)
 // ——————————————————————————————————————————
 void onGetReusedPasswords(const unordered_map<string, string>&) {
     if (!ensureDbInitialized()) return;
@@ -20,20 +34,28 @@ void onGetReusedPasswords(const unordered_map<string, string>&) {
     // 1) DB에서 모든 엔트리 로드
     vector<PasswordEntry> entries = db->getAllData();
 
-    // 2) 각 비밀번호별 사용 횟수 카운트
-    unordered_map<string, int> countMap;
+    // 2) 비밀번호별로 엔트리 그룹화 및 사용 횟수 카운트
+    unordered_map<string, vector<json>> groupedPasswords; // 키: 비밀번호, 값: 해당 비밀번호를 사용하는 엔트리들의 JSON 배열
+    unordered_map<string, int> passwordCounts;             // 키: 비밀번호, 값: 해당 비밀번호의 사용 횟수
+
     for (auto& e : entries) {
-        if (!e.pwd.empty()) {
-            ++countMap[e.pwd];
+        // 특정 태그와 비밀번호가 비어있는 엔트리는 검사에서 제외
+        if (!shouldConsiderPasswordForReused(e)) {
+            continue;
         }
+
+        // 해당 비밀번호의 사용 횟수 증가
+        passwordCounts[e.pwd]++;
+        // 해당 비밀번호 그룹에 현재 엔트리 추가
+        groupedPasswords[e.pwd].push_back(entryToJson(e, false));
     }
 
-    // 3) 사용 횟수 >1인 엔트리만 JSON으로 변환
-    vector<json> rst;
-    rst.reserve(entries.size());
-    for (auto& e : entries) {
-        if (!e.pwd.empty() && countMap[e.pwd] > 1) {
-            rst.push_back(entryToJson(e, false));
+    // 3) 사용 횟수 >1인 비밀번호 그룹(엔트리 배열)만 최종 결과에 추가
+    vector<json> rst; // 최종 응답 데이터 (이중 배열이 될 것임)
+    for (auto const& [pwd_value, entry_list] : groupedPasswords) {
+        // 비밀번호가 1번 초과하여 사용된 경우 (재사용된 경우)
+        if (passwordCounts[pwd_value] > 1) {
+            rst.push_back(entry_list); // 해당 비밀번호를 사용하는 엔트리들의 배열 자체를 추가
         }
     }
 
@@ -50,22 +72,31 @@ void onGetReusedCount(const unordered_map<string, string>&) {
     if (!ensureDbInitialized()) return;
 
     vector<PasswordEntry> entries = db->getAllData();
-    unordered_map<string, int> countMap;
+    unordered_map<string, int> countMap; // To count occurrences of each password
+
     for (auto& e : entries) {
+        // Apply exclusion for specific tags
+        if (!shouldConsiderPasswordForReused(e)) {
+            continue;
+        }
         if (!e.pwd.empty()) {
             ++countMap[e.pwd];
         }
     }
 
-    // 재사용된(사용 횟수 >1) 엔트리 개수 집계
-    size_t cnt = 0;
+    // Count the total number of entries whose passwords are reused
+    size_t totalReusedEntriesCount = 0;
     for (auto& e : entries) {
+        // Apply exclusion for specific tags
+        if (!shouldConsiderPasswordForReused(e)) {
+            continue;
+        }
         if (!e.pwd.empty() && countMap[e.pwd] > 1) {
-            ++cnt;
+            ++totalReusedEntriesCount;
         }
     }
 
     json data;
-    data["total"] = cnt;
+    data["total"] = totalReusedEntriesCount; // This is the count of all entries with reused passwords
     respondSuccess(data);
 }

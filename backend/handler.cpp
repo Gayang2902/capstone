@@ -25,23 +25,6 @@ using HandlerFunc = function<void(const unordered_map<string, string>&)>;
 // 정적 매핑 사용
 static unordered_map<string, HandlerFunc> handlerMap;
 
-// ==== 헬퍼 함수들 ====
-
-// 필수 파라미터 검증
-static bool checkRequiredArgs(const unordered_map<string, string>& args,
-	const vector<string>& required_keys,
-	string& missing_key) {
-	
-	for (auto& key : required_keys) {
-		if (!args.count(key)) {
-			missing_key = key;
-			return false;
-		}
-	}
-
-	return true;
-}
-
 void onOpenFile(const unordered_map<string, string>& args) {
 	string missing;
 	if (!checkRequiredArgs(args, { "file_path" }, missing)) {
@@ -312,7 +295,6 @@ void initHandlers() {
 	handlerMap["deletePasswordEntry"] = onDeletePasswordEntry;
 	handlerMap["searchPasswordEntry"] = onSearchPasswordEntry;
 	// 
-	handlerMap["getPasswordCount"] = onGetPasswordCount;
 	handlerMap["getPasswordsByTag"] = onGetPasswordsByTag;
 
 	handlerMap["getPasswordDetail"] = onGetPasswordDetail;
@@ -324,13 +306,8 @@ void initHandlers() {
 	handlerMap["getOldPasswords"] = onGetOldPasswords;
 	handlerMap["getOldCount"] = onGetOldCount;
 	// VULN.
-	handlerMap["getVulnerablePasswordsStrong"] = onGetVulnerablePasswordsStrong;
-	handlerMap["getStrongCount"] = onGetStrongCount;
-	handlerMap["getVulnerablePasswordsNormal"] = onGetVulnerablePasswordsNormal;
-	handlerMap["getNormalCount"] = onGetNormalCount;
-	handlerMap["getVulnerablePasswordsWeak"] = onGetVulnerablePasswordsWeak;
-	handlerMap["getWeakCount"] = onGetWeakCount;
-
+	handlerMap["getVulnerablePasswords"] = onGetVulnerablePasswords;
+	handlerMap["getVulnerablePasswordCount"] = onGetVulnerablePasswordCount;
 	//// SETTINGS.
 	handlerMap["updateMasterKey"] = onUpdateMasterKey;
 

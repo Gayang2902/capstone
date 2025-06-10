@@ -37,108 +37,111 @@ static bool isWeakPassword(const string& pwd) {
 	return pwd.size() < 8;
 }
 
-// ——————————————————————————————————————————
-// 2) 비밀번호 목록 조회 핸들러
-// ——————————————————————————————————————————
-
-// 강력 비밀번호 리스트
-void onGetVulnerablePasswordsStrong(const std::unordered_map<string, string>&) {
-	if (!ensureDbInitialized()) return;
-
-	vector<PasswordEntry> entries = db->getAllData();
-	vector<json> rst;
-	rst.reserve(entries.size());
-
-	for (auto& e : entries) {
-		if (isStrongPassword(e.pwd)) {
-			rst.push_back(entryToJson(e, false));
-		}
+// 태그 필터링
+static bool shouldConsiderPassword(const PasswordEntry& entry) {
+	if (entry.pwd.empty()) {
+		return false;
 	}
 
-	json data;
-	data["data"] = move(rst);
-	respondSuccess(data);
+	const vector<string> except_tags = { "bankbook", "card", "wifi" };
+	if (find(except_tags.begin(), except_tags.end(), entry.type) != except_tags.end()) {
+		return false;
+	}
+
+	return true;
 }
 
-// 보통 비밀번호 리스트
-void onGetVulnerablePasswordsNormal(const unordered_map<string, string>&) {
-	if (!ensureDbInitialized()) return;
+// 비밀번호 목록 조회 핸들러 (통합 및 수정)
+void onGetVulnerablePasswords(const unordered_map<string, string>& args) {
+    if (!ensureDbInitialized()) return;
 
-	vector<PasswordEntry> entries = db->getAllData();
-	vector<json> rst;
-	rst.reserve(entries.size());
+    string missing;
+    if (!checkRequiredArgs(args, { "type" }, missing)) {
+        respondError("Missing parameter: type (strong, normal, weak)");
+        return;
+    }
+    string passwordType = args.at("type"); // Expected: "strong", "normal", "weak"
 
-	for (auto& e : entries) {
-		if (isNormalPassword(e.pwd)) {
-			rst.push_back(entryToJson(e, false));
-		}
-	}
+    string tag = ""; // Optional tag parameter
+    if (args.count("tag")) {
+        tag = args.at("tag");
+    }
 
-	json data;
-	data["data"] = move(rst);
-	respondSuccess(data);
+    vector<PasswordEntry> entries = db->getAllData();
+    vector<json> rst;
+    rst.reserve(entries.size());
+
+    for (auto& e : entries) {
+        // Apply tag filter if specified
+        if (!tag.empty() && e.type != tag) {
+            continue;
+        }
+
+        // Only consider entries with passwords and not excluded tags for strength checks
+        if (!shouldConsiderPassword(e)) {
+            continue;
+        }
+
+        // Apply password strength filter
+        if (passwordType == "strong" && isStrongPassword(e.pwd)) {
+            rst.push_back(entryToJson(e, false));
+        }
+        else if (passwordType == "normal" && isNormalPassword(e.pwd)) {
+            rst.push_back(entryToJson(e, false));
+        }
+        else if (passwordType == "weak" && isWeakPassword(e.pwd)) {
+            rst.push_back(entryToJson(e, false));
+        }
+    }
+
+    json data;
+    data["data"] = move(rst);
+    respondSuccess(data);
 }
 
-// 약한(취약) 비밀번호 리스트
-void onGetVulnerablePasswordsWeak(const unordered_map<string, string>&) {
-	if (!ensureDbInitialized()) return;
+// 비밀번호 개수 조회 핸들러 (통합 및 수정)
+void onGetVulnerablePasswordCount(const unordered_map<string, string>& args) {
+    if (!ensureDbInitialized()) return;
 
-	vector<PasswordEntry> entries = db->getAllData();
-	vector<json> rst;
-	rst.reserve(entries.size());
+    string missing;
+    if (!checkRequiredArgs(args, { "type" }, missing)) {
+        respondError("Missing parameter: type (strong, normal, weak)");
+        return;
+    }
+    string passwordType = args.at("type"); // Expected: "strong", "normal", "weak"
 
-	for (auto& e : entries) {
-		if (isWeakPassword(e.pwd)) {
-			rst.push_back(entryToJson(e, false));
-		}
-	}
+    string tag = ""; // Optional tag parameter
+    if (args.count("tag")) {
+        tag = args.at("tag");
+    }
 
-	json data;
-	data["data"] = move(rst);
-	respondSuccess(data);
-}
+    vector<PasswordEntry> entries = db->getAllData();
+    size_t cnt = 0;
 
-// 강력 비밀번호 개수
-void onGetStrongCount(const unordered_map<string, string>&) {
-	vector<PasswordEntry> entries = db->getAllData();
-	size_t cnt = 0;
-	for (auto& e : entries) {
-		if (isStrongPassword(e.pwd)) {
-			++cnt;
-		}
-	}
+    for (auto& e : entries) {
+        // Apply tag filter if specified
+        if (!tag.empty() && e.type != tag) {
+            continue;
+        }
 
-	json data;
-	data["total"] = cnt;
-	respondSuccess(data);
-}
+        // Only consider entries with passwords and not excluded tags for strength checks
+        if (!shouldConsiderPassword(e)) {
+            continue;
+        }
 
-// 보통 비밀번호 개수
-void onGetNormalCount(const unordered_map<string, string>&) {
-	vector<PasswordEntry> entries = db->getAllData();
-	size_t cnt = 0;
-	for (auto& e : entries) {
-		if (isNormalPassword(e.pwd)) {
-			++cnt;
-		}
-	}
+        // Apply password strength filter and count
+        if (passwordType == "strong" && isStrongPassword(e.pwd)) {
+            ++cnt;
+        }
+        else if (passwordType == "normal" && isNormalPassword(e.pwd)) {
+            ++cnt;
+        }
+        else if (passwordType == "weak" && isWeakPassword(e.pwd)) {
+            ++cnt;
+        }
+    }
 
-	json data;
-	data["total"] = cnt;
-	respondSuccess(data);
-}
-
-// 약한(취약) 비밀번호 개수
-void onGetWeakCount(const unordered_map<string, string>&) {
-	vector<PasswordEntry> entries = db->getAllData();
-	size_t cnt = 0;
-	for (auto& e : entries) {
-		if (isWeakPassword(e.pwd)) {
-			++cnt;
-		}
-	}
-
-	json data;
-	data["total"] = cnt;
-	respondSuccess(data);
+    json data;
+    data["total"] = cnt;
+    respondSuccess(data);
 }

@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <random>
 #include <sstream>
+#include <vector>
 
 #include "database.hpp"
 #include "json_c.hpp"
@@ -23,3 +24,8 @@ json entryToJson(const PasswordEntry& entry, bool include_pwd);
 
 // DB 초기화 여부 확인
 bool ensureDbInitialized();
+
+// 필수 파라미터 확인
+bool checkRequiredArgs(const unordered_map<string, string>& args,
+	const vector<string>& required_keys,
+	string& missing_key);
