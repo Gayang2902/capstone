@@ -457,7 +457,6 @@ saveBtn.addEventListener('click', async () => {
 // ─────────────────────────────────────────────────────────────
 // ===== 5) 전체 비밀번호 가져와서 렌더링 =====
 // ─────────────────────────────────────────────────────────────
-// ===== 5) 전체 비밀번호 가져와서 카드로 렌더링 =====
 async function loadAndRenderList(query = '') {
   const container = document.getElementById('card-container');
   const emptyMsg  = document.getElementById('empty-msg');
@@ -491,25 +490,25 @@ async function loadAndRenderList(query = '') {
   emptyMsg.style.display = 'none';
 
   entries.forEach(entry => {
-    // 7개 컬럼: icon(48px) | label/sub(200px) | field1(150px) | field2(150px) | field3(150px) | type(100px) | delete(80px)
+    // 7개 컬럼: 10%,20%,20%,15%,15%,10%,10%
     const card = document.createElement('div');
     card.className =
-        'grid grid-cols-[48px,110px,140px,150px,150px,100px,80px] items-center ' +
-        'p-4 bg-white rounded-lg shadow w-full gap-x-4'; // 간격 설정
+        'grid grid-cols-[5%,20%,20%,15%,20%,8%,7%] items-center ' +
+        'p-4 bg-white rounded-lg shadow w-full gap-x-4';
 
     // ① 아이콘 셀
     const iconCell = document.createElement('div');
-    iconCell.className = 'w-12 h-12';
+    iconCell.className = 'w-full h-12 flex items-center justify-center';
     let iconEl;
     if (entry.type === 'website') {
       iconEl = document.createElement('div');
       iconEl.id = 'favicon';
-      iconEl.className = 'w-full h-full object-contain';
+      iconEl.className = 'w-10 h-10 object-contain';
     } else {
       iconEl = document.createElement('img');
       iconEl.src = `../icon/${entry.type === 'wifi' ? 'wifi' : entry.type}.png`;
       iconEl.alt = entry.type;
-      iconEl.className = 'w-full h-full object-contain';
+      iconEl.className = 'w-10 h-10 object-contain';
     }
     iconCell.appendChild(iconEl);
     card.appendChild(iconCell);
@@ -525,7 +524,7 @@ async function loadAndRenderList(query = '') {
     switch (entry.type) {
       case 'website':   sub.textContent = entry.url; break;
       case 'server':    sub.textContent = `Host: ${entry.host} Port: ${entry.port}`; break;
-      case 'bankbook':  sub.textContent = `Bank: ${entry.bankName}`; break;
+      case 'bankbook':  sub.textContent = `Bank: ${entry.bank_name}`; break;
       case 'identity':  sub.textContent = `Eng: ${entry.eng_name}`; break;
       case 'card':      sub.textContent = `CVC: ${entry.cvc}`; break;
       default:          sub.textContent = '';
@@ -537,47 +536,19 @@ async function loadAndRenderList(query = '') {
     const mask = () => '****';
     let fields = [];
     if (entry.type === 'website') {
-      fields = [
-        ['ID:', entry.id],
-        ['PWD:', mask()],
-        ['E-Mail:', entry.email]
-      ];
+      fields = [['ID:', entry.id], ['PWD:', mask()], ['E-Mail:', entry.email]];
     } else if (entry.type === 'server') {
-      fields = [
-        ['ID:', entry.id],
-        ['PWD:', mask()],
-        ['', '']
-      ];
+      fields = [['ID:', entry.id], ['PWD:', mask()], ['', '']];
     } else if (entry.type === 'bankbook') {
-      fields = [
-        ['Num:', entry.accountNum],
-        ['PWD:', mask()],
-        ['', '']
-      ];
+      fields = [['Num:', entry.num], ['PWD:', mask()], ['', '']];
     } else if (entry.type === 'identity') {
-      fields = [
-        ['Name:', entry.name],
-        ['Citizen:', entry.citizen],
-        ['', '']
-      ];
+      fields = [['Name:', entry.name], ['Citizen:', entry.citizen], ['', '']];
     } else if (entry.type === 'card') {
-      fields = [
-        ['Num:', entry.card_number],
-        ['PWD:', mask()],
-        ['', '']
-      ];
+      fields = [['Num:', entry.card_number], ['PWD:', mask()], ['', '']];
     } else if (entry.type === 'wifi') {
-      fields = [
-        ['ID:', entry.id],
-        ['PWD:', mask()],
-        ['', '']
-      ];
+      fields = [['ID:', entry.id], ['PWD:', mask()], ['', '']];
     } else if (entry.type === 'security') {
-      fields = [
-        ['', entry.content],
-        ['', ''],
-        ['', '']
-      ];
+      fields = [[' ', entry.content], ['', ''], ['', '']];
     }
 
     // ③~⑤ 필드 셀
@@ -591,7 +562,7 @@ async function loadAndRenderList(query = '') {
     // ⑥ 타입 셀
     const typeCell = document.createElement('span');
     typeCell.className = 'text-xs text-gray-400';
-    typeCell.textContent = `Type: ${entry.type}`;
+    typeCell.textContent = `${entry.type}`;
     card.appendChild(typeCell);
 
     // ⑦ 삭제 버튼 셀
@@ -611,4 +582,74 @@ async function loadAndRenderList(query = '') {
     card.addEventListener('click', () => openEditModal(entry));
     container.appendChild(card);
   });
+}
+
+// =================================== 비밀번호 업데이트 ===================================
+
+function openEditModal(entry) {
+  // 모달 열기
+  openModal();
+
+  // 타입 설정 및 폼 렌더링
+  selectedType = entry.type;
+  typeSelection.classList.add('hidden');
+  backBtn.classList.remove('hidden');
+  formContainer.innerHTML = wrapWithCommonFields(formTemplates[selectedType] || '');
+
+  // 공통 필드
+  document.getElementById('entry-label').value    = entry.label;
+  document.getElementById('entry-comments').value = entry.comments || '';
+
+  // 타입별 필드 채우기
+  switch (selectedType) {
+    case 'wifi':
+      document.getElementById('wifi-name').value = entry.name;
+      document.getElementById('wifi-pwd').value  = entry.pwd;
+      break;
+
+    case 'server':
+      document.getElementById('server-id').value   = entry.id;
+      document.getElementById('server-pwd').value  = entry.pwd;
+      document.getElementById('server-host').value = entry.host;
+      document.getElementById('server-port').value = entry.port;
+      break;
+
+    case 'bankbook':
+      document.getElementById('bankbook-account-num').value = entry.num;
+      document.getElementById('bankbook-account-pwd').value = entry.pwd;
+      document.getElementById('bankbook-bank-name').value   = entry.bank_name;
+      document.getElementById('bankbook-master').value      = entry.master;
+      break;
+
+    case 'identity':
+      document.getElementById('identity-citizen').value    = entry.citizen;
+      document.getElementById('identity-name').value       = entry.name;
+      document.getElementById('identity-eng-name').value   = entry.eng_name;
+      document.getElementById('identity-address').value    = entry.address;
+      document.getElementById('identity-birth-date').value = entry.birth_date;
+      break;
+
+    case 'website':
+      document.getElementById('website-url').value   = entry.url;
+      document.getElementById('website-id').value    = entry.id;
+      document.getElementById('website-pwd').value   = entry.pwd;
+      document.getElementById('website-email').value = entry.email;
+      break;
+
+    case 'card':
+      document.getElementById('card-number').value    = entry.card_number;
+      document.getElementById('card-cvc').value       = entry.cvc;
+      document.getElementById('card-expiry').value    = entry.last_day;
+      document.getElementById('card-bank-name').value = entry.bank_name;
+      document.getElementById('card-pwd').value       = entry.pwd;
+      document.getElementById('card-name').value      = entry.name;
+      break;
+
+    case 'security':
+      document.getElementById('security-content').value = entry.content;
+      break;
+  }
+
+  // 수정 대상 UID 저장
+  formContainer.dataset.editingUid = entry.UID;
 }
