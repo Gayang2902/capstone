@@ -314,6 +314,20 @@
 </div>
 <!-- ─── 모달 끝 ─── -->
 
+<!-- 편집 모달 -->
+<div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+  <div id="editModalContent" class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
+    <h2 class="text-xl font-semibold mb-4">비밀번호 수정</h2>
+    <form id="editForm" class="space-y-4 overflow-y-auto max-h-[60vh]">
+      <!-- 여기에 JS로 필드가 동적으로 들어갑니다 -->
+    </form>
+    <div class="mt-6 flex justify-end space-x-2">
+      <button id="cancelEdit" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">취소</button>
+      <button id="saveEdit"   class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">저장</button>
+    </div>
+  </div>
+</div>
+
 <!-- ───────────────────────────────────────────────────────────────────────── -->
 <!-- 외부 JS 로직 불러오기 순서:                                        -->
 <!--  1) home_renderer.js → Home 전용 스크립트 로직                         -->
