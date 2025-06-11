@@ -11,62 +11,63 @@
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
+    <style>
+        /* 뒤집기 스타일 (부드러운 이징 적용) */
+        .flip-card { perspective: 1000px; }
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s ease-in-out;
+            transform-style: preserve-3d;
+        }
+        .flip-card-inner.flipped { transform: rotateY(180deg); }
+        .flip-card-front,
+        .flip-card-back {
+            position: absolute;
+            inset: 0;
+            backface-visibility: hidden;
+            overflow: hidden;
+        }
+        .flip-card-front {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .flip-card-back {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start;
+            transform: rotateY(180deg);
+            padding: 1rem;
+        }
+    </style>
 </head>
 
 <body data-page="group" class="flex h-screen bg-gray-100 text-gray-800 font-sans">
 <!-- ─── 사이드바 시작 ─── -->
-<aside class="w-64 flex-shrink-0 pt-10 px-6 pb-6 bg-white/30 backdrop-blur-xl border-r border-white/40 flex flex-col space-y-6">
-    <!-- 상단 로고 영역 -->
-    <div class="flex items-center mb-6">
-        <i class="fa-solid fa-key text-indigo-700 text-xl mr-2"></i>
-        <span class="text-base font-semibold text-gray-700">Password Manager</span>
+<aside class="w-64 flex-shrink-0 pt-10 px-6 pb-6 bg-white/30 backdrop-blur-xl border-r border-white/40 flex flex-col gap-6">
+    <div class="flex items-center gap-2 mb-6">
+        <i class="fa-solid fa-key text-indigo-700 text-xl"></i>
+        <span class="text-base font-semibold">Password Manager</span>
     </div>
-
-    <!-- 네비게이션 버튼 (아이콘 + 텍스트) -->
-    <nav class="space-y-3">
-        <button
-                id="navHome"
-                class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl
-               hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition"
-                onclick="goTo('home')"
-        >
-            <i class="fa-solid fa-house text-indigo-600 text-lg mr-3"></i>
-            <span class="text-base">Home</span>
+    <nav class="flex flex-col gap-3">
+        <button id="navHome" onclick="goTo('home')" class="flex items-center px-5 py-3 rounded-2xl hover:bg-indigo-100 transition">
+            <i class="fa-solid fa-house text-indigo-600 text-lg mr-3"></i>Home
         </button>
-
-        <button
-                id="navStats"
-                class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl
-               hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition"
-                onclick="goTo('statistic')"
-        >
-            <i class="fa-solid fa-chart-line text-indigo-600 text-lg mr-3"></i>
-            <span class="text-base">Statistics</span>
+        <button id="navStats" onclick="goTo('statistic')" class="flex items-center px-5 py-3 rounded-2xl hover:bg-indigo-100 transition">
+            <i class="fa-solid fa-chart-line text-indigo-600 text-lg mr-3"></i>Statistics
         </button>
-
-        <button
-                id="navGroup"
-                class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl
-               hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition"
-                onclick="goTo('group')"
-        >
-            <i class="fa-solid fa-users text-indigo-600 text-lg mr-3"></i>
-            <span class="text-base">Group</span>
+        <button id="navGroup" onclick="goTo('group')" class="flex items-center px-5 py-3 rounded-2xl bg-indigo-100 transition">
+            <i class="fa-solid fa-users text-indigo-600 text-lg mr-3"></i>Group
         </button>
-
-        <button
-                id="navSetting"
-                class="nav-btn w-full flex items-center px-5 py-3 text-gray-700 rounded-2xl
-               hover:bg-indigo-100 hover:translate-x-1 focus:outline-none transition"
-                onclick="goTo('setting')"
-        >
-            <i class="fa-solid fa-cog text-indigo-600 text-lg mr-3"></i>
-            <span class="text-base">Setting</span>
+        <button id="navSetting" onclick="goTo('setting')" class="flex items-center px-5 py-3 rounded-2xl hover:bg-indigo-100 transition">
+            <i class="fa-solid fa-cog text-indigo-600 text-lg mr-3"></i>Setting
         </button>
     </nav>
 </aside>
-<!-- ─── 사이드바 끝 ─── -->
-
 <!-- ─── 메인 영역 시작 ─── -->
 <div class="flex-1 flex flex-col min-h-0">
     <!-- ─── 헤더 시작 ─── -->
@@ -134,125 +135,132 @@
     </header>
     <!-- ─── 헤더 끝 ─── -->
 
-    <!-- ─── Group 콘텐츠 영역 시작 ─── -->
+    <!-- 카드 그리드 -->
     <div class="flex-1 overflow-auto px-8 py-4">
-<!--        <h1 class="text-2xl font-semibold mb-6">Group</h1>-->
         <div class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            <!-- Wi-Fi -->
-            <div
-                    class="bg-white p-6 rounded-2xl shadow-lg transition transform hover:-translate-y-1 hover:shadow-2xl cursor-pointer
-                 aspect-square flex flex-col justify-between"
-            >
-                <div class="flex items-center gap-4">
-                    <i class="fa-solid fa-wifi text-indigo-500 text-3xl"></i>
-                    <span class="text-lg font-semibold text-gray-900">Wi-Fi</span>
+            <!-- Wi-Fi 카드 -->
+            <div class="group-card bg-white p-6 rounded-2xl shadow-lg hover:shadow-2xl cursor-pointer aspect-square"
+                 data-type="Wi-Fi" data-count="5" data-icon="fa-solid fa-wifi" data-color="text-indigo-500"
+                 data-id="MyNetwork" data-password="wifi@1234">
+                <div class="flex flex-col items-center justify-center h-full gap-2">
+                    <i class="fa-solid fa-wifi text-indigo-500 text-4xl"></i>
+                    <span class="text-lg font-semibold">Wi-Fi</span>
+                    <span class="text-sm text-gray-500">5개</span>
                 </div>
-                <span class="text-gray-500 text-sm font-medium">0개</span>
             </div>
-
-            <!-- Server account -->
-            <div
-                    class="bg-white p-6 rounded-2xl shadow-lg transition transform hover:-translate-y-1 hover:shadow-2xl cursor-pointer
-                 aspect-square flex flex-col justify-between"
-            >
-                <div class="flex items-center gap-4">
-                    <i class="fa-solid fa-server text-blue-500 text-3xl"></i>
-                    <span class="text-lg font-semibold text-gray-900">Server account</span>
+            <!-- Server account 카드 -->
+            <div class="group-card bg-white p-6 rounded-2xl shadow-lg hover:shadow-2xl cursor-pointer aspect-square"
+                 data-type="Server account" data-count="5" data-icon="fa-solid fa-server" data-color="text-blue-500"
+                 data-id="serverUser" data-password="serverPass">
+                <div class="flex flex-col items-center justify-center h-full gap-2">
+                    <i class="fa-solid fa-server text-blue-500 text-4xl"></i>
+                    <span class="text-lg font-semibold">Server account</span>
+                    <span class="text-sm text-gray-500">5개</span>
                 </div>
-                <span class="text-gray-500 text-sm font-medium">0개</span>
             </div>
-
-            <!-- Passbook -->
-            <div
-                    class="bg-white p-6 rounded-2xl shadow-lg transition transform hover:-translate-y-1 hover:shadow-2xl cursor-pointer
-                 aspect-square flex flex-col justify-between"
-            >
-                <div class="flex items-center gap-4">
-                    <i class="fa-solid fa-book text-yellow-500 text-3xl"></i>
-                    <span class="text-lg font-semibold text-gray-900">Passbook</span>
+            <!-- Passbook 카드 -->
+            <div class="group-card bg-white p-6 rounded-2xl shadow-lg hover:shadow-2xl cursor-pointer aspect-square"
+                 data-type="Passbook" data-count="5" data-icon="fa-solid fa-book" data-color="text-yellow-500"
+                 data-id="passbookID" data-password="passbookPW">
+                <div class="flex flex-col items-center justify-center h-full gap-2">
+                    <i class="fa-solid fa-book text-yellow-500 text-4xl"></i>
+                    <span class="text-lg font-semibold">Passbook</span>
+                    <span class="text-sm text-gray-500">5개</span>
                 </div>
-                <span class="text-gray-500 text-sm font-medium">0개</span>
             </div>
-
-            <!-- Identity -->
-            <div
-                    class="bg-white p-6 rounded-2xl shadow-lg transition transform hover:-translate-y-1 hover:shadow-2xl cursor-pointer
-                 aspect-square flex flex-col justify-between"
-            >
-                <div class="flex items-center gap-4">
-                    <i class="fa-solid fa-id-card text-pink-500 text-3xl"></i>
-                    <span class="text-lg font-semibold text-gray-900">Identity</span>
+            <!-- Identity 카드 -->
+            <div class="group-card bg-white p-6 rounded-2xl shadow-lg hover:shadow-2xl cursor-pointer aspect-square"
+                 data-type="Identity" data-count="5" data-icon="fa-solid fa-id-card" data-color="text-pink-500"
+                 data-id="identityUser" data-password="identityPW">
+                <div class="flex flex-col items-center justify-center h-full gap-2">
+                    <i class="fa-solid fa-id-card text-pink-500 text-4xl"></i>
+                    <span class="text-lg font-semibold">Identity</span>
+                    <span class="text-sm text-gray-500">5개</span>
                 </div>
-                <span class="text-gray-500 text-sm font-medium">0개</span>
             </div>
-
-            <!-- Security -->
-            <div
-                    class="bg-white p-6 rounded-2xl shadow-lg transition transform hover:-translate-y-1 hover:shadow-2xl cursor-pointer
-                 aspect-square flex flex-col justify-between"
-            >
-                <div class="flex items-center gap-4">
-                    <i class="fa-solid fa-shield-alt text-green-500 text-3xl"></i>
-                    <span class="text-lg font-semibold text-gray-900">Security</span>
+            <!-- Security 카드 -->
+            <div class="group-card bg-white p-6 rounded-2xl shadow-lg hover:shadow-2xl cursor-pointer aspect-square"
+                 data-type="Security" data-count="5" data-icon="fa-solid fa-shield-alt" data-color="text-green-500"
+                 data-id="secUser" data-password="secPass">
+                <div class="flex flex-col items-center justify-center h-full gap-2">
+                    <i class="fa-solid fa-shield-alt text-green-500 text-4xl"></i>
+                    <span class="text-lg font-semibold">Security</span>
+                    <span class="text-sm text-gray-500">5개</span>
                 </div>
-                <span class="text-gray-500 text-sm font-medium">0개</span>
             </div>
-
-            <!-- Web -->
-            <div
-                    class="bg-white p-6 rounded-2xl shadow-lg transition transform hover:-translate-y-1 hover:shadow-2xl cursor-pointer
-                 aspect-square flex flex-col justify-between"
-            >
-                <div class="flex items-center gap-4">
-                    <i class="fa-solid fa-globe text-blue-600 text-3xl"></i>
-                    <span class="text-lg font-semibold text-gray-900">Web</span>
+            <!-- Web 카드 -->
+            <div class="group-card bg-white p-6 rounded-2xl shadow-lg hover:shadow-2xl cursor-pointer aspect-square"
+                 data-type="Web" data-count="5" data-icon="fa-solid fa-globe" data-color="text-blue-600"
+                 data-id="webUser" data-password="webPass">
+                <div class="flex flex-col items-center justify-center h-full gap-2">
+                    <i class="fa-solid fa-globe text-blue-600 text-4xl"></i>
+                    <span class="text-lg font-semibold">Web</span>
+                    <span class="text-sm text-gray-500">5개</span>
                 </div>
-                <span class="text-gray-500 text-sm font-medium">0개</span>
             </div>
-
-            <!-- Card -->
-            <div
-                    class="bg-white p-6 rounded-2xl shadow-lg transition transform hover:-translate-y-1 hover:shadow-2xl cursor-pointer
-                 aspect-square flex flex-col justify-between"
-            >
-                <div class="flex items-center gap-4">
-                    <i class="fa-solid fa-credit-card text-teal-500 text-3xl"></i>
-                    <span class="text-lg font-semibold text-gray-900">Card</span>
+            <!-- Card 카드 -->
+            <div class="group-card bg-white p-6 rounded-2xl shadow-lg hover:shadow-2xl cursor-pointer aspect-square"
+                 data-type="Card" data-count="5" data-icon="fa-solid fa-credit-card" data-color="text-teal-500"
+                 data-id="cardUser" data-password="cardPass">
+                <div class="flex flex-col items-center justify-center h-full gap-2">
+                    <i class="fa-solid fa-credit-card text-teal-500 text-4xl"></i>
+                    <span class="text-lg font-semibold">Card</span>
+                    <span class="text-sm text-gray-500">5개</span>
                 </div>
-                <span class="text-gray-500 text-sm font-medium">0개</span>
             </div>
         </div>
     </div>
-    <!-- ─── Group 콘텐츠 영역 끝 ─── -->
 
-    <!-- ───────────────────────────────────────────────────────────────────────── -->
-    <!-- Generator Modal (처음엔 숨겨진 상태)                                        -->
-    <!-- “+” 버튼을 누르면 열려서 비밀번호 생성 UI가 나타납니다.                       -->
-    <!-- ───────────────────────────────────────────────────────────────────────── -->
-    <div id="generatorModal"
-         class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden flex items-center justify-center"
-    >
-        <div class="bg-white rounded-lg p-6 w-96">
-            <div class="flex justify-between items-center">
+    <!-- 카드 모달 + 뒤집기 -->
+    <div id="cardModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-20">
+        <div class="flip-card w-full h-full max-w-3xl max-h-[80vh] bg-white rounded-2xl overflow-hidden">
+            <div class="flip-card-inner">
+                <!-- 앞면: 가운데 정렬 -->
+                <div class="flip-card-front flex flex-col items-center justify-center h-full">
+                    <i class="modal-icon text-8xl mb-4"></i>
+                    <h2 class="modal-title text-3xl font-semibold mb-2"></h2>
+                    <p class="modal-count text-xl text-gray-500"></p>
+                </div>
+                <!-- 뒷면: 왼쪽 정렬 -->
+                <div class="flip-card-back">
+                    <div class="p-6 flex items-center space-x-4">
+                        <i class="modal-icon text-6xl"></i>
+                        <h2 class="modal-title text-2xl font-semibold"></h2>
+                    </div>
+                    <hr class="border-gray-300" />
+                    <div class="px-6 py-4 space-y-4">
+                        <div>
+                            <span class="font-medium text-gray-700">ID</span>
+                            <p class="text-lg text-gray-900 back-id"></p>
+                        </div>
+                        <div>
+                            <span class="font-medium text-gray-700">PW</span>
+                            <p class="text-lg text-gray-900 back-password"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generator Modal -->
+    <div id="generatorModal" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg p-6 w-full max-w-lg overflow-auto">
+            <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-semibold">비밀번호 생성기</h2>
                 <button id="generatorClose" class="text-gray-500 hover:text-gray-800">×</button>
             </div>
             <div class="mt-4 space-y-4">
-                <!-- 길이 선택 슬라이더 -->
                 <div>
                     <label for="pwdLength">길이: <span id="pwdLengthValue">8</span></label>
                     <input id="pwdLength" type="range" min="4" max="32" value="8" class="w-full" />
                 </div>
-
-                <!-- 옵션 체크박스 -->
                 <div class="flex flex-col space-y-1">
                     <label><input id="optionNumber" type="checkbox" checked /> 숫자 포함</label>
                     <label><input id="optionUpper" type="checkbox" checked /> 대문자 포함</label>
                     <label><input id="optionSymbol" type="checkbox" /> 특수문자 포함</label>
                     <label><input id="optionRandomWord" type="checkbox" /> 랜덤 단어 포함</label>
                 </div>
-
-                <!-- 생성된 비밀번호 표시 및 강도바 -->
                 <div>
                     <input id="generatedPassword" type="text" readonly class="w-full border rounded px-2 py-1" />
                     <div class="w-full bg-gray-200 h-2 rounded mt-2">
@@ -260,8 +268,6 @@
                     </div>
                     <p id="strengthText" class="mt-1 text-sm text-gray-600">강도 표시</p>
                 </div>
-
-                <!-- 버튼들 -->
                 <div class="flex justify-between space-x-2">
                     <button id="generateBtn" class="flex-1 bg-blue-500 text-white rounded py-1">생성하기</button>
                     <button id="refreshPasswordBtn" class="flex-1 bg-green-500 text-white rounded py-1">새로고침</button>
@@ -270,33 +276,11 @@
             </div>
         </div>
     </div>
-    <!-- ─── Generator Modal 끝 ─── -->
 
 </div>
 <!-- ─── 메인 영역 끝 ─── -->
 
 <script src="../../shared/shared_renderer.js"></script>
-
-<!-- ─── 스크린샷 방지 토글 로직 ─── -->
-<script>
-    (() => {
-        const btn = document.getElementById('btnScreenshotPrevent');
-        let blocked = true;
-        // 초기 로드 시 스크린샷 방지 활성화
-        window.electronAPI.preventScreenshot();
-        btn?.addEventListener('click', () => {
-            blocked = !blocked;
-            if (blocked) {
-                window.electronAPI.preventScreenshot();
-                btn.title = '스크린샷 방지';
-                btn.innerHTML = `<i class="fa-solid fa-shield-halved text-indigo-700 text-lg"></i>`;
-            } else {
-                window.electronAPI.allowScreenshot();
-                btn.title = '스크린샷 허용';
-                btn.innerHTML = `<i class="fa-solid fa-shield text-gray-600 text-lg"></i>`;
-            }
-        });
-    })();
-</script>
+<script src="./group_renderer.js" defer></script>
 </body>
 </html>
