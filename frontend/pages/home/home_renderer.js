@@ -15,6 +15,8 @@ const navGroup   = document.getElementById('navGroup');
 const navSetting = document.getElementById('navSetting');
 const mainContent = document.getElementById('main-content');
 const btnScreenshotPrevent = document.getElementById('btnScreenshotPrevent');
+// ─── 검색창 참조 ─────────────────────────────────────────────────
+const searchInput = document.getElementById('input-search');
 
 // Add Password Modal 관련
 const addModal      = document.getElementById('addPasswordModal');
@@ -33,11 +35,15 @@ let currentEntries = [];
 
 // ─────────────────────────────────────────────────────────────
 // ======== 1) 페이지 초기화 ========
+// File: pages/home/home_renderer.js
+
 window.addEventListener('DOMContentLoaded', () => {
-  // (1) 네비게이션 버튼 하이라이트
+  console.log('[home_renderer] DOMContentLoaded');  // ← 확인용
+
+  // (1) 네비 하이라이트
   setActiveButton(navHome);
 
-  // (2) 스크린샷 방지 기본 적용
+  // (2) 스크린샷 방지
   let screenshotBlocked = true;
   window.electronAPI.preventScreenshot();
   btnScreenshotPrevent?.addEventListener('click', () => {
@@ -53,15 +59,35 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // (3) 페이지 로드 직후 비밀번호 목록을 가져와서 테이블을 채운다
-  loadAndRenderList();
+  // (3) 초기 리스트 로드 (검색어 없이 전체)
+  loadAndRenderList('');
 
-  // (4) “+” 버튼 누르면 모달 열기
+  // (4) “+” 버튼 모달 열기
   const addBtnInHome = document.getElementById('filterAddBtnInner');
   if (addBtnInHome) {
     addBtnInHome.addEventListener('click', openModal);
   }
+
+  // (5) 검색 입력 시 — 이미 렌더된 카드만 show/hide
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      const q = e.target.value.trim().toLowerCase();
+      document
+          .querySelectorAll('#card-container > div')
+          .forEach(card => {
+            // 카드 안의 텍스트를 통째로 읽어서 검색어 포함 여부 판단
+            const text = card.innerText.toLowerCase();
+            card.style.display = q === '' || text.includes(q) ? '' : 'none';
+          });
+    });
+  }
+
+
 });
+
+
+
+
 
 // ─────────────────────────────────────────────────────────────
 // ======== 2) 네비 버튼 하이라이트 ========
@@ -457,7 +483,8 @@ saveBtn.addEventListener('click', async () => {
       return;
     }
     closeModal();
-    loadAndRenderList();
+    // 저장 후에도 현재 검색어를 기준으로 다시 렌더링
+    loadAndRenderList(searchInput?.value || '');
   } catch (err) {
     alert('저장 중 오류가 발생했습니다:\n' + (err.message || err));
   }
@@ -467,11 +494,24 @@ saveBtn.addEventListener('click', async () => {
 // ===== 5) 전체 비밀번호 가져와서 렌더링 =====
 // ─────────────────────────────────────────────────────────────
 async function loadAndRenderList(query = '') {
+  // 함수 진입 시 로그
+  console.log('[home_renderer] ▶ loadAndRenderList 호출, query =', query);
+  console.log('[home_renderer]    현재 dataset.page =', document.body.dataset.page);
+
+  // ─── 홈 화면이 아닐 땐 바로 돌아가기 (디버깅 후에도 남겨두세요)
+  if (document.body.dataset.page !== 'home') {
+    console.log('[home_renderer]    home 아님, 리턴');
+    return;
+  }
+
+  // ─── 컨테이너/메시지 요소가 반드시 있어야만 진행 ───────────────────
   const container = document.getElementById('card-container');
   const emptyMsg  = document.getElementById('empty-msg');
+  if (!container || !emptyMsg) return;
+
+  // ─── 기존 로딩 메시지 세팅 ───────────────────────────────────────
   container.innerHTML = '';
   emptyMsg.textContent = '로딩 중...';
-  emptyMsg.style.display = '';
 
   let res;
   try {
@@ -602,12 +642,8 @@ async function loadAndRenderList(query = '') {
     container.appendChild(card);
   });
 
-  pwContainer.querySelectorAll('.pw-item').forEach(card => {
-    card.addEventListener('click', () => {
-      const uid = card.getAttribute('data-uid');
-      openEditModal(uid);
-    });
-  });
+
+
 }
 
 // ==================================== 비밀번호 업데이트 ==============================================
