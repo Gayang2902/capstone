@@ -1,6 +1,6 @@
 // File: main.js
 
-const { app, BrowserWindow, ipcMain, dialog, screen } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, screen, clipboard } = require('electron');
 const { spawn } = require('child_process');
 const fs   = require('fs');
 const path = require('path');
@@ -153,7 +153,7 @@ function createMainWindow() {
 
     mainWindow.loadFile(path.join(__dirname, 'pages', 'start', 'start.html'));
 
-    // mainWindow.webContents.openDevTools({ mode: 'right' }); // 개발자 모드
+    mainWindow.webContents.openDevTools({ mode: 'right' }); // 개발자 모드
 }
 
 // --- 앱 라이프사이클 ---
@@ -524,6 +524,16 @@ ipcMain.handle('getPasswordDetail', async (_evt, { UID }) => {
         console.error('getPasswordDetail 오류:', err);
         return { status: false, error_message: err.message };
     }
+});
+
+// Write text to clipboard and clear after 30 seconds
+ipcMain.handle('writeClipboard', async (_evt, text) => {
+    clipboard.writeText(text);
+    setTimeout(() => {
+        // clear clipboard after 30 seconds
+        clipboard.clear();
+    }, 30000);
+    return { status: true };
 });
 
 // ipcMain.handle('getPasswordCount', async () => {

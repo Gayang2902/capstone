@@ -242,3 +242,19 @@ document.getElementById('generatorModal').addEventListener('click', (e) => {
     }
 });
 //─────────────────────────────────────────────────────────────────────────
+
+// prevent dragging & text-selection everywhere…
+// document.addEventListener('dragstart',  e => {
+//     // …except on the Home page, inside the password-list container
+//     if (document.body.dataset.page === 'home' && e.target.closest('#card-container')) return;
+//     e.preventDefault();
+// });
+// document.addEventListener('selectstart', e => {
+//     if (document.body.dataset.page === 'home' && e.target.closest('#card-container')) return;
+//     e.preventDefault();
+// });
+// document.addEventListener('dragstart',  e => e.preventDefault());
+
+// ─── 전역 드래그·텍스트 선택 방지 ───
+document.addEventListener('dragstart',  e => e.preventDefault());
+document.addEventListener('selectstart', e => e.preventDefault());

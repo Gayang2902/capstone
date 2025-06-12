@@ -100,4 +100,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getOldCount: () =>
         ipcRenderer.invoke('getOldCount'),
 
+    // 클립보드 쓰기 (30초 후 자동 삭제)
+    writeClipboard: text => ipcRenderer.invoke('writeClipboard', text),
+
 });
