@@ -70,24 +70,13 @@ function startBackend() {
                 continue;
             }
 
-            let parsedId = msg.id;
-            const payload = (() => {
-                const { id, ...rest } = msg;
-                return rest;
-            })();
-
-            if (parsedId !== undefined && pending[parsedId]) {
-                pending[parsedId].resolve(payload);
-                delete pending[parsedId];
+            const pendingKeys = Object.keys(pending).map(k => Number(k)).sort((a,b)=>a-b);
+            if (pendingKeys.length > 0) {
+                const targetId = pendingKeys[0];
+                pending[targetId].resolve(msg);
+                delete pending[targetId];
             } else {
-                const pendingKeys = Object.keys(pending);
-                if (pendingKeys.length === 1) {
-                    const onlyKey = pendingKeys[0];
-                    pending[onlyKey].resolve(msg);
-                    delete pending[onlyKey];
-                } else {
-                    console.warn('[WARN] 응답에 id가 없고, pending이 여러 개 있습니다:', msg);
-                }
+                console.warn('[WARN] 처리할 pending 요청이 없습니다:', msg);
             }
         }
     });
@@ -570,5 +559,97 @@ ipcMain.handle('getWeakCount', async () => {
         return resp;
     } catch (err) {
         return { status: false, error_message: err.message };
+    }
+});
+
+// ipcMain.handle('getVulnerablePasswordCount', async (_evt, { type, tag }) => {
+//     if (!currentFilePath) {
+//         return { status: false, error_message: '파일이 선택되지 않았습니다.' };
+//     }
+//     try {
+//         // backend 에 oper 과 data 전달 (file_path 포함)
+//         const resp = await sendToBackend('getVulnerablePasswordCount', {
+//             file_path: currentFilePath,
+//             type,
+//             // tag 파라미터가 없어도 빈 문자열로 넘겨줍니다
+//             tag: tag || ''
+//         });
+//         return resp;
+//     } catch (err) {
+//         console.error('getVulnerablePasswordCount 오류:', err);
+//         return { status: false, error_message: err.message };
+//     }
+// });
+
+// (X) strength 리스트
+ipcMain.handle('getVulnerablePasswords', async (_evt, args) => {
+    if (!currentFilePath) return { status:false, error_message:'파일이 선택되지 않았습니다.' };
+    try {
+        // args = { type: 'strong'|'normal'|'weak', tag?: string }
+        const resp = await sendToBackend('getVulnerablePasswords', {
+            file_path: currentFilePath,
+            ...args
+        });
+        return resp;
+    } catch (err) {
+        return { status:false, error_message: err.message };
+    }
+});
+
+// (Y) strength 개수
+ipcMain.handle('getVulnerablePasswordCount', async (_evt, args) => {
+    if (!currentFilePath) return { status:false, error_message:'파일이 선택되지 않았습니다.' };
+    try {
+        const resp = await sendToBackend('getVulnerablePasswordCount', {
+            file_path: currentFilePath,
+            ...args
+        });
+        return resp;
+    } catch (err) {
+        return { status:false, error_message: err.message };
+    }
+});
+
+// 재사용된 비밀번호 리스트
+ipcMain.handle('getReusedPasswords', async () => {
+    if (!currentFilePath) return { status:false, error_message:'파일이 선택되지 않았습니다.' };
+    try {
+        const resp = await sendToBackend('getReusedPasswords', { file_path: currentFilePath });
+        return resp;
+    } catch (err) {
+        return { status:false, error_message: err.message };
+    }
+});
+
+// 재사용된 비밀번호 개수
+ipcMain.handle('getReusedCount', async () => {
+    if (!currentFilePath) return { status:false, error_message:'파일이 선택되지 않았습니다.' };
+    try {
+        const resp = await sendToBackend('getReusedCount', { file_path: currentFilePath });
+        return resp;
+    } catch (err) {
+        return { status:false, error_message: err.message };
+    }
+});
+
+// 오래된 비밀번호 리스트
+ipcMain.handle('getOldPasswords', async () => {
+    if (!currentFilePath) return { status:false, error_message:'파일이 선택되지 않았습니다.' };
+    try {
+        const resp = await sendToBackend('getOldPasswords', { file_path: currentFilePath });
+        return resp;
+    } catch (err) {
+        return { status:false, error_message: err.message };
+    }
+});
+
+// 오래된 비밀번호 개수
+ipcMain.handle('getOldCount', async () => {
+    if (!currentFilePath) return { status:false, error_message:'파일이 선택되지 않았습니다.' };
+    try {
+        const resp = await sendToBackend('getOldCount', { file_path: currentFilePath });
+        return resp;
+    } catch (err) {
+        return { status:false, error_message: err.message };
     }
 });

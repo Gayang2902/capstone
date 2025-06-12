@@ -64,13 +64,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // searchPasswordEntry: (q) => ipcRenderer.invoke('search-password-entry', q),
     searchPasswordEntry:        query => ipcRenderer.invoke('searchPasswordEntry', { query }),
 
-    // getVulnerablePasswords: () => ipcRenderer.invoke('getVulnerablePasswords'),
-    // getOldPasswords:       () => ipcRenderer.invoke('getOldPasswords'),
-    // getReusedPasswords:    () => ipcRenderer.invoke('getReusedPasswords'),
-
-    // 총 비밀번호 개수 조회
-    // getPasswordCount:      () => ipcRenderer.invoke('getPasswordCount'),
-
     // 비밀번호 상세 조회 (oper="getPasswordDetail", data={ UID })
     getPasswordDetail: args =>
         ipcRenderer.invoke('request-backend', {
@@ -82,4 +75,29 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getStrongCount:   ()       => ipcRenderer.invoke('getStrongCount'),
     getNormalCount:   ()       => ipcRenderer.invoke('getNormalCount'),
     getWeakCount:     ()       => ipcRenderer.invoke('getWeakCount'),
+
+    // 강도별 비밀번호 리스트 조회 (oper="getVulnerablePasswords", data: { type: 'strong'|'normal'|'weak', tag? })
+    getVulnerablePasswords: args =>
+        ipcRenderer.invoke('getVulnerablePasswords', args),
+
+    // 강도별 비밀번호 개수 조회 (oper="getVulnerablePasswordCount", data: { type: 'strong'|'normal'|'weak', tag? })
+    getVulnerablePasswordCount: args =>
+        ipcRenderer.invoke('getVulnerablePasswordCount', args),
+
+    // 재사용된 비밀번호 리스트 조회
+    getReusedPasswords: () =>
+        ipcRenderer.invoke('getReusedPasswords'),
+
+    // 재사용된 비밀번호 개수 조회
+    getReusedCount: () =>
+        ipcRenderer.invoke('getReusedCount'),
+
+    // 오래된 비밀번호 리스트 조회
+    getOldPasswords: () =>
+        ipcRenderer.invoke('getOldPasswords'),
+
+    // 오래된 비밀번호 개수 조회
+    getOldCount: () =>
+        ipcRenderer.invoke('getOldCount'),
+
 });
