@@ -1,4 +1,4 @@
-
+console.log('✅ home_renderer.js 실제 로드됨');
 // File: pages/home/home_renderer.js
 
 // ─── Toast Notification Utility ───
@@ -59,60 +59,102 @@ const typeIconClasses = {
 window.createEntryCard = function(entry) {
   const card = document.createElement('div');
   card.className = `
-    grid grid-cols-[5%,20%,20%,15%,20%,8%,7%] items-center
-    p-4 bg-white rounded-lg shadow w-full gap-x-4 mb-2
-    hover:bg-indigo-50 hover:shadow-lg cursor-pointer
+    flex flex-col space-y-3 p-4 bg-white rounded-xl border border-gray-200 shadow-md w-full mb-4
+    transform transition duration-200 hover:shadow-lg hover:scale-105
+    min-h-[240px]
   `;
-  // 아이콘 (Font Awesome)
-  const icon = document.createElement('div');
-  icon.className = 'w-12 h-12 flex items-center justify-center';
-  const iconEl = document.createElement('i');
-  iconEl.className = typeIconClasses[entry.type] || 'fa-solid fa-key text-gray-600';
-  icon.appendChild(iconEl);
-  card.appendChild(icon);
-
-  // 레이블 + 서브텍스트
-  const label = document.createElement('div');
-  label.className = 'flex flex-col';
-  label.innerHTML = `
-    <span class="font-semibold">${entry.type === 'card' ? entry.bank_name : entry.label}</span>
-    <span class="text-xs text-gray-500">${
-      entry.type === 'website'  ? entry.url :
-      entry.type === 'server'   ? `Host: ${entry.host} Port: ${entry.port}` :
-      entry.type === 'bankbook' ? `Bank: ${entry.bank_name}` :
-      entry.type === 'identity' ? `Eng: ${entry.eng_name}` :
-      entry.type === 'card'     ? `CVC: ${entry.cvc}` : ''
-    }</span>
-  `;
-  card.appendChild(label);
-
-  // 필드(최대 3개)
-  const mask = () => '****';
-  let fields = [];
-  if (entry.type === 'website')      fields = [['ID', entry.id], ['PWD', mask()], ['E-Mail', entry.email]];
-  else if (entry.type === 'server')  fields = [['ID', entry.id], ['PWD', mask()], ['', '']];
-  else if (entry.type === 'bankbook')fields = [['Num', entry.num], ['PWD', mask()], ['', '']];
-  else if (entry.type === 'identity')fields = [['Name', entry.name], ['Citizen', entry.citizen], ['', '']];
-  else if (entry.type === 'card')    fields = [['Num', entry.card_number], ['PWD', mask()], ['', '']];
-  else if (entry.type === 'wifi')    fields = [['Name', entry.name], ['PWD', mask()], ['', '']];
-  else if (entry.type === 'security')fields = [['', entry.content], ['', ''], ['', '']];
-  for (let i = 0; i < 3; i++) {
-    const [k, v] = fields[i] || ['', ''];
-    const cell = document.createElement('div');
-    if (k) cell.innerHTML = `<strong>${k}:</strong> ${v}`;
-    card.appendChild(cell);
-  }
-
-  // 타입 표시
-  const t = document.createElement('span');
-  t.className = 'text-xs text-gray-400';
-  t.textContent = entry.type;
-  card.appendChild(t);
-
-  // 데이터 UID 속성
+  console.log('🛠️ [DEBUG] 카드 클래스:', card.className.trim().split(/\s+/));
   card.dataset.uid = entry.UID;
 
-  // 클릭 시 수정 모달 열기
+  // 1) Header: Icon + Label + favorite icon
+  const header = document.createElement('div');
+  header.className = 'flex justify-between items-center mb-2';
+  // Left side: icon + title
+  const leftDiv = document.createElement('div');
+  leftDiv.className = 'flex items-center';
+  let iconEl;
+  if (entry.type === 'website') {
+    let domain;
+    try { domain = new URL(entry.url).hostname; }
+    catch { domain = entry.url.replace(/^https?:\/\//, '').split('/')[0]; }
+    iconEl = document.createElement('img');
+    iconEl.src = `https://logo.clearbit.com/${domain}?size=32`;
+    iconEl.alt = 'favicon';
+    iconEl.className = 'w-6 h-6 object-contain mr-2';
+  } else {
+    iconEl = document.createElement('i');
+    iconEl.className = `${typeIconClasses[entry.type] || 'fa-solid fa-key text-gray-600'} text-xl mr-2`;
+  }
+  leftDiv.appendChild(iconEl);
+  const title = document.createElement('span');
+  title.className = 'text-lg font-semibold';
+  title.textContent = entry.label || entry.type;
+  leftDiv.appendChild(title);
+  header.appendChild(leftDiv);
+  // Right side: favorite toggle
+  const favIcon = document.createElement('i');
+  favIcon.className = (entry.favorite === 'true' || entry.favorite === true)
+    ? 'fa-solid fa-star text-yellow-500 text-xl cursor-pointer'
+    : 'fa-regular fa-star text-gray-400 text-xl cursor-pointer';
+  favIcon.addEventListener('click', e => {
+    e.stopPropagation();
+    favIcon.classList.toggle('fa-solid');
+    favIcon.classList.toggle('fa-regular');
+    favIcon.classList.toggle('text-yellow-500');
+    favIcon.classList.toggle('text-gray-400');
+  });
+  header.appendChild(favIcon);
+  card.appendChild(header);
+
+  // 2) Field list (vertical with auto-wrap)
+  const fields = [];
+  switch (entry.type) {
+    case 'website':
+      fields.push(['URL', entry.url], ['ID', entry.id], ['PWD', '****'], ['E-Mail', entry.email]);
+      break;
+    case 'server':
+      fields.push(['Host', entry.host], ['Port', entry.port], ['ID', entry.id], ['PWD', '****']);
+      break;
+    case 'bankbook':
+      fields.push(['Bank', entry.bank_name], ['Account No.', entry.num], ['PWD', '****']);
+      break;
+    case 'identity':
+      fields.push(['Name', entry.name], ['Eng Name', entry.eng_name], ['Citizen ID', entry.citizen]);
+      break;
+    case 'card':
+      fields.push(['Bank', entry.bank_name], ['Card No.', entry.card_number], ['Expiry', entry.last_day], ['CVC', entry.cvc], ['PWD', '****']);
+      break;
+    case 'wifi':
+      fields.push(['SSID', entry.name], ['PWD', '****']);
+      break;
+    case 'security':
+      fields.push(['Content', entry.content]);
+      break;
+    default:
+      fields.push(['Type', entry.type]);
+  }
+  fields.forEach(([k, v]) => {
+    const row = document.createElement('div');
+    row.className = 'flex flex-wrap mb-2';
+    const keyEl = document.createElement('span');
+    keyEl.className = 'font-medium mr-2';
+    keyEl.textContent = `${k}:`;
+    const valEl = document.createElement('span');
+    valEl.textContent = v;
+    valEl.classList.add('break-words');
+    row.append(keyEl, valEl);
+    card.appendChild(row);
+  });
+
+  // 3) Comments
+  if (entry.comments) {
+    const com = document.createElement('div');
+    com.className = 'mt-4 text-sm text-gray-600 whitespace-pre-wrap';
+    com.textContent = entry.comments;
+    card.appendChild(com);
+  }
+
+  // 4) Click to open edit modal
   card.addEventListener('click', () => openEditModal(entry.UID));
   return card;
 };
@@ -687,212 +729,7 @@ async function loadAndRenderList(query = '') {
   container.innerHTML = '';
 
   entries.forEach(entry => {
-    // 7개 컬럼: 10%,20%,20%,15%,15%,10%,10%
-    const card = document.createElement('div');
-    card.className =
-        'grid grid-cols-[5%,20%,20%,15%,20%,8%,7%] items-center ' +
-        'p-4 bg-white rounded-lg shadow w-full gap-x-4 ' +
-        'transition-colors duration-200 ease-in-out ' +   // → 색 변화 애니메이션
-        'hover:bg-indigo-50 hover:shadow-lg';              // → 호버 시 배경·그림자 변화
-    card.dataset.uid = entry.UID;
-
-    // ① 아이콘 셀
-    const iconCell = document.createElement('div');
-    iconCell.className = 'w-12 h-12 flex items-center justify-center';
-    let iconEl;
-    if (entry.type === 'website') {
-      // URL에서 호스트 추출
-      let domain;
-      try {
-        domain = new URL(entry.url).hostname;
-      } catch (e) {
-        domain = entry.url.replace(/^https?:\/\//, '').split('/')[0];
-      }
-      // Clearbit Logo API 사용
-      iconEl = document.createElement('img');
-      iconEl.src = `https://logo.clearbit.com/${domain}?size=64`;
-      iconEl.alt = 'favicon';
-      iconEl.className = 'w-full h-full object-contain';
-    } else {
-      // Font Awesome 아이콘 사용
-      iconEl = document.createElement('i');
-      iconEl.className = `${typeIconClasses[entry.type] || 'fa-solid fa-key text-gray-600'} text-4xl`;
-    }
-    iconCell.appendChild(iconEl);
-    card.appendChild(iconCell);
-
-    // ② 레이블 + 서브텍스트 셀
-    const labelCell = document.createElement('div');
-    labelCell.className = 'flex flex-col';
-    const lbl = document.createElement('span');
-    lbl.className = 'font-semibold';
-    lbl.textContent = entry.type === 'card' ? entry.bank_name : entry.label;
-    const sub = document.createElement('span');
-    sub.className = 'text-xs text-gray-500';
-    switch (entry.type) {
-      case 'website':   sub.textContent = entry.url; break;
-      case 'server':    sub.textContent = `Host: ${entry.host} Port: ${entry.port}`; break;
-      case 'bankbook':  sub.textContent = `Bank: ${entry.bank_name}`; break;
-      case 'identity':  sub.textContent = `Eng: ${entry.eng_name}`; break;
-      case 'card':      sub.textContent = `CVC: ${entry.cvc}`; break;
-      default:          sub.textContent = '';
-    }
-    labelCell.append(lbl, sub);
-    card.appendChild(labelCell);
-
-    // 준비: 필드 값 배열 (최대 3)
-    const mask = () => '****';
-    let fields = [];
-    if (entry.type === 'website') {
-      fields = [['ID:', entry.id], ['PWD:', mask()], ['E-Mail:', entry.email]];
-    } else if (entry.type === 'server') {
-      fields = [['ID:', entry.id], ['PWD:', mask()], ['', '']];
-    } else if (entry.type === 'bankbook') {
-      fields = [['Num:', entry.num], ['PWD:', mask()], ['', '']];
-    } else if (entry.type === 'identity') {
-      fields = [['Name:', entry.name], ['Citizen:', entry.citizen], ['', '']];
-    } else if (entry.type === 'card') {
-      fields = [['Num:', entry.card_number], ['PWD:', mask()], ['', '']];
-    } else if (entry.type === 'wifi') {
-      fields = [['ID:', entry.name], ['PWD:', mask()], ['', '']];
-    } else if (entry.type === 'security') {
-      fields = [[' ', entry.content], ['', ''], ['', '']];
-    }
-
-    // ③~⑤ 필드 셀 with copy & hover for ID/PWD
-    for (let i = 0; i < 3; i++) {
-      const [key, val] = fields[i] || ['', ''];
-      const cell = document.createElement('div');
-      if (key) {
-        const labelEl = document.createElement('strong');
-        labelEl.textContent = key;
-        const valueSpan = document.createElement('span');
-        valueSpan.className = 'field-value draggable-text ml-1 cursor-pointer select-none';
-        if (key.startsWith('PWD')) {
-          valueSpan.innerText = '****';
-          // hover to reveal
-          let revealedPwd = null;
-          valueSpan.addEventListener('mouseenter', async () => {
-            try {
-              const res = await window.electronAPI.getPasswordDetail({ UID: entry.UID });
-              if (res.status) {
-                if (res.data.pwd) {
-                  revealedPwd = res.data.pwd;
-                  valueSpan.textContent = revealedPwd;
-                } else {
-                  showToast('저장된 비밀번호가 없습니다.', 'error');
-                }
-              } else {
-                showToast('비밀번호 가져오기 실패: ' + res.error_message, 'error');
-              }
-            } catch {
-              showToast('비밀번호 가져오기 오류', 'error');
-            }
-          });
-          // hide on leave
-          valueSpan.addEventListener('mouseleave', () => {
-            valueSpan.textContent = '****';
-            revealedPwd = null;
-          });
-          // click to copy revealed or fetch if not present
-          valueSpan.addEventListener('click', async e => {
-            e.stopPropagation();
-            try {
-              const pwdToCopy = revealedPwd || (await window.electronAPI.getPasswordDetail({ UID: entry.UID })).data.pwd;
-              await navigator.clipboard.writeText(pwdToCopy);
-              showToast('비밀번호 복사됨');
-              valueSpan.classList.add('text-green-400');
-              setTimeout(() => valueSpan.classList.remove('text-green-400'), 3000);
-              // clear system clipboard after 30s
-              window.electronAPI.writeClipboard(pwdToCopy);
-            } catch (err) {
-              showToast('복사 오류', 'error');
-            }
-          });
-        } else if (key.startsWith('ID')) {
-          valueSpan.textContent = val;
-          valueSpan.addEventListener('click', (e) => {
-            e.stopPropagation();
-            navigator.clipboard.writeText(val)
-                .then(() => {
-                  showToast('ID 복사됨');
-                  valueSpan.classList.add('text-green-400');
-                  setTimeout(() => valueSpan.classList.remove('text-green-400'), 3000);
-                })
-                .catch(() => showToast('복사 실패', 'error'));
-          });
-        } else {
-          valueSpan.textContent = val;
-        }
-        cell.append(labelEl, valueSpan);
-      }
-      card.appendChild(cell);
-    }
-
-    // ⑥ 타입 셀
-    const typeCell = document.createElement('span');
-    typeCell.className = 'text-xs text-gray-400';
-    typeCell.textContent = `${entry.type}`;
-    card.appendChild(typeCell);
-
-    // ⑦ 액션 버튼 셀: 즐겨찾기 토글 + 삭제
-    const actionCell = document.createElement('div');
-    actionCell.className = 'flex items-center space-x-2';
-
-    // (가) 즐겨찾기 토글 버튼
-    const favBtn = document.createElement('button');
-    favBtn.className = 'focus:outline-none';
-    const favIcon = document.createElement('i');
-    favIcon.className = (entry.favorite === 'true' || entry.favorite === true)
-        ? 'fa-solid fa-star text-yellow-500 text-lg'
-        : 'fa-regular fa-star text-gray-400 text-lg';
-    favBtn.appendChild(favIcon);
-    favBtn.addEventListener('click', async e => {
-      e.stopPropagation();
-      const newFav = !(entry.favorite === 'true' || entry.favorite === true);
-      try {
-        // API에 favorite=true/false 업데이트
-        await window.electronAPI.updatePasswordEntry({
-          UID: entry.UID,
-          favorite: newFav.toString()
-        });
-        entry.favorite = newFav;
-        // 아이콘 모양 업데이트
-        favIcon.className = newFav
-            ? 'fa-solid fa-star text-yellow-500 text-lg'
-            : 'fa-regular fa-star text-gray-400 text-lg';
-        // 맨 위로 고정: favorite=true면 prepend
-        if (newFav) container.prepend(card);
-        showToast(`즐겨찾기 ${newFav ? '추가' : '해제'}`);
-      } catch (err) {
-        showToast('즐겨찾기 업데이트 실패', 'error');
-      }
-    });
-    actionCell.appendChild(favBtn);
-
-    // (나) 삭제 버튼
-    const delBtn = document.createElement('button');
-    delBtn.className = 'text-red-500 hover:underline';
-    delBtn.textContent = '삭제';
-    delBtn.addEventListener('click', async e => {
-      e.stopPropagation();
-      console.log('🗑️ 삭제 핸들러 실행, UID=', entry.UID);
-      if (!confirm('정말 삭제하시겠습니까?')) return;
-      const res = await window.electronAPI.deletePasswordEntry(entry.UID);
-      if (res.status) {
-        // 삭제 성공 후 자동 목록 갱신
-        console.log('✅ removeCard 호출');
-        removeCard(entry.UID);
-        showToast('삭제되었습니다.');
-      } else {
-        console.log('❌ 삭제 실패:', res.error_message);
-        showToast('삭제 실패: ' + res.error_message, 'error');
-      }
-    });
-    actionCell.appendChild(delBtn);
-
-    card.appendChild(actionCell);
-    card.addEventListener('click', () => openEditModal(entry.UID));
+    const card = window.createEntryCard(entry);
     container.appendChild(card);
   });
   // Restore scroll position
