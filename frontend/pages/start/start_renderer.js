@@ -16,27 +16,6 @@ window.addEventListener('DOMContentLoaded', () => {
     if (Array.isArray(saved) && saved.length > 0) {
       filePaths = saved;
       currentFileIndex = 0;
-      // 자동으로 최근 파일 선택 및 API 호출
-      (async () => {
-        try {
-          const res = await window.electronAPI.openFilePath(filePaths[0]);
-          if (res.status) {
-            // backend에서 반환된 경로로 업데이트
-            filePaths[0] = res.file_path;
-            saveFilePaths();
-            statusMsg.textContent = '';
-          } else {
-            statusMsg.textContent = res.error_message;
-            currentFileIndex = -1;
-          }
-        } catch (err) {
-          statusMsg.textContent = '파일 로드 오류: ' + err.message;
-          currentFileIndex = -1;
-        }
-        renderFileList();
-      })();
-    } else {
-      renderFileList();
     }
 
     function saveFilePaths() {
@@ -84,27 +63,36 @@ window.addEventListener('DOMContentLoaded', () => {
 
             // (3) 리스트 항목 클릭 시 “선택된 파일” 변경
             li.addEventListener('click', async () => {
-                try {
-                    const res = await window.electronAPI.openFilePath(fp);
-                    if (res.status) {
-                        currentFileIndex = idx;
-                        // update stored paths in case backend normalization changed it
-                        filePaths[idx] = res.file_path;
-                        saveFilePaths();
-                        inputKey.value = '';
-                        btnAuth.disabled = true;
-                        statusMsg.textContent = '';
-                        renderFileList();
-                    } else {
-                        statusMsg.textContent = res.error_message;
-                    }
-                } catch (err) {
-                    statusMsg.textContent = '파일 선택 중 오류: ' + err.message;
-                }
+                await selectFileAtIndex(idx);
             });
 
             fileList.append(li);
         });
+    }
+
+    async function selectFileAtIndex(idx) {
+        const fp = filePaths[idx];
+        try {
+            const res = await window.electronAPI.openFilePath(fp);
+            if (res.status) {
+                currentFileIndex = idx;
+                filePaths[idx] = res.file_path;
+                saveFilePaths();
+                inputKey.value = '';
+                btnAuth.disabled = true;
+                statusMsg.textContent = '';
+                renderFileList();
+            } else {
+                statusMsg.textContent = res.error_message;
+            }
+        } catch (err) {
+            statusMsg.textContent = '파일 선택 중 오류: ' + err.message;
+        }
+    }
+
+    renderFileList();
+    if (filePaths.length > 0) {
+        selectFileAtIndex(0);
     }
 
     // CSV 파일 열기
@@ -116,7 +104,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 filePaths.push(res.file_path);
                 currentFileIndex = filePaths.length - 1;
                 saveFilePaths();
-                renderFileList();
+                await selectFileAtIndex(currentFileIndex);
                 statusMsg.textContent = '';
             } else {
                 statusMsg.textContent = '이미 선택된 파일입니다.';
@@ -134,7 +122,7 @@ window.addEventListener('DOMContentLoaded', () => {
             filePaths = [res.file_path];
             saveFilePaths();
             currentFileIndex = 0;
-            renderFileList();
+            await selectFileAtIndex(0);
             statusMsg.textContent = '신규 파일이 생성되어 목록이 초기화되었습니다.';
             inputKey.value = '';
             btnAuth.disabled = true;

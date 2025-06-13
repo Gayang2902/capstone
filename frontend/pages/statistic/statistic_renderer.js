@@ -56,7 +56,8 @@ window.createEntryCard = function(entry) {
   for (let i=0;i<3;i++){
     const [k,v] = fields[i]||['',''];
     const cell = document.createElement('div');
-    if (k) cell.innerHTML=`<strong>${k}:</strong> ${v}`;
+    if (k) cell.innerHTML=`<strong>${k}:</strong> <span class="field-value">${v}</span>`;
+    else cell.innerHTML=`<span class="field-value">${v}</span>`;
     card.appendChild(cell);
   }
 
@@ -78,9 +79,13 @@ window.openEditModal = async function(uid) {
   editModal.classList.remove('hidden');
   editModal.classList.add('flex');
   // 배경 클릭 시 닫기
-  editModal.addEventListener('click', e=>{
+  // Define the closeOnBackground function before using it
+  function closeOnBackground(e) {
     if (e.target===editModal) editModal.classList.add('hidden');
-  },{once:true});
+  }
+  // Remove any previous listener to avoid duplicates
+  editModal.removeEventListener('click', closeOnBackground);
+  editModal.addEventListener('click', closeOnBackground);
   // 폼 초기화
   editForm.innerHTML='';
   // Label + Favorite
@@ -111,8 +116,34 @@ window.openEditModal = async function(uid) {
   };
   (typeFields[entry.type]||[]).forEach(([label,key,inputType])=>{
     const div=document.createElement('div'); div.className='mb-4';
-    if(inputType==='textarea') div.innerHTML=`<label class="block text-sm font-medium">${label}</label><textarea id="edit-${key}" class="mt-1 w-full border rounded px-2 py-1">${entry[key]||''}</textarea>`;
-    else div.innerHTML=`<label class="block text-sm font-medium">${label}</label><input id="edit-${key}" type="${inputType}" value="${entry[key]||''}" class="mt-1 w-full border rounded px-2 py-1"/>`;
+    if(inputType==='textarea') {
+      div.innerHTML=`<label class="block text-sm font-medium">${label}</label><textarea id="edit-${key}" class="mt-1 w-full border rounded px-2 py-1">${entry[key]||''}</textarea>`;
+    }
+    else {
+      div.innerHTML=`<label class="block text-sm font-medium">${label}</label><input id="edit-${key}" type="${inputType}" value="${entry[key]||''}" class="mt-1 w-full border rounded px-2 py-1"/>`;
+      // If password input, add eye icon for toggle (with relative container)
+      if (inputType === 'password') {
+        const pwdInput = div.querySelector(`#edit-${key}`);
+        // create a relative wrapper
+        const wrapper = document.createElement('div');
+        wrapper.className = 'relative';
+        // move input into wrapper
+        pwdInput.parentNode.replaceChild(wrapper, pwdInput);
+        wrapper.appendChild(pwdInput);
+        // create the eye icon
+        const eye = document.createElement('i');
+        eye.className = 'fa-solid fa-eye-slash absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer eye-toggle';
+        wrapper.appendChild(eye);
+        // toggle handler
+        eye.addEventListener('click', () => {
+          const isMasked = pwdInput.type === 'password';
+          pwdInput.type = isMasked ? 'text' : 'password';
+          eye.className = isMasked
+            ? 'fa-solid fa-eye absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer eye-toggle'
+            : 'fa-solid fa-eye-slash absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer eye-toggle';
+        });
+      }
+    }
     editForm.appendChild(div);
   });
   // Comments
@@ -129,6 +160,25 @@ window.openEditModal = async function(uid) {
 
 
 // File: src/statistics/statistic_renderer.js
+function showToast(message) {
+  // Simple toast implementation
+  let toast = document.createElement('div');
+  toast.textContent = message;
+  toast.style.position = 'fixed';
+  toast.style.bottom = '20px';
+  toast.style.left = '50%';
+  toast.style.transform = 'translateX(-50%)';
+  toast.style.backgroundColor = 'rgba(0,0,0,0.7)';
+  toast.style.color = 'white';
+  toast.style.padding = '10px 20px';
+  toast.style.borderRadius = '5px';
+  toast.style.zIndex = '9999';
+  document.body.appendChild(toast);
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+
 window.addEventListener('DOMContentLoaded', async () => {
   const totalCountEl = document.getElementById('totalCount');
   const weakCountEl  = document.getElementById('weakCount');
@@ -184,7 +234,24 @@ window.addEventListener('DOMContentLoaded', async () => {
       window.sharedEntries = groups.flat();
       groups.forEach(gr=>{
         const grpDiv=document.createElement('div'); grpDiv.className='bg-white p-4 rounded-lg shadow mb-4';
-        gr.forEach(e=> grpDiv.appendChild(createEntryCard(e)) );
+        gr.forEach(e => {
+          const card = createEntryCard(e);
+          // Remove or disable default click-to-edit logic: override with our own
+          card.addEventListener('click', async (evt) => {
+            evt.stopPropagation();
+            try {
+              const res = await window.electronAPI.getPasswordDetail({ UID: e.UID });
+              if (res.status && res.data) {
+                e.pwd = res.data.pwd || res.data.password;
+              }
+              window.sharedEntries = [e];
+              openEditModal(e.UID);
+            } catch {
+              showToast('비밀번호 상세 정보를 불러오는데 실패했습니다.');
+            }
+          });
+          grpDiv.appendChild(card);
+        });
         reusedBody.appendChild(grpDiv);
       });
     }
@@ -216,7 +283,22 @@ window.addEventListener('DOMContentLoaded', async () => {
       // 정상적인 데이터 렌더링
       window.sharedEntries = res.data.data;
       res.data.data.forEach(entry => {
-        expiredBody.appendChild(createEntryCard(entry));
+        const card = createEntryCard(entry);
+        // Remove or disable default click-to-edit logic: override with our own
+        card.addEventListener('click', async (evt) => {
+          evt.stopPropagation();
+          try {
+            const res = await window.electronAPI.getPasswordDetail({ UID: entry.UID });
+            if (res.status && res.data) {
+              entry.pwd = res.data.pwd || res.data.password;
+            }
+            window.sharedEntries = [entry];
+            openEditModal(entry.UID);
+          } catch {
+            showToast('비밀번호 상세 정보를 불러오는데 실패했습니다.');
+          }
+        });
+        expiredBody.appendChild(card);
       });
     }
 

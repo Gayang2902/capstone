@@ -885,9 +885,16 @@ editModal.addEventListener('click', e => {
 cancelEdit.addEventListener('click', () => {
   editModal.classList.add('hidden');
 });
+// 지속적인 배경 클릭 시 모달 닫기
+editModal.addEventListener('click', e => {
+  if (e.target === editModal) {
+    editModal.classList.add('hidden');
+    editModal.classList.remove('flex');
+  }
+});
 
 // --- openEditModal 함수 ---
-function openEditModal(uid) {
+async function openEditModal(uid) {
   // 현재 entries 배열은 전역 loadAndRenderList에서 저장해야 합니다
   const entry = currentEntries.find(e => (e.UID||e.id||e.uid) === uid);
   if (!entry) return;
@@ -896,13 +903,7 @@ function openEditModal(uid) {
   editModal.classList.remove('hidden');
   editModal.classList.add('flex');  // hidden 해제 후 flex로 중앙 배치
 
-  // 클릭 영역 눌러서 닫기
-  editModal.addEventListener('click', (e) => {
-    if (e.target === editModal) {
-      editModal.classList.add('hidden');
-      editModal.classList.remove('flex');
-    }
-  }, { once: true });
+
 
   // 폼 초기화
   editForm.innerHTML = '';
@@ -980,6 +981,19 @@ function openEditModal(uid) {
         <label class="block text-sm font-medium">${label}</label>
         <textarea id="edit-${key}" class="mt-1 w-full border rounded px-2 py-1">${entry[key]||''}</textarea>
       `;
+    } else if (inputType === 'password') {
+      div.innerHTML = `
+        <label class="block text-sm font-medium">${label}</label>
+        <div class="relative">
+          <input id="edit-${key}" type="password"
+            value="${entry[key]||''}"
+            class="mt-1 w-full border rounded px-2 py-1 pr-10" />
+          <button type="button"
+            id="toggle-${key}"
+            class="absolute inset-y-0 right-0 pr-3 flex items-center">
+            <i class="fa fa-eye-slash text-gray-500"></i>
+          </button>
+        </div>`;
     } else {
       div.innerHTML = `
         <label class="block text-sm font-medium">${label}</label>
@@ -989,7 +1003,36 @@ function openEditModal(uid) {
       `;
     }
     editForm.appendChild(div);
+    // Toggle visibility for password field
+    if (inputType === 'password') {
+      const toggleBtn = document.getElementById(`toggle-${key}`);
+      const pwdInput  = document.getElementById(`edit-${key}`);
+      const icon      = toggleBtn.querySelector('i');
+      toggleBtn.addEventListener('click', () => {
+        if (pwdInput.type === 'password') {
+          pwdInput.type = 'text';
+          icon.classList.replace('fa-eye-slash', 'fa-eye');
+        } else {
+          pwdInput.type = 'password';
+          icon.classList.replace('fa-eye', 'fa-eye-slash');
+        }
+      });
+    }
   });
+
+  // Load actual password into the password input
+  try {
+    const pwdRes = await window.electronAPI.getPasswordDetail({ UID: uid });
+    if (pwdRes.status) {
+      const pwdInput = document.getElementById('edit-pwd');
+      if (pwdInput) pwdInput.value = pwdRes.data.pwd || '';
+    } else {
+      showToast('비밀번호 불러오기 실패: ' + pwdRes.error_message, 'error');
+    }
+  } catch (e) {
+    showToast('비밀번호 불러오기 오류', 'error');
+  }
+
 
   // 3) Comments
   const commentsDiv = document.createElement('div');

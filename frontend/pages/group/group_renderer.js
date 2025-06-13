@@ -71,7 +71,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // 수정 모달 열기 함수 (그룹 페이지에 직접 구현)
-async function openEditModal(uid) {
+window.openEditModal = async function(uid) {
     const entry = window.currentGroupEntries.find(e => e.UID === uid);
     if (!entry) return;
 
@@ -86,9 +86,13 @@ async function openEditModal(uid) {
 
     editModal.classList.remove('hidden');
     editModal.classList.add('flex');
-    editModal.addEventListener('click', e => {
+    // Define the closeOnBackground function before using it
+    function closeOnBackground(e) {
         if (e.target === editModal) editModal.classList.add('hidden');
-    }, { once: true });
+    }
+    // Remove any previous listener to avoid duplicates
+    editModal.removeEventListener('click', closeOnBackground);
+    editModal.addEventListener('click', closeOnBackground);
 
     editForm.innerHTML = '';
     // Label + Favorite
@@ -120,7 +124,44 @@ async function openEditModal(uid) {
     };
     (typeFields[entry.type]||[]).forEach(([label,key,inputType]) => {
         const div = document.createElement('div'); div.className = 'mb-4';
-        if (inputType === 'textarea') {
+        if (inputType === 'password') {
+            div.innerHTML = `
+                <label class="block text-sm font-medium">${label}</label>
+                <div class="relative">
+                  <input id="edit-${key}" type="password"
+                         class="mt-1 w-full border rounded px-2 py-1 pr-10" />
+                  <button id="toggle-${key}" type="button"
+                          class="absolute inset-y-0 right-2 flex items-center">
+                    <i class="fa-solid fa-eye-slash text-gray-500"></i>
+                  </button>
+                </div>
+            `;
+            // Fetch real password from backend and set as value
+            window.electronAPI.getPasswordDetail({ UID: uid })
+              .then(res => {
+                if (res.status) {
+                  div.querySelector(`#edit-${key}`).value = res.data.pwd;
+                } else {
+                  window.showToast('비밀번호 불러오기 실패', 'error');
+                }
+              })
+              .catch(() => window.showToast('비밀번호 불러오기 오류', 'error'));
+            // Toggle visibility on eye icon click
+            const toggleBtn = div.querySelector(`#toggle-${key}`);
+            const pwdInput = div.querySelector(`#edit-${key}`);
+            const iconEl = toggleBtn.querySelector('i');
+            toggleBtn.addEventListener('click', () => {
+              if (pwdInput.type === 'password') {
+                pwdInput.type = 'text';
+                iconEl.classList.remove('fa-eye-slash');
+                iconEl.classList.add('fa-eye');
+              } else {
+                pwdInput.type = 'password';
+                iconEl.classList.remove('fa-eye');
+                iconEl.classList.add('fa-eye-slash');
+              }
+            });
+        } else if (inputType === 'textarea') {
             div.innerHTML = `
                 <label class="block text-sm font-medium">${label}</label>
                 <textarea id="edit-${key}" class="mt-1 w-full border rounded px-2 py-1">${entry[key]||''}</textarea>
