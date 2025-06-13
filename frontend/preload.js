@@ -22,6 +22,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // 새 CSV 파일 생성 다이얼로그
     createFile:         () => ipcRenderer.invoke('createFile'),
 
+    openFilePath: filePath => ipcRenderer.invoke('openFilePath', filePath),
+
     // **마스터 키 인증 요청** (oper="postMasterKey", data={ master_key })
     postMasterKey:      master_key => ipcRenderer.invoke('request-backend', {
         oper: 'postMasterKey',

@@ -5,6 +5,8 @@ const { spawn } = require('child_process');
 const fs   = require('fs');
 const path = require('path');
 
+let recentFiles = [];
+
 
 let currentFilePath = '';   // 현재 선택된 TXT 파일 경로
 
@@ -138,6 +140,14 @@ function sendToBackend(oper, data) {
     });
 }
 
+async function handleOpenFilePath(filePath) {
+  currentFilePath = filePath;
+  const resp = await sendToBackend('openFile', { file_path: filePath });
+  recentFiles.push(filePath);
+  mainWindow.webContents.send('recent-file-list', recentFiles);
+  return { ...resp, file_path: filePath };
+}
+
 /** 3) 메인 윈도우 생성 */
 
 function createMainWindow() {
@@ -264,57 +274,38 @@ ipcMain.handle('getAllPasswords', async () => {
     }
 });
 
+ipcMain.handle('openFilePath', async (_evt, filePath) => {
+  return handleOpenFilePath(filePath);
+});
+
 /** (3) TXT 파일 열기 다이얼로그 + 백엔드에 openFile 요청 */
 ipcMain.handle('openFile', async () => {
-    try {
-        const { canceled, filePaths } = await dialog.showOpenDialog(mainWindow, {
-            title: 'txt 파일 선택',
-            properties: ['openFile'],
-            filters: [{ name: '텍스트 파일', extensions: ['txt'] }],
-        });
-        if (canceled) return { status: false, error_message: '파일 선택을 취소했습니다.' };
+  const { canceled, filePaths } = await dialog.showOpenDialog(mainWindow, {
+    title: 'txt 파일 선택',
+    properties: ['openFile'],
+    filters: [{ name: '텍스트 파일', extensions: ['txt'] }],
+  });
+  if (canceled) return { status: false, error_message: '파일 선택을 취소했습니다.' };
 
-        const selectedPath = filePaths[0];
-        currentFilePath = selectedPath;
-
-        const resp = await sendToBackend('openFile', { file_path: selectedPath });
-
-        return {
-            status: resp.status,
-            error_message: resp.error_message,
-            file_path: selectedPath,
-            data: resp.data
-        };
-    } catch (err) {
-        console.error('openFile 오류:', err);
-        return { status: false, error_message: err.message };
-    }
+  const selectedPath = filePaths[0];
+  recentFiles.push(selectedPath);
+  mainWindow.webContents.send('recent-file-list', recentFiles);
+  return { status: true, file_path: selectedPath };
 });
 
 /** (4) 새 TXT 파일 생성 다이얼로그 */
 ipcMain.handle('createFile', async () => {
-    try {
-        const { canceled, filePath } = await dialog.showSaveDialog(mainWindow, {
-            title: '새 TXT 파일 생성',
-            defaultPath: '',
-            filters: [{ name: '텍스트 파일', extensions: ['txt'] }],
-        });
-        if (canceled) return { status: false, error_message: '파일 생성을 취소했습니다.' };
+  const { canceled, filePath } = await dialog.showSaveDialog(mainWindow, {
+    title: '새 TXT 파일 생성',
+    defaultPath: '',
+    filters: [{ name: '텍스트 파일', extensions: ['txt'] }],
+  });
+  if (canceled || !filePath) return { status: false, error_message: '파일 생성을 취소했습니다.' };
 
-        fs.writeFileSync(filePath, '');
-        currentFilePath = filePath;
-        const resp = await sendToBackend('openFile', { file_path: filePath });
-
-        return {
-            status: resp.status,
-            error_message: resp.error_message,
-            file_path: filePath,
-            data: resp.data
-        };
-    } catch (err) {
-        console.error('createFile 오류:', err);
-        return { status: false, error_message: err.message };
-    }
+  fs.writeFileSync(filePath, '');
+  recentFiles.push(filePath);
+  mainWindow.webContents.send('recent-file-list', recentFiles);
+  return { status: true, file_path: filePath };
 });
 
 /** (5) 마스터 키 인증 요청 */
