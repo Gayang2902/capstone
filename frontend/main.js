@@ -296,7 +296,7 @@ ipcMain.handle('createFile', async () => {
     try {
         const { canceled, filePath } = await dialog.showSaveDialog(mainWindow, {
             title: '새 TXT 파일 생성',
-            defaultPath: 'passwords.txt',
+            defaultPath: '',
             filters: [{ name: '텍스트 파일', extensions: ['txt'] }],
         });
         if (canceled) return { status: false, error_message: '파일 생성을 취소했습니다.' };
