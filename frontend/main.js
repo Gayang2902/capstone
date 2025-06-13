@@ -1,6 +1,6 @@
 // File: main.js
 
-const { app, BrowserWindow, ipcMain, dialog, screen, clipboard } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, screen, clipboard, Menu, globalShortcut } = require('electron');
 const { spawn } = require('child_process');
 const fs   = require('fs');
 const path = require('path');
@@ -139,6 +139,7 @@ function sendToBackend(oper, data) {
 }
 
 /** 3) 메인 윈도우 생성 */
+
 function createMainWindow() {
     mainWindow = new BrowserWindow({
         width: 1500,
@@ -149,21 +150,64 @@ function createMainWindow() {
             nodeIntegration: false,
         },
         contentProtection: true,
+        autoHideMenuBar: true,  // 메뉴바 숨기기(Alt 누르면 잠시 보임)
+    });
+
+    // 완전 숨김(Alt 키에도 안 뜸)
+    Menu.setApplicationMenu(null);
+
+    // F12, Ctrl+Shift+I / ⌘+Shift+I 단축키로 devtools 열리지 않도록 차단
+    mainWindow.webContents.on('before-input-event', (event, input) => {
+        if (input.type === 'keyDown') {
+            const key = input.key.toLowerCase();
+            if (
+                input.key === 'F12' ||
+                ((input.control || input.meta) && input.shift && key === 'i')
+            ) {
+                event.preventDefault();
+            }
+        }
     });
 
     mainWindow.loadFile(path.join(__dirname, 'pages', 'start', 'start.html'));
 
-    mainWindow.webContents.openDevTools({ mode: 'right' }); // 개발자 모드
+    // mainWindow.webContents.openDevTools({ mode: 'right' }); // 개발자 모드
 }
 
-// --- 앱 라이프사이클 ---
 app.whenReady().then(() => {
+    // 숨기되, Edit 메뉴 역할만 남겨서 단축키는 유지
+    const template = [
+        { role: 'editMenu' },           // Cmd/Ctrl+X, C, V, A 단축키
+        { role: 'viewMenu', visible: false },
+        { role: 'windowMenu', visible: false },
+        { role: 'help', visible: false }
+    ];
+    Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+
     startBackend();
     createMainWindow();
+
+    // CmdOrCtrl+R → 현재 포커스된 창 새로고침
+    globalShortcut.register('CommandOrControl+R', () => {
+        const win = BrowserWindow.getFocusedWindow();
+        if (win) win.reload();
+    });
+
+    // CmdOrCtrl+Q → 앱 종료
+    globalShortcut.register('CommandOrControl+Q', () => {
+        app.quit();
+    });
+
     app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
     });
 });
+
+// 앱 종료 시 전역 단축키 해제
+app.on('will-quit', () => {
+    globalShortcut.unregisterAll();
+});
+
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
