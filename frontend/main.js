@@ -170,6 +170,11 @@ function createMainWindow() {
     mainWindow.webContents.on('before-input-event', (event, input) => {
         if (input.type === 'keyDown') {
             const key = input.key.toLowerCase();
+            // Prevent Cmd/Ctrl+R reload
+            if ((input.control || input.meta) && !input.shift && key === 'r') {
+                event.preventDefault();
+                return;
+            }
             if (
                 input.key === 'F12' ||
                 ((input.control || input.meta) && input.shift && key === 'i')
@@ -181,7 +186,7 @@ function createMainWindow() {
 
     mainWindow.loadFile(path.join(__dirname, 'pages', 'start', 'start.html'));
 
-    // mainWindow.webContents.openDevTools({ mode: 'right' }); // 개발자 모드
+    mainWindow.webContents.openDevTools({ mode: 'right' }); // 개발자 모드
 }
 
 app.whenReady().then(() => {
@@ -198,10 +203,10 @@ app.whenReady().then(() => {
     createMainWindow();
 
     // CmdOrCtrl+R → 현재 포커스된 창 새로고침
-    globalShortcut.register('CommandOrControl+R', () => {
-        const win = BrowserWindow.getFocusedWindow();
-        if (win) win.reload();
-    });
+    // globalShortcut.register('CommandOrControl+R', () => {
+    //     const win = BrowserWindow.getFocusedWindow();
+    //     if (win) win.reload();
+    // });
 
     // CmdOrCtrl+Q → 앱 종료
     globalShortcut.register('CommandOrControl+Q', () => {

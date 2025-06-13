@@ -160,4 +160,14 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- Enter키로 인증하기 기능 추가 ---
+    inputKey.addEventListener('keydown', e => {
+        // Enter키를 눌렀을 때
+        if (e.key === 'Enter' && !btnAuth.disabled) {
+            e.preventDefault();
+            btnAuth.click();
+        }
+    });
+
+    inputKey.focus();
 });

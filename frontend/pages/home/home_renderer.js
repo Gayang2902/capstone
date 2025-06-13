@@ -584,19 +584,41 @@ saveBtn.addEventListener('click', async () => {
       break;
   }
 
+  // try {
+  //   const res = await window.electronAPI.createPasswordEntry(data);
+  //   console.log('➕ 생성 핸들러 실행, entry=', res.data);
+  //   if (!res.status) {
+  //     alert('저장에 실패했습니다: ' + res.error_message);
+  //     return;
+  //   }
+  //   closeModal();
+  //   // Add newly created entry without reloading all
+  //   addCard(res.data.data);
+  //   // Update currentEntries array to include new entry at the beginning
+  //   currentEntries.unshift(res.data.data);
+  // } catch (err) {
+  //   alert('저장 중 오류가 발생했습니다:\n' + (err.message || err));
+  // }
+
   try {
     const res = await window.electronAPI.createPasswordEntry(data);
     console.log('➕ 생성 핸들러 실행, entry=', res.data);
+
     if (!res.status) {
       alert('저장에 실패했습니다: ' + res.error_message);
       return;
     }
     closeModal();
-    // Add newly created entry without reloading all
-    addCard(res.data);
+    // Reload full list to ensure all handlers on new cards
+    const scrollParent = findScrollParent(container);
+    const prevScroll = scrollParent.scrollTop;
+    await loadAndRenderList(searchInput?.value || '');
+    scrollParent.scrollTop = prevScroll;
+
   } catch (err) {
     alert('저장 중 오류가 발생했습니다:\n' + (err.message || err));
   }
+
 });
 
 // ─────────────────────────────────────────────────────────────
@@ -1077,4 +1099,21 @@ async function openEditModal(uid) {
   cancelEdit.onclick = () => {
     editModal.classList.add('hidden');
   };
+
+  // addPasswordModal 내 입력란
+  modalBox.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      saveBtn.click();
+    }
+  });
+
+  // editModal 내 입력란
+  editModal.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      saveEdit.click();
+    }
+  });
+
 }
