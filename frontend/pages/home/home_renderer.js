@@ -42,6 +42,17 @@ let favorite = false;
 let selectedType = null;
 let currentEntries = [];
 
+// 타입별 Font Awesome 아이콘 클래스 매핑
+const typeIconClasses = {
+  wifi:     'fa-solid fa-wifi text-indigo-500',
+  website:  'fa-solid fa-globe text-blue-600',
+  server:   'fa-solid fa-server text-blue-500',
+  bankbook: 'fa-solid fa-book text-yellow-500',
+  identity: 'fa-solid fa-id-card text-pink-500',
+  security: 'fa-solid fa-shield-alt text-green-500',
+  card:     'fa-solid fa-credit-card text-teal-500'
+};
+
 // ─────────────────────────────────────────────────────────────
 // 공통: 엔트리 카드 생성 헬퍼 (홈 전용)
 // ─────────────────────────────────────────────────────────────
@@ -52,18 +63,12 @@ window.createEntryCard = function(entry) {
     p-4 bg-white rounded-lg shadow w-full gap-x-4 mb-2
     hover:bg-indigo-50 hover:shadow-lg cursor-pointer
   `;
-  // 아이콘
-  const icon = document.createElement('div'); icon.className = 'w-12 h-12';
-  const img  = document.createElement('img');
-  if (entry.type === 'website') {
-    let d;
-    try { d = new URL(entry.url).hostname; } catch { d = entry.url; }
-    img.src = `https://logo.clearbit.com/${d}?size=64`;
-  } else {
-    img.src = `../icon/${entry.type === 'wifi' ? 'wifi' : entry.type}.png`;
-  }
-  img.className = 'w-full h-full object-contain';
-  icon.appendChild(img);
+  // 아이콘 (Font Awesome)
+  const icon = document.createElement('div');
+  icon.className = 'w-12 h-12 flex items-center justify-center';
+  const iconEl = document.createElement('i');
+  iconEl.className = typeIconClasses[entry.type] || 'fa-solid fa-key text-gray-600';
+  icon.appendChild(iconEl);
   card.appendChild(icon);
 
   // 레이블 + 서브텍스트
@@ -669,9 +674,9 @@ async function loadAndRenderList(query = '') {
         'hover:bg-indigo-50 hover:shadow-lg';              // → 호버 시 배경·그림자 변화
     card.dataset.uid = entry.UID;
 
-    // ① 아이콘 셀 (website 타입만 파비콘 로드)
+    // ① 아이콘 셀
     const iconCell = document.createElement('div');
-    iconCell.className = 'w-12 h-12';
+    iconCell.className = 'w-12 h-12 flex items-center justify-center';
     let iconEl;
     if (entry.type === 'website') {
       // URL에서 호스트 추출
@@ -687,10 +692,9 @@ async function loadAndRenderList(query = '') {
       iconEl.alt = 'favicon';
       iconEl.className = 'w-full h-full object-contain';
     } else {
-      iconEl = document.createElement('img');
-      iconEl.src = `../icon/${entry.type === 'wifi' ? 'wifi' : entry.type}.png`;
-      iconEl.alt = entry.type;
-      iconEl.className = 'w-full h-full object-contain';
+      // Font Awesome 아이콘 사용
+      iconEl = document.createElement('i');
+      iconEl.className = `${typeIconClasses[entry.type] || 'fa-solid fa-key text-gray-600'} text-4xl`;
     }
     iconCell.appendChild(iconEl);
     card.appendChild(iconCell);
