@@ -140,7 +140,7 @@
         <div class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
             <!-- Wi-Fi 카드 -->
             <div class="group-card bg-white p-6 rounded-2xl shadow-lg hover:shadow-2xl cursor-pointer aspect-square"
-                 data-type="Wi-Fi" data-count="5" data-icon="fa-solid fa-wifi" data-color="text-indigo-500"
+                 data-type="wifi" data-count="5" data-icon="fa-solid fa-wifi" data-color="text-indigo-500"
                  data-id="MyNetwork" data-password="wifi@1234">
                 <div class="flex flex-col items-center justify-center h-full gap-2">
                     <i class="fa-solid fa-wifi text-indigo-500 text-4xl"></i>
@@ -150,27 +150,27 @@
             </div>
             <!-- Server account 카드 -->
             <div class="group-card bg-white p-6 rounded-2xl shadow-lg hover:shadow-2xl cursor-pointer aspect-square"
-                 data-type="Server account" data-count="5" data-icon="fa-solid fa-server" data-color="text-blue-500"
+                 data-type="server" data-count="5" data-icon="fa-solid fa-server" data-color="text-blue-500"
                  data-id="serverUser" data-password="serverPass">
                 <div class="flex flex-col items-center justify-center h-full gap-2">
                     <i class="fa-solid fa-server text-blue-500 text-4xl"></i>
-                    <span class="text-lg font-semibold">Server account</span>
+                    <span class="text-lg font-semibold">Server</span>
                     <span class="text-sm text-gray-500">5개</span>
                 </div>
             </div>
             <!-- Passbook 카드 -->
             <div class="group-card bg-white p-6 rounded-2xl shadow-lg hover:shadow-2xl cursor-pointer aspect-square"
-                 data-type="Passbook" data-count="5" data-icon="fa-solid fa-book" data-color="text-yellow-500"
+                 data-type="bankbook" data-count="5" data-icon="fa-solid fa-book" data-color="text-yellow-500"
                  data-id="passbookID" data-password="passbookPW">
                 <div class="flex flex-col items-center justify-center h-full gap-2">
                     <i class="fa-solid fa-book text-yellow-500 text-4xl"></i>
-                    <span class="text-lg font-semibold">Passbook</span>
+                    <span class="text-lg font-semibold">Bankbook</span>
                     <span class="text-sm text-gray-500">5개</span>
                 </div>
             </div>
             <!-- Identity 카드 -->
             <div class="group-card bg-white p-6 rounded-2xl shadow-lg hover:shadow-2xl cursor-pointer aspect-square"
-                 data-type="Identity" data-count="5" data-icon="fa-solid fa-id-card" data-color="text-pink-500"
+                 data-type="identity" data-count="5" data-icon="fa-solid fa-id-card" data-color="text-pink-500"
                  data-id="identityUser" data-password="identityPW">
                 <div class="flex flex-col items-center justify-center h-full gap-2">
                     <i class="fa-solid fa-id-card text-pink-500 text-4xl"></i>
@@ -180,7 +180,7 @@
             </div>
             <!-- Security 카드 -->
             <div class="group-card bg-white p-6 rounded-2xl shadow-lg hover:shadow-2xl cursor-pointer aspect-square"
-                 data-type="Security" data-count="5" data-icon="fa-solid fa-shield-alt" data-color="text-green-500"
+                 data-type="security" data-count="5" data-icon="fa-solid fa-shield-alt" data-color="text-green-500"
                  data-id="secUser" data-password="secPass">
                 <div class="flex flex-col items-center justify-center h-full gap-2">
                     <i class="fa-solid fa-shield-alt text-green-500 text-4xl"></i>
@@ -190,17 +190,17 @@
             </div>
             <!-- Web 카드 -->
             <div class="group-card bg-white p-6 rounded-2xl shadow-lg hover:shadow-2xl cursor-pointer aspect-square"
-                 data-type="Web" data-count="5" data-icon="fa-solid fa-globe" data-color="text-blue-600"
+                 data-type="website" data-count="5" data-icon="fa-solid fa-globe" data-color="text-blue-600"
                  data-id="webUser" data-password="webPass">
                 <div class="flex flex-col items-center justify-center h-full gap-2">
                     <i class="fa-solid fa-globe text-blue-600 text-4xl"></i>
-                    <span class="text-lg font-semibold">Web</span>
+                    <span class="text-lg font-semibold">Website</span>
                     <span class="text-sm text-gray-500">5개</span>
                 </div>
             </div>
             <!-- Card 카드 -->
             <div class="group-card bg-white p-6 rounded-2xl shadow-lg hover:shadow-2xl cursor-pointer aspect-square"
-                 data-type="Card" data-count="5" data-icon="fa-solid fa-credit-card" data-color="text-teal-500"
+                 data-type="card" data-count="5" data-icon="fa-solid fa-credit-card" data-color="text-teal-500"
                  data-id="cardUser" data-password="cardPass">
                 <div class="flex flex-col items-center justify-center h-full gap-2">
                     <i class="fa-solid fa-credit-card text-teal-500 text-4xl"></i>
@@ -279,6 +279,17 @@
 
 </div>
 <!-- ─── 메인 영역 끝 ─── -->
+
+<!-- Edit Modal -->
+<div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-30">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md">
+        <form id="editForm"></form>
+        <div class="flex justify-end space-x-2 mt-4">
+            <button id="cancelEdit" type="button" class="px-4 py-2 bg-gray-200 rounded">취소</button>
+            <button id="saveEdit" type="button" class="px-4 py-2 bg-indigo-600 text-white rounded">저장</button>
+        </div>
+    </div>
+</div>
 
 <script src="../../shared/shared_renderer.js"></script>
 <script src="./group_renderer.js" defer></script>

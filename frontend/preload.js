@@ -103,4 +103,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // 클립보드 쓰기 (30초 후 자동 삭제)
     writeClipboard: text => ipcRenderer.invoke('writeClipboard', text),
 
+    // 태그별 PW 가져오기
+    getPasswordsByTag: (tag) => ipcRenderer.invoke('getPasswordsByTag', { tag }),
+
 });

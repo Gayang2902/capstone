@@ -30,18 +30,18 @@ window.createEntryCard = function(entry) {
   img.className='w-full h-full object-contain'; icon.appendChild(img);
   card.appendChild(icon);
 
-  // 레이블 + 서브텍스트
-  const label = document.createElement('div'); label.className='flex flex-col';
-  label.innerHTML = `
-    <span class="font-semibold">${entry.type==='card'?entry.bank_name:entry.label}</span>
-    <span class="text-xs text-gray-500">${
-      entry.type==='website'?entry.url:
-          entry.type==='server'?`Host: ${entry.host} Port: ${entry.port}`:
-              entry.type==='bankbook'?`Bank: ${entry.bank_name}`:
-                  entry.type==='identity'?`Eng: ${entry.eng_name}`:
-                      entry.type==='card'?`CVC: ${entry.cvc}`:''
-  }</span>`;
-  card.appendChild(label);
+  // // 레이블 + 서브텍스트
+  // const label = document.createElement('div'); label.className='flex flex-col';
+  // label.innerHTML = `
+  //   <span class="font-semibold">${entry.type==='card'?entry.bank_name:entry.label}</span>
+  //   <span class="text-xs text-gray-500">${
+  //     entry.type==='website'?entry.url:
+  //         entry.type==='server'?`Host: ${entry.host} Port: ${entry.port}`:
+  //             entry.type==='bankbook'?`Bank: ${entry.bank_name}`:
+  //                 entry.type==='identity'?`Eng: ${entry.eng_name}`:
+  //                     entry.type==='card'?`CVC: ${entry.cvc}`:''
+  // }</span>`;
+  // card.appendChild(label);
 
   // 주요 필드
   const mask = ()=>'****';

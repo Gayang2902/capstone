@@ -663,3 +663,16 @@ ipcMain.handle('getOldCount', async () => {
         return { status:false, error_message: err.message };
     }
 });
+
+ipcMain.handle('getPasswordsByTag', async (_evt, { tag }) => {
+    if (!currentFilePath) {
+        return { status: false, error_message: '파일이 선택되지 않았습니다.' };
+    }
+    try {
+        // 백엔드에는 file_path는 sendToBackend 안에서 자동으로 포함되므로 tag만 전달
+        const resp = await sendToBackend('getPasswordsByTag', { tag });
+        return resp;
+    } catch (err) {
+        return { status: false, error_message: err.message };
+    }
+});

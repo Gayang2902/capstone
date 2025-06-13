@@ -541,7 +541,13 @@ async function loadAndRenderList(query = '') {
   }
 
   currentEntries = Array.isArray(res.data?.data) ? res.data.data : [];
-  let entries = currentEntries;
+  // 즐겨찾기(favorite===true)인 항목을 맨 위로 올립니다.
+  let entries = currentEntries.slice().sort((a, b) => {
+    const fa = (a.favorite === 'true' || a.favorite === true) ? 1 : 0;
+    const fb = (b.favorite === 'true' || b.favorite === true) ? 1 : 0;
+    return fb - fa;
+  });
+
   if (query) {
     const lower = query.toLowerCase();
     entries = entries.filter(e =>
@@ -682,12 +688,12 @@ async function loadAndRenderList(query = '') {
           valueSpan.addEventListener('click', (e) => {
             e.stopPropagation();
             navigator.clipboard.writeText(val)
-              .then(() => {
-                showToast('ID 복사됨');
-                valueSpan.classList.add('text-green-400');
-                setTimeout(() => valueSpan.classList.remove('text-green-400'), 3000);
-              })
-              .catch(() => showToast('복사 실패', 'error'));
+                .then(() => {
+                  showToast('ID 복사됨');
+                  valueSpan.classList.add('text-green-400');
+                  setTimeout(() => valueSpan.classList.remove('text-green-400'), 3000);
+                })
+                .catch(() => showToast('복사 실패', 'error'));
           });
         } else {
           valueSpan.textContent = val;
@@ -704,7 +710,42 @@ async function loadAndRenderList(query = '') {
     card.appendChild(typeCell);
 
     // ⑦ 삭제 버튼 셀
-    const btnCell = document.createElement('div');
+    // ⑦ 액션 버튼 셀: 즐겨찾기 토글 + 삭제
+    const actionCell = document.createElement('div');
+    actionCell.className = 'flex items-center space-x-2';
+
+    // (가) 즐겨찾기 토글 버튼
+    const favBtn = document.createElement('button');
+    favBtn.className = 'focus:outline-none';
+    const favIcon = document.createElement('i');
+    favIcon.className = (entry.favorite === 'true' || entry.favorite === true)
+        ? 'fa-solid fa-star text-yellow-500 text-lg'
+        : 'fa-regular fa-star text-gray-400 text-lg';
+    favBtn.appendChild(favIcon);
+    favBtn.addEventListener('click', async e => {
+      e.stopPropagation();
+      const newFav = !(entry.favorite === 'true' || entry.favorite === true);
+      try {
+        // API에 favorite=true/false 업데이트
+        await window.electronAPI.updatePasswordEntry({
+          UID: entry.UID,
+          favorite: newFav.toString()
+        });
+        entry.favorite = newFav;
+        // 아이콘 모양 업데이트
+        favIcon.className = newFav
+            ? 'fa-solid fa-star text-yellow-500 text-lg'
+            : 'fa-regular fa-star text-gray-400 text-lg';
+        // 맨 위로 고정: favorite=true면 prepend
+        if (newFav) container.prepend(card);
+        showToast(`즐겨찾기 ${newFav ? '추가' : '해제'}`);
+      } catch (err) {
+        showToast('즐겨찾기 업데이트 실패', 'error');
+      }
+    });
+    actionCell.appendChild(favBtn);
+
+    // (나) 삭제 버튼
     const delBtn = document.createElement('button');
     delBtn.className = 'text-red-500 hover:underline';
     delBtn.textContent = '삭제';
@@ -714,9 +755,9 @@ async function loadAndRenderList(query = '') {
       await window.electronAPI.deletePasswordEntry(entry.UID);
       loadAndRenderList(query);
     });
-    btnCell.appendChild(delBtn);
-    card.appendChild(btnCell);
+    actionCell.appendChild(delBtn);
 
+    card.appendChild(actionCell);
     card.addEventListener('click', () => openEditModal(entry.UID));
     container.appendChild(card);
   });
