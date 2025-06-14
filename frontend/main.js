@@ -537,19 +537,19 @@ ipcMain.handle('searchPasswordEntry', async (_evt, { query }) => {
 //     return resp;
 // });
 
-/** (8) 총 비밀번호 개수 조회 */
-ipcMain.handle('getPasswordCount', async () => {
-    if (!currentFilePath) {
-        return { status: false, error_message: '파일이 선택되지 않았습니다.' };
-    }
-    try {
-        const resp = await sendToBackend('getPasswordCount', { file_path: currentFilePath });
-        return resp;
-    } catch (err) {
-        console.error('getPasswordCount 오류:', err);
-        return { status: false, error_message: err.message };
-    }
-});
+// /** (8) 총 비밀번호 개수 조회 */
+// ipcMain.handle('get-password-count', async () => {
+//     if (!currentFilePath) {
+//         return { status: false, error_message: '파일이 선택되지 않았습니다.' };
+//     }
+//     try {
+//         const resp = await sendToBackend('getPasswordCount', { file_path: currentFilePath });
+//         return resp;
+//     } catch (err) {
+//         console.error('getPasswordCount 오류:', err);
+//         return { status: false, error_message: err.message };
+//     }
+// });
 
 // 비밀번호 상세 조회 핸들러
 ipcMain.handle('getPasswordDetail', async (_evt, { UID }) => {
@@ -713,6 +713,20 @@ ipcMain.handle('getPasswordsByTag', async (_evt, { tag }) => {
         const resp = await sendToBackend('getPasswordsByTag', { tag });
         return resp;
     } catch (err) {
+        return { status: false, error_message: err.message };
+    }
+});
+
+ipcMain.handle('get-password-count', async () => {
+    if (!currentFilePath) {
+        return { status: false, error_message: '파일이 선택되지 않았습니다.' };
+    }
+    try {
+        // 백엔드로부터 count만 조회
+        const resp = await sendToBackend('getPasswordCount', { file_path: currentFilePath });
+        return resp; // { status: true, data: { count } } 형태 기대
+    } catch (err) {
+        console.error('get-password-count 처리 중 오류:', err);
         return { status: false, error_message: err.message };
     }
 });

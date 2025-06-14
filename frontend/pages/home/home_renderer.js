@@ -54,9 +54,61 @@ const typeIconClasses = {
 };
 
 // ─────────────────────────────────────────────────────────────
+// 공통 필드 설정: 유형별 필드 목록 (전역)
+const fieldConfig = {
+  wifi: [
+    { key: 'name',     label: '이름' },
+    { key: 'pwd',      label: '비밀번호' },
+    { key: 'comments', label: '설명'}
+  ],
+  server: [
+    { key: 'id',       label: '아이디' },
+    { key: 'pwd',      label: '비밀번호' },
+    { key: 'host',     label: '호스트' },
+    { key: 'port',     label: '포트' },
+    { key: 'comments', label: '설명'}
+  ],
+  bankbook: [
+    { key: 'bank_name', label: '은행 이름' },
+    { key: 'num',       label: '계좌번호' },
+    { key: 'master',    label: '예금주' },
+    { key: 'pwd',       label: '계좌 비밀번호' },
+    { key: 'comments', label: '설명'}
+  ],
+  identity: [
+    { key: 'name',       label: '이름' },
+    { key: 'eng_name',   label: '영문이름' },
+    { key: 'address',    label: '주소' },
+    { key: 'birth_date', label: '생일' },
+    { key: 'citizen',    label: '주민번호' },
+    { key: 'comments', label: '설명'}
+  ],
+  security: [
+    { key: 'content',    label: '내용' },
+    { key: 'comments', label: '설명'}
+  ],
+  website: [
+    { key: 'url',        label: 'URL' },
+    { key: 'id',         label: '아이디' },
+    { key: 'pwd',        label: '비밀번호' },
+    { key: 'email',      label: '이메일' },
+    { key: 'comments', label: '설명'}
+  ],
+  card: [
+    { key: 'bank_name',   label: '은행이름' },
+    { key: 'name',        label: '예금주' },
+    { key: 'card_number', label: '카드 번호' },
+    { key: 'cvc',         label: 'CVC' },
+    { key: 'last_day',    label: '만료일' },
+    { key: 'comments', label: '설명'}
+  ]
+};
+
+// ─────────────────────────────────────────────────────────────
 // 공통: 엔트리 카드 생성 헬퍼 (홈 전용)
 // ─────────────────────────────────────────────────────────────
 window.createEntryCard = function(entry) {
+  console.log('▶ entry:', entry);
   const card = document.createElement('div');
   card.className = `
     flex flex-col space-y-3 p-4 bg-white rounded-xl border border-gray-200 shadow-md w-full mb-4
@@ -89,99 +141,158 @@ window.createEntryCard = function(entry) {
   title.className = 'text-lg font-semibold';
   title.textContent = entry.label || entry.type;
   leftDiv.appendChild(title);
+  // 최근 수정일 표시
+  const modSpan = document.createElement('span');
+  modSpan.className = 'text-sm text-gray-500 ml-4';
+  modSpan.textContent = `최근 수정일: ${entry.modified_at}`;
+  leftDiv.appendChild(modSpan);
   header.appendChild(leftDiv);
-  // Right side: favorite toggle
+  // Right side icons: favorite, edit, and delete
   const favIcon = document.createElement('i');
   favIcon.className = (entry.favorite === 'true' || entry.favorite === true)
     ? 'fa-solid fa-star text-yellow-500 text-xl cursor-pointer'
     : 'fa-regular fa-star text-gray-400 text-xl cursor-pointer';
-  favIcon.addEventListener('click', e => {
+  favIcon.addEventListener('click', async e => {
     e.stopPropagation();
-    favIcon.classList.toggle('fa-solid');
-    favIcon.classList.toggle('fa-regular');
-    favIcon.classList.toggle('text-yellow-500');
-    favIcon.classList.toggle('text-gray-400');
+    // FLIP animation: record initial position
+    const cardEl = document.querySelector(`[data-uid="${entry.UID}"]`);
+    const firstRect = cardEl.getBoundingClientRect();
+    // Toggle favorite state
+    entry.favorite = !(entry.favorite === true || entry.favorite === 'true');
+    // Update icon classes
+    favIcon.classList.toggle('fa-solid', entry.favorite);
+    favIcon.classList.toggle('fa-regular', !entry.favorite);
+    favIcon.classList.toggle('text-yellow-500', entry.favorite);
+    favIcon.classList.toggle('text-gray-400', !entry.favorite);
+    // Persist change via IPC
+    try {
+      await window.electronAPI.updatePasswordEntry({
+        UID: entry.UID,
+        favorite: entry.favorite.toString()
+      });
+    } catch (err) {
+      console.error('즐겨찾기 저장 실패:', err);
+    }
+    // Move card in DOM
+    const container = document.getElementById('card-container');
+    if (entry.favorite) {
+      container.prepend(cardEl);
+    } else {
+      container.appendChild(cardEl);
+    }
+    // FLIP: record final position and animate
+    const lastRect = cardEl.getBoundingClientRect();
+    const deltaY = firstRect.top - lastRect.top;
+    cardEl.style.transform = `translateY(${deltaY}px)`;
+    cardEl.style.transition = 'transform 300ms ease';
+    requestAnimationFrame(() => {
+      cardEl.style.transform = '';
+    });
+    // (Removed: loadAndRenderList call)
   });
-  header.appendChild(favIcon);
+
+  // Edit icon
+  const editIcon = document.createElement('i');
+  editIcon.className = 'fa-solid fa-pen text-blue-500 text-xl cursor-pointer';
+  editIcon.addEventListener('click', e => {
+    e.stopPropagation();
+    openEditModal(entry.UID);
+  });
+
+  const delIcon = document.createElement('i');
+  delIcon.className = 'fa-solid fa-trash text-red-500 text-xl cursor-pointer ml-3';
+  delIcon.addEventListener('click', async e => {
+    e.stopPropagation();
+    if (!confirm('정말 삭제하시겠습니까?')) return;
+    try {
+      const res = await window.electronAPI.deletePasswordEntry(entry.UID);
+      if (res.status) {
+        removeCard(entry.UID);
+        showToast('삭제되었습니다.');
+      } else {
+        showToast('삭제 실패: ' + res.error_message, 'error');
+      }
+    } catch {
+      showToast('삭제 오류', 'error');
+    }
+  });
+  const rightDiv = document.createElement('div');
+  rightDiv.className = 'flex items-center space-x-2';
+  rightDiv.appendChild(favIcon);
+  rightDiv.appendChild(editIcon);
+  rightDiv.appendChild(delIcon);
+  header.appendChild(rightDiv);
   card.appendChild(header);
 
-  // 2) Field list (vertical with auto-wrap)
-  const fields = [];
-  switch (entry.type) {
-    case 'website':
-      fields.push(['URL', entry.url], ['ID', entry.id], ['PWD', '****'], ['E-Mail', entry.email]);
-      break;
-    case 'server':
-      fields.push(['Host', entry.host], ['Port', entry.port], ['ID', entry.id], ['PWD', '****']);
-      break;
-    case 'bankbook':
-      fields.push(['Bank', entry.bank_name], ['Account No.', entry.num], ['PWD', '****']);
-      break;
-    case 'identity':
-      fields.push(['Name', entry.name], ['Eng Name', entry.eng_name], ['Citizen ID', entry.citizen]);
-      break;
-    case 'card':
-      fields.push(['Bank', entry.bank_name], ['Card No.', entry.card_number], ['Expiry', entry.last_day], ['CVC', entry.cvc], ['PWD', '****']);
-      break;
-    case 'wifi':
-      fields.push(['SSID', entry.name], ['PWD', '****']);
-      break;
-    case 'security':
-      fields.push(['Content', entry.content]);
-      break;
-    default:
-      fields.push(['Type', entry.type]);
-  }
-  fields.forEach(([k, v]) => {
+  // 2) Field list by type using common fieldConfig
+  const config = fieldConfig[entry.type] || [];
+  config.forEach(({ key, label }) => {
+    const value = entry[key];
+    // 항상 pwd 필드 렌더, 나머지는 값이 없으면 스킵
+    if (key !== 'pwd' && (value == null || value === '')) return;
     const row = document.createElement('div');
     row.className = 'flex flex-wrap mb-2 bg-gray-50 p-2 rounded-lg';
     const keyEl = document.createElement('span');
     keyEl.className = 'font-medium text-indigo-600 mr-2';
-    keyEl.textContent = `${k}:`;
+    keyEl.textContent = `${label}:`;
     const valEl = document.createElement('span');
-    valEl.classList.add('break-words');
-    valEl.classList.add('text-gray-800');
-    if (k === 'PWD') {
-      valEl.textContent = '****';
-      let revealedPwd = null;
-      valEl.addEventListener('mouseenter', async () => {
-        try {
-          const res = await window.electronAPI.getPasswordDetail({ UID: entry.UID });
+    valEl.classList.add('break-words','text-gray-800');
+    if (key === 'pwd') {
+      // 초기 플레이스홀더
+      valEl.textContent = '••••••';
+      let revealed = null;
+      // 실제 비밀번호 길이 기반 마스킹을 위해 fetch
+      window.electronAPI.getPasswordDetail({ UID: entry.UID })
+        .then(res => {
           if (res.status && res.data.pwd) {
-            revealedPwd = res.data.pwd;
-            valEl.textContent = revealedPwd;
+            revealed = res.data.pwd;
+            valEl.textContent = '*'.repeat(revealed.length);
           }
-        } catch {}
+        })
+        .catch(() => {
+          // fetch 실패 시 placeholder 유지
+        });
+      valEl.addEventListener('mouseenter', async () => {
+        const res = await window.electronAPI.getPasswordDetail({ UID: entry.UID });
+        if (res.status && res.data.pwd) {
+          revealed = res.data.pwd;
+          valEl.textContent = revealed;
+        }
       });
       valEl.addEventListener('mouseleave', () => {
-        valEl.textContent = '****';
-        revealedPwd = null;
+        valEl.textContent = revealed ? '*'.repeat(revealed.length) : '••••••';
+        // revealed = null;  // 유지
       });
       valEl.addEventListener('click', async e => {
         e.stopPropagation();
-        try {
-          const textToCopy = revealedPwd || (await window.electronAPI.getPasswordDetail({ UID: entry.UID })).data.pwd;
-          await navigator.clipboard.writeText(textToCopy);
-          showToast('비밀번호 복사됨');
-        } catch {}
+        const toCopy = revealed || (await window.electronAPI.getPasswordDetail({ UID: entry.UID })).data.pwd;
+        await navigator.clipboard.writeText(toCopy);
+        showToast('비밀번호 복사됨');
       });
     } else {
-      valEl.textContent = v;
+      valEl.textContent = value;
+      valEl.classList.add('cursor-pointer');
+      valEl.addEventListener('click', e => {
+        e.stopPropagation();
+        navigator.clipboard.writeText(value);
+        showToast('복사되었습니다.');
+      });
     }
     row.append(keyEl, valEl);
     card.appendChild(row);
   });
 
-  // 3) Comments
-  if (entry.comments) {
-    const com = document.createElement('div');
-    com.className = 'mt-4 text-sm text-gray-600 whitespace-pre-wrap bg-gray-50 p-2 rounded';
-    com.textContent = entry.comments;
-    card.appendChild(com);
-  }
+  // // 3) Comments at bottom
+  // if (entry.comments) {
+  //   const com = document.createElement('div');
+  //   com.className = 'mt-4 text-sm text-gray-600 whitespace-pre-wrap bg-gray-50 p-2 rounded-lg';
+  //   com.textContent = entry.comments;
+  //   card.appendChild(com);
+  // }
+
 
   // 4) Click to open edit modal
-  card.addEventListener('click', () => openEditModal(entry.UID));
+  // (Removed: card click no longer opens edit modal)
   return card;
 };
 // Partial DOM update helpers
@@ -275,7 +386,7 @@ function setActiveButton(btn) {
 }
 
 // 네비게이션 클릭 시
-navHome.addEventListener('click', () => { goTo('home'); loadAndRenderList(); });
+navHome.addEventListener('click', () => { goTo('home'); loadAndRenderList(); updateAllCountButton(); });
 navStats.addEventListener('click', () => goTo('statistic'));
 navGroup.addEventListener('click', () => goTo('group'));
 navSetting.addEventListener('click', () => goTo('setting'));
@@ -306,7 +417,10 @@ function closeModal() {
 
 cancelBtn.addEventListener('click', closeModal);
 addModal.addEventListener('click', (e) => {
-  if (e.target === addModal) closeModal();
+  // 클릭한 요소가 모달 백그라운드 컨테이너일 때만 닫기 (e.currentTarget 사용)
+  if (e.target === e.currentTarget) {
+    closeModal();
+  }
 });
 
 // 유형별 버튼 참조
@@ -712,6 +826,17 @@ async function loadAndRenderList(query = '') {
   console.log('[home_renderer] ▶ loadAndRenderList 호출, query =', query);
   console.log('[home_renderer]    현재 dataset.page =', document.body.dataset.page);
 
+  // Update "전체" button with total password count on each load
+  window.electronAPI.getPasswordCount()
+    .then(res => {
+      if (res.status && res.data && typeof res.data.total === 'number') {
+        const btn = document.getElementById('btnAllCount');
+        if (btn) btn.textContent = `전체 ${res.data.total}개`;
+      }
+    })
+    .catch(err => console.error('getPasswordCount 오류:', err));
+
+
   // ─── 홈 화면이 아닐 땐 바로 돌아가기 (디버깅 후에도 남겨두세요)
   if (document.body.dataset.page !== 'home') {
     console.log('[home_renderer]    home 아님, 리턴');
@@ -747,6 +872,14 @@ async function loadAndRenderList(query = '') {
       Object.values(e).some(v => String(v).toLowerCase().includes(lower))
     );
   }
+  // 2) Sort favorites and non-favorites by created_at ascending
+  const favEntries = entries
+    .filter(e => e.favorite === true || e.favorite === 'true')
+    .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+  const nonFavEntries = entries
+    .filter(e => !(e.favorite === true || e.favorite === 'true'))
+    .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+  entries = favEntries.concat(nonFavEntries);
   if (!entries.length) {
     container.innerHTML = `<div class="col-span-1 text-center text-gray-500 italic py-8">저장된 비밀번호가 없습니다.</div>`;
     return;
@@ -762,25 +895,49 @@ async function loadAndRenderList(query = '') {
   scrollContainer.scrollTop = prevScroll;
 }
 
-
+// Helper: update the "전체" button count
+function updateAllCountButton() {
+  const btn = document.getElementById('btnAllCount');
+  if (!btn) return;
+  window.electronAPI.getPasswordCount()
+      .then(res => {
+        if (res.status && res.data && typeof res.data.total === 'number') {
+          btn.textContent = `전체 ${res.data.total}`;
+        }
+      })
+      .catch(err => console.error('getPasswordCount 오류:', err));
+}
 
 
 // ==================================== 비밀번호 업데이트 ==============================================
-// 모달 바깥 클릭 시 닫기
-editModal.addEventListener('click', e => {
-  if (e.target === editModal) editModal.classList.add('hidden');
-});
 // 취소 버튼
 cancelEdit.addEventListener('click', () => {
   editModal.classList.add('hidden');
 });
-// 지속적인 배경 클릭 시 모달 닫기
+
+// Modal background click handlers (generalized for all modals)
+// Background click closes Add Password Modal
+addModal.addEventListener('click', e => {
+  if (e.target.id === 'addPasswordModal') closeModal();
+});
+
+// Background click closes Edit Modal
 editModal.addEventListener('click', e => {
-  if (e.target === editModal) {
+  if (e.target.id === 'editModal') {
     editModal.classList.add('hidden');
     editModal.classList.remove('flex');
   }
 });
+
+// Background click closes Generator Modal
+const genModal = document.getElementById('generatorModal');
+if (genModal) {
+  genModal.addEventListener('click', e => {
+    if (e.target.id === 'generatorModal') {
+      genModal.classList.add('hidden');
+    }
+  });
+}
 
 // --- openEditModal 함수 ---
 async function openEditModal(uid) {
@@ -978,5 +1135,4 @@ async function openEditModal(uid) {
       saveEdit.click();
     }
   });
-
 }

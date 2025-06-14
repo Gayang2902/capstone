@@ -73,7 +73,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
             data: args
         }),
 
-    getPasswordCount: ()       => ipcRenderer.invoke('getPasswordCount'),
+    getPasswordCount: ()       => ipcRenderer.invoke('get-password-count'),
     getStrongCount:   ()       => ipcRenderer.invoke('getStrongCount'),
     getNormalCount:   ()       => ipcRenderer.invoke('getNormalCount'),
     getWeakCount:     ()       => ipcRenderer.invoke('getWeakCount'),
