@@ -60,7 +60,6 @@ window.createEntryCard = function(entry) {
   const card = document.createElement('div');
   card.className = `
     flex flex-col space-y-3 p-4 bg-white rounded-xl border border-gray-200 shadow-md w-full mb-4
-    transform transition duration-200 hover:shadow-lg hover:scale-105
     min-h-[240px]
   `;
   console.log('🛠️ [DEBUG] 카드 클래스:', card.className.trim().split(/\s+/));
@@ -68,7 +67,7 @@ window.createEntryCard = function(entry) {
 
   // 1) Header: Icon + Label + favorite icon
   const header = document.createElement('div');
-  header.className = 'flex justify-between items-center mb-2';
+  header.className = 'flex justify-between items-center mb-2 border-b border-gray-200 pb-2';
   // Left side: icon + title
   const leftDiv = document.createElement('div');
   leftDiv.className = 'flex items-center';
@@ -80,10 +79,10 @@ window.createEntryCard = function(entry) {
     iconEl = document.createElement('img');
     iconEl.src = `https://logo.clearbit.com/${domain}?size=32`;
     iconEl.alt = 'favicon';
-    iconEl.className = 'w-6 h-6 object-contain mr-2';
+    iconEl.className = 'w-8 h-8 object-contain mr-3';
   } else {
     iconEl = document.createElement('i');
-    iconEl.className = `${typeIconClasses[entry.type] || 'fa-solid fa-key text-gray-600'} text-xl mr-2`;
+    iconEl.className = `${typeIconClasses[entry.type] || 'fa-solid fa-key text-gray-600'} text-2xl mr-3`;
   }
   leftDiv.appendChild(iconEl);
   const title = document.createElement('span');
@@ -135,13 +134,40 @@ window.createEntryCard = function(entry) {
   }
   fields.forEach(([k, v]) => {
     const row = document.createElement('div');
-    row.className = 'flex flex-wrap mb-2';
+    row.className = 'flex flex-wrap mb-2 bg-gray-50 p-2 rounded-lg';
     const keyEl = document.createElement('span');
-    keyEl.className = 'font-medium mr-2';
+    keyEl.className = 'font-medium text-indigo-600 mr-2';
     keyEl.textContent = `${k}:`;
     const valEl = document.createElement('span');
-    valEl.textContent = v;
     valEl.classList.add('break-words');
+    valEl.classList.add('text-gray-800');
+    if (k === 'PWD') {
+      valEl.textContent = '****';
+      let revealedPwd = null;
+      valEl.addEventListener('mouseenter', async () => {
+        try {
+          const res = await window.electronAPI.getPasswordDetail({ UID: entry.UID });
+          if (res.status && res.data.pwd) {
+            revealedPwd = res.data.pwd;
+            valEl.textContent = revealedPwd;
+          }
+        } catch {}
+      });
+      valEl.addEventListener('mouseleave', () => {
+        valEl.textContent = '****';
+        revealedPwd = null;
+      });
+      valEl.addEventListener('click', async e => {
+        e.stopPropagation();
+        try {
+          const textToCopy = revealedPwd || (await window.electronAPI.getPasswordDetail({ UID: entry.UID })).data.pwd;
+          await navigator.clipboard.writeText(textToCopy);
+          showToast('비밀번호 복사됨');
+        } catch {}
+      });
+    } else {
+      valEl.textContent = v;
+    }
     row.append(keyEl, valEl);
     card.appendChild(row);
   });
@@ -149,7 +175,7 @@ window.createEntryCard = function(entry) {
   // 3) Comments
   if (entry.comments) {
     const com = document.createElement('div');
-    com.className = 'mt-4 text-sm text-gray-600 whitespace-pre-wrap';
+    com.className = 'mt-4 text-sm text-gray-600 whitespace-pre-wrap bg-gray-50 p-2 rounded';
     com.textContent = entry.comments;
     card.appendChild(com);
   }
