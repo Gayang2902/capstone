@@ -310,6 +310,44 @@ window.addEventListener('DOMContentLoaded', () => {
                   cardClone.parentElement.removeChild(cardClone);
                 }
               });
+
+              // Register reverse transition on background click
+              const closeHandler = () => {
+                // Shared-element close: reverse the open animation
+                const closeClone = card.cloneNode(true);
+                Object.assign(closeClone.style, {
+                  position: 'fixed',
+                  top: '0px',
+                  left: '0px',
+                  width: `${cardRect.width}px`,
+                  height: `${cardRect.height}px`,
+                  transformOrigin: 'top left',
+                  transform: `translate(${modalRect.left}px, ${modalRect.top}px) scale(${modalRect.width / cardRect.width}, ${modalRect.height / cardRect.height})`,
+                  transition: 'transform 300ms ease'
+                });
+                document.body.appendChild(closeClone);
+
+                // Hide modal immediately
+                modalInner.classList.remove('flipped');
+                setTimeout(() => modal.classList.add('hidden'), 0);
+
+                // Animate clone back to original card position/size
+                requestAnimationFrame(() => {
+                  closeClone.style.transform = `translate(${cardRect.left}px, ${cardRect.top}px) scale(1)`;
+                });
+                // Remove clone after animation
+                closeClone.addEventListener('transitionend', () => {
+                  closeClone.remove();
+                });
+
+                // Clean up listener
+                modal.removeEventListener('click', closeHandler);
+              };
+              modal.addEventListener('click', function modalBgHandler(e) {
+                if (e.target !== modal) return;
+                closeHandler();
+                modal.removeEventListener('click', modalBgHandler);
+              });
             });
         });
     });
@@ -329,12 +367,6 @@ window.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    modal.addEventListener('click', e => {
-        if (e.target === modal) {
-            inner.classList.remove('flipped');
-            modal.classList.add('hidden');
-        }
-    });
 });
 
 // 수정 모달 열기 함수 (그룹 페이지에 직접 구현)
