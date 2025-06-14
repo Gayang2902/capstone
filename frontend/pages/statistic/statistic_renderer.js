@@ -203,7 +203,28 @@ window.addEventListener('DOMContentLoaded', async () => {
   } catch { totalCountEl.textContent=weakCountEl.textContent=normalCountEl.textContent=secureCountEl.textContent='API 오류'; }
 
   // 2) Doughnut
-  new Chart(ctxPie,{ type:'doughnut', data:{ labels:['강력','보통','취약'], datasets:[{ data:[parseInt(secureCountEl.textContent),parseInt(normalCountEl.textContent),parseInt(weakCountEl.textContent)], spacing:6, backgroundColor:['rgba(72,187,120,0.8)','rgba(245,158,11,0.8)','rgba(239,68,68,0.8)'], borderWidth:0, cutout:'60%', hoverOffset:20 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'bottom'}, title:{display:true,text:'강도별 분포'} } } });
+  new Chart(ctxPie, {
+    type: 'doughnut',
+    data: {
+      labels: ['강력', '보통', '취약'],
+      datasets: [{
+        data: [parseInt(secureCountEl.textContent), parseInt(normalCountEl.textContent), parseInt(weakCountEl.textContent)],
+        spacing: 0,
+        borderWidth: 0,
+        backgroundColor: ['rgba(72,187,120,0.8)', 'rgba(245,158,11,0.8)', 'rgba(239,68,68,0.8)'],
+        cutout: '60%',
+        hoverOffset: 20
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom' },
+        title: { display: true, text: '강도별 분포' }
+      }
+    }
+  });
 
   // 3) Bar (Website, Server)
   const types=['website','server'], strongBy=[], normalBy=[], weakBy=[];
@@ -217,7 +238,27 @@ window.addEventListener('DOMContentLoaded', async () => {
     weakBy.push(w.status?w.data.total:0);
   }
   const grad=ctxBar.createLinearGradient(0,0,0,200); grad.addColorStop(0,'rgba(72,187,120,1)'); grad.addColorStop(1,'rgba(72,187,120,0.5)');
-  new Chart(ctxBar,{ type:'bar', data:{ labels:types.map(t=>t.charAt(0).toUpperCase()+t.slice(1)), datasets:[ {label:'취약',data:weakBy, backgroundColor:'rgba(239,68,68,0.8)', borderRadius:6, categoryPercentage:0.7, barPercentage:0.7}, {label:'보통',data:normalBy, backgroundColor:'rgba(245,158,11,0.8)', borderRadius:6, categoryPercentage:0.7, barPercentage:0.7}, {label:'강력',data:strongBy, backgroundColor:grad, borderRadius:6, categoryPercentage:0.7, barPercentage:0.7} ] }, options:{ responsive:true, maintainAspectRatio:false, scales:{ x:{grid:{display:false}}, y:{beginAtZero:true} }, plugins:{ legend:{position:'top'}, title:{display:true,text:'타입별 강도 분포'} } } });
+  new Chart(ctxBar,{ type:'bar', data:{ labels:types.map(t=>t.charAt(0).toUpperCase()+t.slice(1)), datasets:[
+      {label:'취약',data:weakBy, backgroundColor:'rgba(239,68,68,0.8)',
+        borderRadius:6,
+        categoryPercentage:0.7,
+        barPercentage:0.7
+      }, {label:'보통',data:normalBy,
+          backgroundColor:'rgba(245,158,11,0.8)',
+          // borderRadius:6,
+          categoryPercentage:0.7,
+          barPercentage:0.7
+        }, {label:'강력',data:strongBy,
+          backgroundColor:grad,
+          // borderRadius:6,
+          categoryPercentage:0.7,
+          barPercentage:0.7
+  } ]
+    }, options:{ responsive:true,
+      maintainAspectRatio:false,
+      scales:{ x:{grid:{display:false}}, y:{beginAtZero:true} },
+      plugins:{ legend:{position:'top'},
+        title:{display:true,text:'타입별 강도 분포'} } } });
 
   // 4) 재사용 / 오래된 모달 로직
   const reusedModal = document.getElementById('regenerated-modal');

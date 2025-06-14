@@ -186,7 +186,7 @@ function createMainWindow() {
 
     mainWindow.loadFile(path.join(__dirname, 'pages', 'start', 'start.html'));
 
-    mainWindow.webContents.openDevTools({ mode: 'right' }); // 개발자 모드
+    // mainWindow.webContents.openDevTools({ mode: 'right' }); // 개발자 모드
 }
 
 app.whenReady().then(() => {
