@@ -8,10 +8,8 @@
 using namespace std;
 using json = nlohmann::json;
 
-int main(int argc, char** argv) {
+int main(void) {
     initHandlers();
-
-    //cout << "RUNNING!!!" << "\n" << flush;
 
     while (true) {
         string raw;
@@ -33,7 +31,6 @@ int main(int argc, char** argv) {
             args[it.key()] = it.value().get<string>();
         }
 
-        // 메인 루틴
         handleOperation(oper, args);
     }
 

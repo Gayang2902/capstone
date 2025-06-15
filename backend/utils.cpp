@@ -111,3 +111,18 @@ bool checkRequiredArgs(const unordered_map<string, string>& args,
 
 	return true;
 }
+
+// 공통 필터링 로직 (검사해야하는 엔트리인지...)
+bool shouldConsiderPasswordForReused(const PasswordEntry& entry) {
+	// Check if password exists
+	if (entry.pwd.empty()) {
+		return false;
+	}
+
+	// Exclude specific tags from reused password consideration
+	const vector<string> except_tags = { "bankbook", "card", "wifi" };
+	if (find(except_tags.begin(), except_tags.end(), entry.type) != except_tags.end()) {
+		return false;
+	}
+	return true;
+}

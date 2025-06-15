@@ -11,20 +11,6 @@
 using namespace std;
 using json = nlohmann::json;
 
-// 공통 필터링 로직 (재사용 비밀번호)
-static bool shouldConsiderPasswordForReused(const PasswordEntry& entry) {
-    // Check if password exists
-    if (entry.pwd.empty()) {
-        return false;
-    }
-
-    // Exclude specific tags from reused password consideration
-    const vector<string> except_tags = { "bankbook", "card", "wifi" };
-    if (find(except_tags.begin(), except_tags.end(), entry.type) != except_tags.end()) {
-        return false;
-    }
-    return true;
-}
 // ——————————————————————————————————————————
 // 재사용된 비밀번호 조회 (그룹화됨)
 // ——————————————————————————————————————————

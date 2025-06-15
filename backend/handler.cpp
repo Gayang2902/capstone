@@ -13,12 +13,15 @@
 #include "response.hpp"
 #include "database.hpp"
 #include "utils.hpp"
+#include "json_c.hpp"
 
 #include "vuln.hpp"
 #include "old.hpp"
 #include "reuse.hpp"
+#include "leak.hpp"
 
 using namespace std;
+using json = nlohmann::json;
 
 // API를 함수 포인터로 관리
 using HandlerFunc = function<void(const unordered_map<string, string>&)>;
@@ -307,12 +310,12 @@ void initHandlers() {
 	handlerMap["getOldCount"] = onGetOldCount;
 	// VULN.
 	handlerMap["getVulnerablePasswords"] = onGetVulnerablePasswords;
-	handlerMap["getVulnerablePasswordCount"] = onGetVulnerablePasswordCount;
-	//// SETTINGS.
+	handlerMap["getVulnCount"] = onGetVulnCount;
+	// LEAKED.
+	handlerMap["getLeakedPasswords"] = onGetLeakedPasswords;
+	handlerMap["getLeakedCount"] = onGetLeakedCount;
+	// SETTINGS.
 	handlerMap["updateMasterKey"] = onUpdateMasterKey;
-
-	//// LEAKED.
-	//handlerMap["getLeakedPasswords"]
 }
 
 void handleOperation(const string& oper,

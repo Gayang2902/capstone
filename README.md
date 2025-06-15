@@ -23,6 +23,7 @@ beautiful/useful password manager
 - 필수 라이브러리
   - `libsodium`
   - `Crypto++`
+  - `libcurl 8.7.1 over`
 - Cmake (macOS/Linux)
 - Visual Studio (Windows)
 

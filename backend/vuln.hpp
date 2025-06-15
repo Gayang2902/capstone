@@ -5,4 +5,4 @@
 #include "database.hpp" 
 
 void onGetVulnerablePasswords(const unordered_map<string, string>& args);
-void onGetVulnerablePasswordCount(const unordered_map<string, string>& args);
+void onGetVulnCount(const unordered_map<string, string>& args);

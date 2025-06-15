@@ -77,7 +77,6 @@ void onGetVulnerablePasswords(const unordered_map<string, string>& args) {
             continue;
         }
 
-        // Only consider entries with passwords and not excluded tags for strength checks
         if (!shouldConsiderPassword(e)) {
             continue;
         }
@@ -100,7 +99,7 @@ void onGetVulnerablePasswords(const unordered_map<string, string>& args) {
 }
 
 // 비밀번호 개수 조회 핸들러 (통합 및 수정)
-void onGetVulnerablePasswordCount(const unordered_map<string, string>& args) {
+void onGetVulnCount(const unordered_map<string, string>& args) {
     if (!ensureDbInitialized()) return;
 
     string missing;
@@ -124,16 +123,15 @@ void onGetVulnerablePasswordCount(const unordered_map<string, string>& args) {
             continue;
         }
 
-        // Only consider entries with passwords and not excluded tags for strength checks
         if (!shouldConsiderPassword(e)) {
             continue;
         }
 
-        // Apply password strength filter and count
-        if (passwordType == "strong" && isStrongPassword(e.pwd)) {
-            ++cnt;
-        }
-        else if (passwordType == "normal" && isNormalPassword(e.pwd)) {
+        //// Apply password strength filter and count
+        //if (passwordType == "strong" && isStrongPassword(e.pwd)) {
+        //    ++cnt;
+        //}
+        if (passwordType == "normal" && isNormalPassword(e.pwd)) {
             ++cnt;
         }
         else if (passwordType == "weak" && isWeakPassword(e.pwd)) {

@@ -29,3 +29,6 @@ bool ensureDbInitialized();
 bool checkRequiredArgs(const unordered_map<string, string>& args,
 	const vector<string>& required_keys,
 	string& missing_key);
+
+// 공통 필터링 로직 (재사용 비밀번호)
+bool shouldConsiderPasswordForReused(const PasswordEntry& entry);
