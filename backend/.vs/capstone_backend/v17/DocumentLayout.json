@@ -3,32 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\millet\\capstone\\backend\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|C:\\Users\\millet\\capstone\\backend\\leak.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|solutionrelative:leak.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|C:\\Users\\millet\\capstone\\backend\\utils.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|solutionrelative:utils.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|C:\\Users\\millet\\capstone\\backend\\handler.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|solutionrelative:handler.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|C:\\Users\\millet\\capstone\\backend\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|solutionrelative:main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|C:\\Users\\millet\\capstone\\backend\\vuln.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|solutionrelative:vuln.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|C:\\Users\\millet\\capstone\\backend\\leak.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|solutionrelative:leak.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|C:\\Users\\millet\\capstone\\backend\\vuln.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|solutionrelative:vuln.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|C:\\Users\\millet\\capstone\\backend\\reuse.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
@@ -39,24 +19,60 @@
       "RelativeMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|solutionrelative:old.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|C:\\Users\\millet\\capstone\\backend\\json_c.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|solutionrelative:json_c.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|C:\\Users\\millet\\capstone\\backend\\leak.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|solutionrelative:leak.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|C:\\Users\\millet\\capstone\\backend\\utils.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|solutionrelative:utils.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|C:\\Users\\millet\\capstone\\backend\\handler.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|solutionrelative:handler.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|C:\\Users\\millet\\capstone\\backend\\database.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|solutionrelative:database.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|C:\\Users\\millet\\capstone\\backend\\reuse.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|solutionrelative:reuse.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|C:\\Users\\millet\\capstone\\backend\\json_c.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|solutionrelative:json_c.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|C:\\Users\\millet\\capstone\\backend\\response.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|solutionrelative:response.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|C:\\Users\\millet\\capstone\\backend\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|solutionrelative:main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|C:\\Users\\millet\\capstone\\backend\\database.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|solutionrelative:database.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|C:\\Users\\millet\\capstone\\backend\\global.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|solutionrelative:global.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|C:\\Users\\millet\\capstone\\backend\\handler.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|solutionrelative:handler.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|C:\\Users\\millet\\capstone\\backend\\leak.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|solutionrelative:leak.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|C:\\Users\\millet\\capstone\\backend\\old.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|solutionrelative:old.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|C:\\Users\\millet\\capstone\\backend\\reuse.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|solutionrelative:reuse.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|C:\\Users\\millet\\capstone\\backend\\utils.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|solutionrelative:utils.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|C:\\Users\\millet\\capstone\\backend\\vuln.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{F165015F-E1AD-491B-BE5B-5E46FAC641FE}|capstone_backend.vcxproj|solutionrelative:vuln.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
   "DocumentGroupContainers": [
@@ -70,150 +86,202 @@
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "utils.cpp",
-              "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\utils.cpp",
-              "RelativeDocumentMoniker": "utils.cpp",
-              "ToolTip": "C:\\Users\\millet\\capstone\\backend\\utils.cpp",
-              "RelativeToolTip": "utils.cpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAHUAAAAZAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2025-06-10T05:13:09.828Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "database.cpp",
-              "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\database.cpp",
-              "RelativeDocumentMoniker": "database.cpp",
-              "ToolTip": "C:\\Users\\millet\\capstone\\backend\\database.cpp",
-              "RelativeToolTip": "database.cpp",
-              "ViewState": "AgIAABcAAAAAAAAAAAAnwDMAAAAjAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2025-06-10T08:30:52.92Z",
+              "DocumentIndex": 7,
+              "Title": "json_c.hpp",
+              "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\json_c.hpp",
+              "RelativeDocumentMoniker": "json_c.hpp",
+              "ToolTip": "C:\\Users\\millet\\capstone\\backend\\json_c.hpp",
+              "RelativeToolTip": "json_c.hpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAHAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-06-16T01:31:43.054Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 5,
-              "Title": "leak.hpp",
-              "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\leak.hpp",
-              "RelativeDocumentMoniker": "leak.hpp",
-              "ToolTip": "C:\\Users\\millet\\capstone\\backend\\leak.hpp",
-              "RelativeToolTip": "leak.hpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAABBAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2025-06-14T14:14:45.632Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "vuln.cpp",
-              "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\vuln.cpp",
-              "RelativeDocumentMoniker": "vuln.cpp",
-              "ToolTip": "C:\\Users\\millet\\capstone\\backend\\vuln.cpp",
-              "RelativeToolTip": "vuln.cpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAE4AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2025-06-10T04:48:12.922Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "old.cpp",
-              "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\old.cpp",
-              "RelativeDocumentMoniker": "old.cpp",
-              "ToolTip": "C:\\Users\\millet\\capstone\\backend\\old.cpp",
-              "RelativeToolTip": "old.cpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2025-06-10T04:48:35.271Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "vuln.hpp",
-              "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\vuln.hpp",
-              "RelativeDocumentMoniker": "vuln.hpp",
-              "ToolTip": "C:\\Users\\millet\\capstone\\backend\\vuln.hpp",
-              "RelativeToolTip": "vuln.hpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAA7AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2025-06-10T04:49:16.664Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "main.cpp",
-              "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\main.cpp",
-              "RelativeDocumentMoniker": "main.cpp",
-              "ToolTip": "C:\\Users\\millet\\capstone\\backend\\main.cpp",
-              "RelativeToolTip": "main.cpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACEAAAAXAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2025-06-15T07:13:28.259Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "leak.cpp",
-              "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\leak.cpp",
-              "RelativeDocumentMoniker": "leak.cpp",
-              "ToolTip": "C:\\Users\\millet\\capstone\\backend\\leak.cpp",
-              "RelativeToolTip": "leak.cpp",
-              "ViewState": "AgIAAEgAAAAAAAAAAAAnwGoAAAAkAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2025-06-14T14:14:51.885Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
               "Title": "handler.cpp",
               "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\handler.cpp",
               "RelativeDocumentMoniker": "handler.cpp",
               "ToolTip": "C:\\Users\\millet\\capstone\\backend\\handler.cpp",
               "RelativeToolTip": "handler.cpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAUAAAAAAAAAA==",
+              "ViewState": "AgIAADYBAAAAAAAAAAAwwE0BAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2025-06-10T05:37:24.023Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 6,
+              "Title": "database.cpp",
+              "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\database.cpp",
+              "RelativeDocumentMoniker": "database.cpp",
+              "ToolTip": "C:\\Users\\millet\\capstone\\backend\\database.cpp",
+              "RelativeToolTip": "database.cpp",
+              "ViewState": "AgIAAIsBAAAAAAAAAAAAwJkBAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-06-10T08:30:52.92Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "response.hpp",
+              "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\response.hpp",
+              "RelativeDocumentMoniker": "response.hpp",
+              "ToolTip": "C:\\Users\\millet\\capstone\\backend\\response.hpp",
+              "RelativeToolTip": "response.hpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-06-15T21:21:28.409Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "main.cpp",
+              "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\main.cpp",
+              "RelativeDocumentMoniker": "main.cpp",
+              "ToolTip": "C:\\Users\\millet\\capstone\\backend\\main.cpp",
+              "RelativeToolTip": "main.cpp",
+              "ViewState": "AgIAABcAAAAAAAAAAAAqwCcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-06-15T07:13:28.259Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "vuln.cpp",
+              "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\vuln.cpp",
+              "RelativeDocumentMoniker": "vuln.cpp",
+              "ToolTip": "C:\\Users\\millet\\capstone\\backend\\vuln.cpp",
+              "RelativeToolTip": "vuln.cpp",
+              "ViewState": "AgIAAH0AAAAAAAAAAADwv5UAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-06-10T04:48:12.922Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "global.hpp",
+              "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\global.hpp",
+              "RelativeDocumentMoniker": "global.hpp",
+              "ToolTip": "C:\\Users\\millet\\capstone\\backend\\global.hpp",
+              "RelativeToolTip": "global.hpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-06-16T01:31:36.039Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "utils.cpp",
+              "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\utils.cpp",
+              "RelativeDocumentMoniker": "utils.cpp",
+              "ToolTip": "C:\\Users\\millet\\capstone\\backend\\utils.cpp",
+              "RelativeToolTip": "utils.cpp",
+              "ViewState": "AgIAAGYAAAAAAAAAAADwv3YAAAAPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-06-10T05:13:09.828Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "reuse.cpp",
               "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\reuse.cpp",
               "RelativeDocumentMoniker": "reuse.cpp",
               "ToolTip": "C:\\Users\\millet\\capstone\\backend\\reuse.cpp",
               "RelativeToolTip": "reuse.cpp",
-              "ViewState": "AgIAAC0AAAAAAAAAAAAAADgAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAADcAAAAAAAAAAADwv08AAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2025-06-10T04:49:04.471Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "json_c.hpp",
-              "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\json_c.hpp",
-              "RelativeDocumentMoniker": "json_c.hpp",
-              "ToolTip": "C:\\Users\\millet\\capstone\\backend\\json_c.hpp",
-              "RelativeToolTip": "json_c.hpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2025-06-15T07:26:06.45Z",
+              "DocumentIndex": 4,
+              "Title": "leak.cpp",
+              "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\leak.cpp",
+              "RelativeDocumentMoniker": "leak.cpp",
+              "ToolTip": "C:\\Users\\millet\\capstone\\backend\\leak.cpp",
+              "RelativeToolTip": "leak.cpp",
+              "ViewState": "AgIAAHkAAAAAAAAAAADwv5EAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-06-14T14:14:51.885Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "old.cpp",
+              "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\old.cpp",
+              "RelativeDocumentMoniker": "old.cpp",
+              "ToolTip": "C:\\Users\\millet\\capstone\\backend\\old.cpp",
+              "RelativeToolTip": "old.cpp",
+              "ViewState": "AgIAAEAAAAAAAAAAAADwv1gAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-06-10T04:48:35.271Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 12,
+              "Title": "handler.hpp",
+              "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\handler.hpp",
+              "RelativeDocumentMoniker": "handler.hpp",
+              "ToolTip": "C:\\Users\\millet\\capstone\\backend\\handler.hpp",
+              "RelativeToolTip": "handler.hpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-06-15T21:57:47.325Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "database.hpp",
+              "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\database.hpp",
+              "RelativeDocumentMoniker": "database.hpp",
+              "ToolTip": "C:\\Users\\millet\\capstone\\backend\\database.hpp",
+              "RelativeToolTip": "database.hpp",
+              "ViewState": "AgIAACkAAAAAAAAAAADgvzEAAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-06-10T08:30:54.597Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "leak.hpp",
+              "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\leak.hpp",
+              "RelativeDocumentMoniker": "leak.hpp",
+              "ToolTip": "C:\\Users\\millet\\capstone\\backend\\leak.hpp",
+              "RelativeToolTip": "leak.hpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-06-14T14:14:45.632Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "old.hpp",
+              "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\old.hpp",
+              "RelativeDocumentMoniker": "old.hpp",
+              "ToolTip": "C:\\Users\\millet\\capstone\\backend\\old.hpp",
+              "RelativeToolTip": "old.hpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-06-16T01:31:45.906Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
               "Title": "reuse.hpp",
               "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\reuse.hpp",
               "RelativeDocumentMoniker": "reuse.hpp",
@@ -221,32 +289,34 @@
               "RelativeToolTip": "reuse.hpp",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAoAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2025-06-10T04:49:34.419Z"
+              "WhenOpened": "2025-06-10T04:49:34.419Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 16,
               "Title": "utils.hpp",
               "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\utils.hpp",
               "RelativeDocumentMoniker": "utils.hpp",
               "ToolTip": "C:\\Users\\millet\\capstone\\backend\\utils.hpp",
               "RelativeToolTip": "utils.hpp",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAAACEAAABBAAAAAAAAAA==",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAACEAAABBAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
               "WhenOpened": "2025-06-10T04:49:39.304Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "database.hpp",
-              "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\database.hpp",
-              "RelativeDocumentMoniker": "database.hpp",
-              "ToolTip": "C:\\Users\\millet\\capstone\\backend\\database.hpp",
-              "RelativeToolTip": "database.hpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 17,
+              "Title": "vuln.hpp",
+              "DocumentMoniker": "C:\\Users\\millet\\capstone\\backend\\vuln.hpp",
+              "RelativeDocumentMoniker": "vuln.hpp",
+              "ToolTip": "C:\\Users\\millet\\capstone\\backend\\vuln.hpp",
+              "RelativeToolTip": "vuln.hpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2025-06-10T08:30:54.597Z"
+              "WhenOpened": "2025-06-10T04:49:16.664Z",
+              "EditorCaption": ""
             }
           ]
         }

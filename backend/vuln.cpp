@@ -37,6 +37,14 @@ static bool isWeakPassword(const string& pwd) {
 	return pwd.size() < 8;
 }
 
+// 소문자 변환
+static string toLower(const string& s) {
+    string rst = s;
+    transform(rst.begin(), rst.end(), rst.begin(), ::tolower);
+
+    return rst;
+}
+
 // 태그 필터링
 static bool shouldConsiderPassword(const PasswordEntry& entry) {
 	if (entry.pwd.empty()) {
@@ -60,9 +68,9 @@ void onGetVulnerablePasswords(const unordered_map<string, string>& args) {
         respondError("Missing parameter: type (strong, normal, weak)");
         return;
     }
-    string passwordType = args.at("type"); // Expected: "strong", "normal", "weak"
+    string passwordType = args.at("type"); 
 
-    string tag = ""; // Optional tag parameter
+    string tag = ""; 
     if (args.count("tag")) {
         tag = args.at("tag");
     }
@@ -72,8 +80,7 @@ void onGetVulnerablePasswords(const unordered_map<string, string>& args) {
     rst.reserve(entries.size());
 
     for (auto& e : entries) {
-        // Apply tag filter if specified
-        if (!tag.empty() && e.type != tag) {
+        if (!tag.empty() && toLower(e.type) != toLower(tag)) {
             continue;
         }
 
@@ -81,7 +88,6 @@ void onGetVulnerablePasswords(const unordered_map<string, string>& args) {
             continue;
         }
 
-        // Apply password strength filter
         if (passwordType == "strong" && isStrongPassword(e.pwd)) {
             rst.push_back(entryToJson(e, false));
         }
@@ -107,9 +113,9 @@ void onGetVulnCount(const unordered_map<string, string>& args) {
         respondError("Missing parameter: type (strong, normal, weak)");
         return;
     }
-    string passwordType = args.at("type"); // Expected: "strong", "normal", "weak"
+    string passwordType = args.at("type"); 
 
-    string tag = ""; // Optional tag parameter
+    string tag = ""; 
     if (args.count("tag")) {
         tag = args.at("tag");
     }
@@ -118,8 +124,7 @@ void onGetVulnCount(const unordered_map<string, string>& args) {
     size_t cnt = 0;
 
     for (auto& e : entries) {
-        // Apply tag filter if specified
-        if (!tag.empty() && e.type != tag) {
+        if (!tag.empty() && toLower(e.type) != toLower(tag)) {
             continue;
         }
 
@@ -127,11 +132,10 @@ void onGetVulnCount(const unordered_map<string, string>& args) {
             continue;
         }
 
-        //// Apply password strength filter and count
-        //if (passwordType == "strong" && isStrongPassword(e.pwd)) {
-        //    ++cnt;
-        //}
-        if (passwordType == "normal" && isNormalPassword(e.pwd)) {
+        if (passwordType == "strong" && isStrongPassword(e.pwd)) {
+            ++cnt;
+        }
+        else if (passwordType == "normal" && isNormalPassword(e.pwd)) {
             ++cnt;
         }
         else if (passwordType == "weak" && isWeakPassword(e.pwd)) {

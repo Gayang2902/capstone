@@ -174,25 +174,19 @@ bool Database::decryptAES256WithIV(const string& ciphertext,
     return true;
 }
 
-// --------------------------------------------------------
-// getAllData: 메모리 상의 전체 엔트리들을 복사해서 반환
-// --------------------------------------------------------
+// 메모리 상의 전체 엔트리들을 복사해서 반환
 vector<PasswordEntry> Database::getAllData() const {
     return entries;
 }
 
-// --------------------------------------------------------
-// addEntry: 새 PasswordEntry를 entries에 추가
-// --------------------------------------------------------
+// 새 PasswordEntry를 entries에 추가
 bool Database::addEntry(const PasswordEntry& new_entry) {
     entries.push_back(new_entry);
     is_modified = true;
     return true;
 }
 
-// --------------------------------------------------------
-// updateEntry: uid에 해당하는 항목을 찾아 필드 업데이트
-// --------------------------------------------------------
+// uid에 해당하는 항목을 찾아 필드 업데이트
 bool Database::updateEntry(const string& uid, const unordered_map<string, string>& args)
 {
     for (auto& e : entries) {
@@ -233,9 +227,7 @@ bool Database::updateEntry(const string& uid, const unordered_map<string, string
     return false;
 }
 
-// --------------------------------------------------------
-// deleteEntry: uid에 해당하는 항목 삭제
-// --------------------------------------------------------
+// uid에 해당하는 항목 삭제
 bool Database::deleteEntry(const string& uid) {
     auto it = remove_if(entries.begin(), entries.end(),
         [&](const PasswordEntry& e) { return e.UID == uid; });
@@ -245,9 +237,7 @@ bool Database::deleteEntry(const string& uid) {
     return true;
 }
 
-// --------------------------------------------------------
-// getEntry: uid에 해당하는 단일 항목 조회
-// --------------------------------------------------------
+// uid에 해당하는 단일 항목 조회
 PasswordEntry Database::getEntry(const string& uid) const {
     for (const auto& e : entries) {
         if (e.UID == uid) {
@@ -257,9 +247,7 @@ PasswordEntry Database::getEntry(const string& uid) const {
     return PasswordEntry{};
 }
 
-// --------------------------------------------------------
-// searchByTag: “type” 필드가 tag와 일치하는 모든 항목 반환
-// --------------------------------------------------------
+// “type” 필드가 tag와 일치하는 모든 항목 반환
 vector<PasswordEntry> Database::searchByTag(const string& tag) const {
     vector<PasswordEntry> rst;
     for (const auto& e : entries) {
@@ -270,14 +258,12 @@ vector<PasswordEntry> Database::searchByTag(const string& tag) const {
     return rst;
 }
 
-// 단순히 벡터 길이 반환
+// 벡터 길이 반환
 size_t Database::getPasswordCount() const {
     return entries.size();
 }
 
-// --------------------------------------------------------
-// updateMasterKey: 새 비밀번호로 Argon2 키 유도 → 전체 파일 재암호화
-// --------------------------------------------------------
+// 새 비밀번호로 Argon2 키 유도 후 전체 파일 재암호화
 bool Database::updateMasterKey(const string& new_user_password) {
     // 기존 키 메모리 덮어쓰기
     fill(master_key.begin(), master_key.end(), '\0');
@@ -296,9 +282,7 @@ bool Database::updateMasterKey(const string& new_user_password) {
     return true;
 }
 
-// --------------------------------------------------------
 // loadFromFile: 파일 읽기 → 복호화 → JSON 파싱 → 메모리에 로드
-// --------------------------------------------------------
 bool Database::loadFromFile() {
     // 파일을 읽어 암호화된 바이너리 데이터를 가져옴
     string encrypted = readAllBytes();
@@ -371,9 +355,7 @@ bool Database::loadFromFile() {
     return true;
 }
 
-// --------------------------------------------------------
-// saveToFile: entries → JSON dump → 암호화 → 파일 쓰기
-// --------------------------------------------------------
+// entries를 JSON로 dump -> 암호화 -> 파일 쓰기
 bool Database::saveToFile() {
     // entries 벡터를 JSON 배열로 직렬화
     json root = json::array();
@@ -411,7 +393,7 @@ bool Database::saveToFile() {
     }
     string plain = root.dump(); // 직렬화
 
-    // 2) 랜덤 IV 생성 → IV || ciphertext
+    // IV 생성
     string iv_bytes(AES::BLOCKSIZE, '\0');
     random_device rd;
     uniform_int_distribution<int> dist(0, 255);
@@ -425,7 +407,7 @@ bool Database::saveToFile() {
         return false;
     }
 
-    // 3) IV + ciphertext 결합하여 파일에 쓰기
+    // IV + ciphertext 결합하여 파일에 쓰기
     string combined = iv_bytes + cipher;
     if (!writeAllBytes(combined)) {
         printError("파일 쓰기 실패");

@@ -6,7 +6,7 @@
 
 using json = nlohmann::json;
 
-// Success.
+// 성공 응답
 inline void respondSuccess(const json& data = {}) {
     json j;
     j["status"] = true;
@@ -14,7 +14,7 @@ inline void respondSuccess(const json& data = {}) {
     std::cout << j.dump() << "\n" << flush; 
 }
 
-// Error.
+// 에러 응답
 inline void respondError(const std::string& message) {
     json j;
     j["status"] = false;

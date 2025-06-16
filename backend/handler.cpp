@@ -66,6 +66,7 @@ void onPostMasterKey(const unordered_map<string, string>& args) {
 
 	string master_key = args.at("master_key");
 	db = new Database(pending_path, master_key);
+
 	if (!db->loadFromFile()) {
 		respondError("Invalid master key.");
 		delete db;
@@ -97,24 +98,24 @@ void onCreatePasswordEntry(const unordered_map<string, string>& args) {
 	entry.type = args.at("type");
 
 	//> details.
-	entry.name			= args.count("name")		? args.at("name")			: "";
-	entry.pwd			= args.count("pwd")			? args.at("pwd")			: "";
-	entry.id			= args.count("id")			? args.at("id")				: "";
-	entry.host			= args.count("host")		? args.at("host")			: "";
-	entry.port			= args.count("port")		? args.at("port")			: "";
-	entry.num			= args.count("num")			? args.at("num")			: "";
-	entry.master		= args.count("master")		? args.at("master")			: "";
-	entry.citizen		= args.count("citizen")		? args.at("citizen")		: "";
-	entry.eng_name		= args.count("eng_name")	? args.at("eng_name")		: "";
-	entry.address		= args.count("address")		? args.at("address")		: "";
-	entry.birth_date	= args.count("birth_date")	? args.at("birth_date")		: "";
-	entry.content		= args.count("content")		? args.at("content")		: "";
-	entry.url			= args.count("url")			? args.at("url")			: "";
-	entry.email			= args.count("email")		? args.at("email")			: "";
-	entry.card_number	= args.count("card_number") ? args.at("card_number")	: "";
-	entry.cvc			= args.count("cvc")			? args.at("cvc")			: "";
-	entry.last_day		= args.count("last_day")	? args.at("last_day")		: "";
-	entry.bank_name		= args.count("bank_name")	? args.at("bank_name")		: "";
+	entry.name = args.count("name") ? args.at("name") : "";
+	entry.pwd = args.count("pwd") ? args.at("pwd") : "";
+	entry.id = args.count("id") ? args.at("id") : "";
+	entry.host = args.count("host") ? args.at("host") : "";
+	entry.port = args.count("port") ? args.at("port") : "";
+	entry.num = args.count("num") ? args.at("num") : "";
+	entry.master = args.count("master") ? args.at("master") : "";
+	entry.citizen = args.count("citizen") ? args.at("citizen") : "";
+	entry.eng_name = args.count("eng_name") ? args.at("eng_name") : "";
+	entry.address = args.count("address") ? args.at("address") : "";
+	entry.birth_date = args.count("birth_date") ? args.at("birth_date") : "";
+	entry.content = args.count("content") ? args.at("content") : "";
+	entry.url = args.count("url") ? args.at("url") : "";
+	entry.email = args.count("email") ? args.at("email") : "";
+	entry.card_number = args.count("card_number") ? args.at("card_number") : "";
+	entry.cvc = args.count("cvc") ? args.at("cvc") : "";
+	entry.last_day = args.count("last_day") ? args.at("last_day") : "";
+	entry.bank_name = args.count("bank_name") ? args.at("bank_name") : "";
 
 	if (!db->addEntry(entry)) {
 		respondError("Unable to create entry.");
@@ -134,7 +135,7 @@ void onUpdatePasswordEntry(const unordered_map<string, string>& args) {
 	if (!ensureDbInitialized()) return;
 
 	string missing;
-	if (!checkRequiredArgs(args, {"UID"}, missing)) {
+	if (!checkRequiredArgs(args, { "UID" }, missing)) {
 		respondError("Missing parameter: UID");
 		return;
 	}
@@ -155,7 +156,7 @@ void onDeletePasswordEntry(const unordered_map<string, string>& args) {
 	if (!ensureDbInitialized()) return;
 
 	string missing;
-	if (!checkRequiredArgs(args, {"UID"}, missing)) {
+	if (!checkRequiredArgs(args, { "UID" }, missing)) {
 		respondError("Missing parameter: UID");
 		return;
 	}
@@ -177,7 +178,7 @@ void onSearchPasswordEntry(const unordered_map<string, string>& args) {
 	if (!ensureDbInitialized()) return;
 
 	string missing;
-	if (!checkRequiredArgs(args, {"query"}, missing)) {
+	if (!checkRequiredArgs(args, { "query" }, missing)) {
 		respondError("Missing parameter: query");
 		return;
 	}
@@ -310,7 +311,7 @@ void initHandlers() {
 	handlerMap["getOldCount"] = onGetOldCount;
 	// VULN.
 	handlerMap["getVulnerablePasswords"] = onGetVulnerablePasswords;
-	handlerMap["getVulnCount"] = onGetVulnCount;
+	handlerMap["getVulnerablePasswordCount"] = onGetVulnCount;
 	// LEAKED.
 	handlerMap["getLeakedPasswords"] = onGetLeakedPasswords;
 	handlerMap["getLeakedCount"] = onGetLeakedCount;
@@ -320,7 +321,7 @@ void initHandlers() {
 
 void handleOperation(const string& oper,
 	const unordered_map<string, string>& args) {
-	
+
 	auto handler = handlerMap.find(oper);
 	// 핸들러 탐색
 	if (handler != handlerMap.end()) {

@@ -7,45 +7,35 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# 소스 파일
+# 소스 파일 목록
 set(SRC_FILES
     main.cpp
     handler.cpp
     database.cpp
     utils.cpp
-
     old.cpp
     reuse.cpp
     vuln.cpp
 )
 
-# 기본 include 디렉터리
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}
-)
+# 기본 include 경로
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-# 플랫폼별 구분 및 라이브러리 설정
+# 플랫폼별 구성
 if(WIN32)
-    message(WARNING "Windows: Visual Studio 솔루션(.sln)을 사용하세요.")
+    message(WARNING "Windows에서는 Visual Studio 솔루션(.sln)을 사용하세요.")
 
 elseif(APPLE)
     set(PLATFORM_DIR "mac")
 
-    find_path(SODIUM_INCLUDE_DIR sodium.h PATHS /opt/homebrew/include /usr/local/include)
-    find_library(SODIUM_LIB NAMES sodium PATHS /opt/homebrew/lib /usr/local/lib)
+    find_path(SODIUM_INCLUDE_DIR sodium.h HINTS /opt/homebrew/include /usr/local/include)
+    find_library(SODIUM_LIB NAMES sodium HINTS /opt/homebrew/lib /usr/local/lib)
 
-    find_path(CRYPTOPP_INCLUDE_DIR cryptopp/cryptlib.h PATHS /opt/homebrew/include /usr/local/include)
-    find_library(CRYPTOPP_LIB NAMES cryptopp PATHS /opt/homebrew/lib /usr/local/lib)
+    find_path(CRYPTOPP_INCLUDE_DIR cryptopp/cryptlib.h HINTS /opt/homebrew/include /usr/local/include)
+    find_library(CRYPTOPP_LIB NAMES cryptopp HINTS /opt/homebrew/lib /usr/local/lib)
 
-    if(NOT SODIUM_LIB OR NOT SODIUM_INCLUDE_DIR)
-        message(FATAL_ERROR "libsodium not found. brew install libsodium")
-    endif()
-    if(NOT CRYPTOPP_LIB OR NOT CRYPTOPP_INCLUDE_DIR)
-        message(FATAL_ERROR "cryptopp not found. brew install cryptopp")
-    endif()
-
-    include_directories(${SODIUM_INCLUDE_DIR} ${CRYPTOPP_INCLUDE_DIR})
-    link_libraries(${SODIUM_LIB} ${CRYPTOPP_LIB})
+    find_package(OpenSSL REQUIRED HINTS /opt/homebrew/opt/openssl /usr/local/opt/openssl)
+    find_package(CURL REQUIRED HINTS /opt/homebrew/opt/curl /usr/local/opt/curl)
 
 elseif(UNIX)
     set(PLATFORM_DIR "linux")
@@ -56,20 +46,47 @@ elseif(UNIX)
     find_path(CRYPTOPP_INCLUDE_DIR cryptopp/cryptlib.h PATHS /usr/include /usr/local/include)
     find_library(CRYPTOPP_LIB NAMES cryptopp PATHS /usr/lib /usr/local/lib)
 
-    if(NOT SODIUM_LIB OR NOT SODIUM_INCLUDE_DIR)
-        message(FATAL_ERROR "libsodium not found. sudo apt install libsodium-dev")
-    endif()
-    if(NOT CRYPTOPP_LIB OR NOT CRYPTOPP_INCLUDE_DIR)
-        message(FATAL_ERROR "cryptopp not found. sudo apt install libcrypto++-dev")
-    endif()
-
-    include_directories(${SODIUM_INCLUDE_DIR} ${CRYPTOPP_INCLUDE_DIR})
-    link_libraries(${SODIUM_LIB} ${CRYPTOPP_LIB})
+    find_package(OpenSSL REQUIRED)
+    find_package(CURL REQUIRED)
 endif()
 
-if(DEFINED PLATFORM_DIR)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PLATFORM_DIR})
+# 필수 라이브러리 확인
+if(NOT SODIUM_LIB OR NOT SODIUM_INCLUDE_DIR)
+    message(FATAL_ERROR "libsodium not found.")
+endif()
+if(NOT CRYPTOPP_LIB OR NOT CRYPTOPP_INCLUDE_DIR)
+    message(FATAL_ERROR "cryptopp not found.")
+endif()
+if(NOT OPENSSL_FOUND)
+    message(FATAL_ERROR "OpenSSL not found.")
+endif()
+if(NOT CURL_FOUND)
+    message(FATAL_ERROR "libcurl not found.")
 endif()
 
-# 실행 파일 생성
+# 빌드 타겟
 add_executable(main ${SRC_FILES})
+
+# include 경로 설정
+target_include_directories(main PRIVATE
+    ${SODIUM_INCLUDE_DIR}
+    ${CRYPTOPP_INCLUDE_DIR}
+    ${OPENSSL_INCLUDE_DIR}
+    ${CURL_INCLUDE_DIRS}
+)
+
+# 링크할 라이브러리
+target_link_libraries(main PRIVATE
+    ${SODIUM_LIB}
+    ${CRYPTOPP_LIB}
+    OpenSSL::SSL
+    OpenSSL::Crypto
+    CURL::libcurl
+)
+
+# 출력 디렉터리 설정
+if(DEFINED PLATFORM_DIR)
+    set_target_properties(main PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PLATFORM_DIR}
+    )
+endif()

@@ -1,14 +1,21 @@
 #include <iostream>
 #include <string>
 #include <unordered_map>
+#include <curl/curl.h>
 
 #include "json_c.hpp"
 #include "handler.hpp"
+#include "response.hpp"
 
 using namespace std;
 using json = nlohmann::json;
 
 int main(void) {
+    // libcurl 전역 초기화
+    if (curl_global_init(CURL_GLOBAL_DEFAULT) < 0) {
+        respondError("[ERROR] curl_global_init failed");
+    }
+    // 핸들러 초기화
     initHandlers();
 
     while (true) {
@@ -33,6 +40,8 @@ int main(void) {
 
         handleOperation(oper, args);
     }
+
+    curl_global_cleanup();
 
     return 0;
 }

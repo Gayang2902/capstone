@@ -52,33 +52,49 @@ static string sha1hex(const string& input) {
     return output;
 }
 
+// 유출 여부 확인
 static bool isLeakedOnline(const string& hash40) {
-    if (hash40.size() != 40) 
-        return false;
+    if (hash40.size() != 40) return false;
     string prefix = hash40.substr(0, 5);
     string suffix = hash40.substr(5);
 
-    string url = "https://api.pwnedpasswords.com/range/" + prefix; // 해시 앞 부분을 요청에 포함
+    //cerr << "[DEBUG] Checking leak for hash: " << hash40 << " (prefix=" << prefix << ", suffix=" << suffix << ")\n";
+
+    // libcurl 전역 초기화가 필요
+    string url = string("https://api.pwnedpasswords.com/range/") + prefix;
     CURL* curl = curl_easy_init();
-    if (!curl) 
+    if (!curl) {
+        cerr << "[DEBUG] curl init failed\n";
         return false;
+    }
 
     string response;
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlWriteCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
-    curl_easy_setopt(curl, CURLOPT_USERAGENT, "MyApp LeakChecker");
+    //// 디버깅용 SSL 옵션
+    //curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+    //curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+    //curl_easy_setopt(curl, CURLOPT_USERAGENT, "LeakChecker/Debug");
+
     CURLcode res = curl_easy_perform(curl);
+    long http_code = 0;
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
     curl_easy_cleanup(curl);
 
-    if (res != CURLE_OK) 
-        return false;
+    //cerr << "[DEBUG] curl result=" << res << ", http_code=" << http_code
+    //    << ", response_len=" << response.size() << "\n";
+    //if (res != CURLE_OK || http_code != 200) return false;
+
+    //// 응답 샘플
+    //cerr << "[DEBUG] response sample: " << response.substr(0, min<size_t>(200, response.size())) << "...\n";
 
     istringstream iss(response);
     string line;
     while (getline(iss, line)) {
         auto pos = line.find(':');
         if (pos != string::npos && line.substr(0, pos) == suffix) {
+            //cerr << "[DEBUG] Leak found: " << line << "\n";
             return true;
         }
     }

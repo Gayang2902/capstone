@@ -11,17 +11,15 @@
 using namespace std;
 using json = nlohmann::json;
 
-// ——————————————————————————————————————————
 // 재사용된 비밀번호 조회 (그룹화됨)
-// ——————————————————————————————————————————
 void onGetReusedPasswords(const unordered_map<string, string>&) {
     if (!ensureDbInitialized()) return;
 
-    // 1) DB에서 모든 엔트리 로드
+    // DB에서 모든 엔트리 로드
     vector<PasswordEntry> entries = db->getAllData();
 
-    // 2) 비밀번호별로 엔트리 그룹화 및 사용 횟수 카운트
-    unordered_map<string, vector<json>> groupedPasswords; // 키: 비밀번호, 값: 해당 비밀번호를 사용하는 엔트리들의 JSON 배열
+    // 비밀번호별로 엔트리 그룹화 및 사용 횟수 카운트
+    unordered_map<string, vector<json>> groupedPasswords;  // 키: 비밀번호, 값: 해당 비밀번호를 사용하는 엔트리들의 JSON 배열
     unordered_map<string, int> passwordCounts;             // 키: 비밀번호, 값: 해당 비밀번호의 사용 횟수
 
     for (auto& e : entries) {
@@ -36,8 +34,8 @@ void onGetReusedPasswords(const unordered_map<string, string>&) {
         groupedPasswords[e.pwd].push_back(entryToJson(e, false));
     }
 
-    // 3) 사용 횟수 >1인 비밀번호 그룹(엔트리 배열)만 최종 결과에 추가
-    vector<json> rst; // 최종 응답 데이터 (이중 배열이 될 것임)
+    // 사용 횟수 > 1인 비밀번호 그룹(엔트리 배열)만 최종 결과에 추가
+    vector<json> rst; 
     for (auto const& [pwd_value, entry_list] : groupedPasswords) {
         // 비밀번호가 1번 초과하여 사용된 경우 (재사용된 경우)
         if (passwordCounts[pwd_value] > 1) {
@@ -45,23 +43,19 @@ void onGetReusedPasswords(const unordered_map<string, string>&) {
         }
     }
 
-    // 4) 응답
     json data;
     data["data"] = move(rst);
     respondSuccess(data);
 }
 
-// ——————————————————————————————————————————
 // 재사용된 비밀번호 개수 조회
-// ——————————————————————————————————————————
 void onGetReusedCount(const unordered_map<string, string>&) {
     if (!ensureDbInitialized()) return;
 
     vector<PasswordEntry> entries = db->getAllData();
-    unordered_map<string, int> countMap; // To count occurrences of each password
+    unordered_map<string, int> countMap; 
 
     for (auto& e : entries) {
-        // Apply exclusion for specific tags
         if (!shouldConsiderPasswordForReused(e)) {
             continue;
         }
@@ -70,10 +64,8 @@ void onGetReusedCount(const unordered_map<string, string>&) {
         }
     }
 
-    // Count the total number of entries whose passwords are reused
     size_t totalReusedEntriesCount = 0;
     for (auto& e : entries) {
-        // Apply exclusion for specific tags
         if (!shouldConsiderPasswordForReused(e)) {
             continue;
         }
@@ -83,6 +75,6 @@ void onGetReusedCount(const unordered_map<string, string>&) {
     }
 
     json data;
-    data["total"] = totalReusedEntriesCount; // This is the count of all entries with reused passwords
+    data["total"] = totalReusedEntriesCount; 
     respondSuccess(data);
 }
