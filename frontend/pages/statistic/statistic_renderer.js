@@ -208,7 +208,9 @@ window.addEventListener('DOMContentLoaded', async () => {
     data: {
       labels: ['강력', '보통', '취약'],
       datasets: [{
-        data: [parseInt(secureCountEl.textContent), parseInt(normalCountEl.textContent), parseInt(weakCountEl.textContent)],
+        data: [parseInt(secureCountEl.textContent),
+          parseInt(normalCountEl.textContent),
+          parseInt(weakCountEl.textContent)],
         spacing: 0,
         borderWidth: 0,
         backgroundColor: ['rgba(72,187,120,0.8)', 'rgba(245,158,11,0.8)', 'rgba(239,68,68,0.8)'],
