@@ -16,14 +16,15 @@ set(SRC_FILES
     old.cpp
     reuse.cpp
     vuln.cpp
+    leak.cpp
 )
 
 # 기본 include 경로
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-# 플랫폼별 구성
+# 플랫폼 구분
 if(WIN32)
-    message(WARNING "Windows에서는 Visual Studio 솔루션(.sln)을 사용하세요.")
+    message(WARNING "Windows는 Visual Studio 솔루션(.sln)을 사용하세요.")
 
 elseif(APPLE)
     set(PLATFORM_DIR "mac")
@@ -54,17 +55,20 @@ endif()
 if(NOT SODIUM_LIB OR NOT SODIUM_INCLUDE_DIR)
     message(FATAL_ERROR "libsodium not found.")
 endif()
+
 if(NOT CRYPTOPP_LIB OR NOT CRYPTOPP_INCLUDE_DIR)
     message(FATAL_ERROR "cryptopp not found.")
 endif()
+
 if(NOT OPENSSL_FOUND)
     message(FATAL_ERROR "OpenSSL not found.")
 endif()
+
 if(NOT CURL_FOUND)
     message(FATAL_ERROR "libcurl not found.")
 endif()
 
-# 빌드 타겟
+# 실행 파일 생성
 add_executable(main ${SRC_FILES})
 
 # include 경로 설정
@@ -75,13 +79,13 @@ target_include_directories(main PRIVATE
     ${CURL_INCLUDE_DIRS}
 )
 
-# 링크할 라이브러리
+# 라이브러리 링크
 target_link_libraries(main PRIVATE
     ${SODIUM_LIB}
     ${CRYPTOPP_LIB}
     OpenSSL::SSL
     OpenSSL::Crypto
-    CURL::libcurl
+    ${CURL_LIBRARIES}
 )
 
 # 출력 디렉터리 설정
