@@ -85,7 +85,7 @@ target_link_libraries(main PRIVATE
     ${CRYPTOPP_LIB}
     OpenSSL::SSL
     OpenSSL::Crypto
-    ${CURL_LIBRARIES}
+    curl
 )
 
 # 출력 디렉터리 설정
