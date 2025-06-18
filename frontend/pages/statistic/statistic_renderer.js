@@ -44,11 +44,12 @@ window.createEntryCard = function(entry) {
   // card.appendChild(label);
 
   // 주요 필드
-  const mask = ()=>'****';
+  const mask = ()=>'**********';
+  const mask2 = ()=>'********';
   let fields = [];
-  if (entry.type==='website')      fields=[['ID',entry.id],['PWD',mask()],['E-Mail',entry.email]];
-  else if (entry.type==='server')  fields=[['ID',entry.id],['PWD',mask()],['','']];
-  else if (entry.type==='bankbook')fields=[['Num',entry.num],['PWD',mask()],['','']];
+  if (entry.type==='website')      fields=[['ID',entry.id],['Password',mask()]];
+  else if (entry.type==='server')  fields=[['ID',entry.id],['Password',mask2()],['','']];
+  else if (entry.type==='bankbook') fields = [['Num', entry.num], ['PWD', mask()], ['','']];
   else if (entry.type==='identity')fields=[['Name',entry.name],['Citizen',entry.citizen],['','']];
   else if (entry.type==='card')    fields=[['Num',entry.card_number],['PWD',mask()],['','']];
   else if (entry.type==='wifi')    fields=[['Name',entry.name],['PWD',mask()],['','']];
@@ -160,6 +161,58 @@ window.openEditModal = async function(uid) {
 
 
 // File: src/statistics/statistic_renderer.js
+// ─────────────────────────────────────────────────────────────
+// 공통 필드 설정: 유형별 필드 목록
+// ─────────────────────────────────────────────────────────────
+const fieldConfig = {
+  wifi: [
+    { key: 'name',     label: '이름' },
+    { key: 'pwd',      label: '비밀번호' },
+    { key: 'comments', label: '설명' }
+  ],
+  server: [
+    { key: 'id',       label: '아이디' },
+    { key: 'pwd',      label: '비밀번호' },
+    { key: 'host',     label: '호스트' },
+    { key: 'port',     label: '포트' },
+    { key: 'comments', label: '설명' }
+  ],
+  bankbook: [
+    { key: 'bank_name', label: '은행 이름' },
+    { key: 'num',       label: '계좌번호' },
+    { key: 'master',    label: '예금주' },
+    { key: 'pwd',       label: '계좌 비밀번호' },
+    { key: 'comments', label: '설명' }
+  ],
+  identity: [
+    { key: 'name',       label: '이름' },
+    { key: 'eng_name',   label: '영문이름' },
+    { key: 'address',    label: '주소' },
+    { key: 'birth_date', label: '생일' },
+    { key: 'citizen',    label: '주민번호' },
+    { key: 'comments', label: '설명' }
+  ],
+  security: [
+    { key: 'content',    label: '내용' },
+    { key: 'comments',   label: '설명' }
+  ],
+  website: [
+    { key: 'url',        label: 'URL' },
+    { key: 'id',         label: '아이디' },
+    { key: 'pwd',        label: '비밀번호' },
+    { key: 'email',      label: '이메일' },
+    { key: 'comments',   label: '설명' }
+  ],
+  card: [
+    { key: 'bank_name',   label: '은행이름' },
+    { key: 'name',        label: '예금주' },
+    { key: 'card_number', label: '카드 번호' },
+    { key: 'cvc',         label: 'CVC' },
+    { key: 'last_day',    label: '만료일' },
+    { key: 'comments',    label: '설명' }
+  ]
+};
+
 function showToast(message) {
   // Simple toast implementation
   let toast = document.createElement('div');
@@ -275,24 +328,11 @@ window.addEventListener('DOMContentLoaded', async () => {
       // 그룹이 2차원 배열로 옴
       const groups = res.data.data;
       window.sharedEntries = groups.flat();
-      groups.forEach(gr=>{
-        const grpDiv=document.createElement('div'); grpDiv.className='bg-white p-4 rounded-lg shadow mb-4';
+      groups.forEach(gr => {
+        const grpDiv = document.createElement('div');
+        grpDiv.className = 'bg-white p-4 rounded-lg shadow mb-4';
         gr.forEach(e => {
-          const card = createEntryCard(e);
-          // Remove or disable default click-to-edit logic: override with our own
-          card.addEventListener('click', async (evt) => {
-            evt.stopPropagation();
-            try {
-              const res = await window.electronAPI.getPasswordDetail({ UID: e.UID });
-              if (res.status && res.data) {
-                e.pwd = res.data.pwd || res.data.password;
-              }
-              window.sharedEntries = [e];
-              openEditModal(e.UID);
-            } catch {
-              showToast('비밀번호 상세 정보를 불러오는데 실패했습니다.');
-            }
-          });
+          const card = window.createEntryCard(e);
           grpDiv.appendChild(card);
         });
         reusedBody.appendChild(grpDiv);
@@ -355,4 +395,218 @@ window.addEventListener('DOMContentLoaded', async () => {
   expiredModal.addEventListener('click', e => {
     if (e.target === expiredModal) expiredModal.classList.add('hidden');
   });
+
+  // ─── 6) 오래된 비밀번호 모달 (버튼 정상 작동하도록 관리) ───
+  const leakedModal = document.getElementById('leaked-modal');
+  const leakedBody  = document.getElementById('leaked-modal-body');
+  document.getElementById('manageLeakedBtn').addEventListener('click', async () => {
+    window.sharedEntries = [];
+    leakedBody.innerHTML = '로딩 중...';
+
+    const res = await window.electronAPI.getLeakedPasswords();
+    leakedBody.innerHTML = '';
+
+    if (!res.status) {
+      // API 오류
+      leakedBody.innerHTML = `<p class="text-red-500">불러오기 실패: ${res.error_message}</p>`;
+    } else if (Array.isArray(res.data.data) && res.data.data.length === 0) {
+      // 데이터가 빈 배열인 경우
+      leakedBody.innerHTML = `
+        <div class="flex items-center justify-center h-full">
+          <p class="text-gray-500 text-lg">유출된 비밀번호 항목이 없습니다.</p>
+        </div>`;
+    } else {
+      // 정상적인 데이터 렌더링
+      window.sharedEntries = res.data.data;
+      res.data.data.forEach(entry => {
+        const card = createEntryCard(entry);
+        // Remove or disable default click-to-edit logic: override with our own
+        card.addEventListener('click', async (evt) => {
+          evt.stopPropagation();
+          try {
+            const res = await window.electronAPI.getPasswordDetail({ UID: entry.UID });
+            if (res.status && res.data) {
+              entry.pwd = res.data.pwd || res.data.password;
+            }
+            window.sharedEntries = [entry];
+            openEditModal(entry.UID);
+          } catch {
+            showToast('비밀번호 상세 정보를 불러오는데 실패했습니다.');
+          }
+        });
+        leakedBody.appendChild(card);
+      });
+    }
+
+    leakedModal.classList.remove('hidden');
+  });
+  ['closeLeakedModal','closeLeakedModalFooter'].forEach(id =>
+      document.getElementById(id).addEventListener('click', () =>
+          leakedModal.classList.add('hidden')
+      )
+  );
+  leakedModal.addEventListener('click', e => {
+    if (e.target === expiredModal) leakedModal.classList.add('hidden');
+  });
+
+
 });
+// ─────────────────────────────────────────────────────────────
+// 카드 생성 헬퍼: 홈 페이지와 동일한 레이아웃 사용
+// ─────────────────────────────────────────────────────────────
+const typeIconClasses = {
+  wifi: 'fa-solid fa-wifi text-indigo-500',
+  server: 'fa-solid fa-server text-blue-400',
+  bankbook: 'fa-solid fa-building-columns text-green-500',
+  identity: 'fa-solid fa-id-card text-purple-400',
+  security: 'fa-solid fa-shield-halved text-red-400',
+  website: 'fa-solid fa-globe text-gray-600',
+  card: 'fa-regular fa-credit-card text-pink-500'
+};
+window.createEntryCard = function(entry) {
+  const card = document.createElement('div');
+  card.className = `
+    flex flex-col space-y-3 p-4 bg-white rounded-xl border border-gray-200 shadow-md w-full mb-4
+    min-h-[240px]
+  `;
+  card.dataset.uid = entry.UID;
+
+  // 1) Header: Icon + Label + favorite, edit, delete
+  const header = document.createElement('div');
+  header.className = 'flex justify-between items-center mb-2 border-b border-gray-200 pb-2';
+  const leftDiv = document.createElement('div');
+  leftDiv.className = 'flex items-center';
+  let iconEl;
+  if (entry.type === 'website') {
+    let domain;
+    try { domain = new URL(entry.url).hostname; }
+    catch { domain = entry.url.replace(/^https?:\/\//, '').split('/')[0]; }
+    iconEl = document.createElement('img');
+    iconEl.src = `https://logo.clearbit.com/${domain}?size=32`;
+    iconEl.alt = 'favicon';
+    iconEl.className = 'w-8 h-8 object-contain mr-3';
+  } else {
+    iconEl = document.createElement('i');
+    iconEl.className = `${typeIconClasses[entry.type] || 'fa-solid fa-key text-gray-600'} text-2xl mr-3`;
+  }
+  leftDiv.appendChild(iconEl);
+  const title = document.createElement('span');
+  title.className = 'text-lg font-semibold';
+  title.textContent = entry.label || entry.type;
+  leftDiv.appendChild(title);
+  const modSpan = document.createElement('span');
+  modSpan.className = 'text-sm text-gray-500 ml-4';
+  modSpan.textContent = `최근 수정일: ${entry.modified_at}`;
+  leftDiv.appendChild(modSpan);
+  header.appendChild(leftDiv);
+
+  const rightDiv = document.createElement('div');
+  rightDiv.className = 'flex items-center space-x-2';
+  const favIcon = document.createElement('i');
+  favIcon.className = (entry.favorite === true || entry.favorite === 'true')
+    ? 'fa-solid fa-star text-yellow-500 text-xl cursor-pointer'
+    : 'fa-regular fa-star text-gray-400 text-xl cursor-pointer';
+  favIcon.addEventListener('click', async e => {
+    e.stopPropagation();
+    const cardEl = document.querySelector(`[data-uid="${entry.UID}"]`);
+    const firstRect = cardEl.getBoundingClientRect();
+    entry.favorite = !(entry.favorite === true || entry.favorite === 'true');
+    favIcon.classList.toggle('fa-solid', entry.favorite);
+    favIcon.classList.toggle('fa-regular', !entry.favorite);
+    favIcon.classList.toggle('text-yellow-500', entry.favorite);
+    favIcon.classList.toggle('text-gray-400', !entry.favorite);
+    try {
+      await window.electronAPI.updatePasswordEntry({
+        UID: entry.UID,
+        favorite: entry.favorite.toString()
+      });
+    } catch {}
+    const container = document.getElementById('card-container');
+    if (entry.favorite) container.prepend(cardEl);
+    else container.appendChild(cardEl);
+    const lastRect = cardEl.getBoundingClientRect();
+    const deltaY = firstRect.top - lastRect.top;
+    cardEl.style.transform = `translateY(${deltaY}px)`;
+    cardEl.style.transition = 'transform 300ms ease';
+    requestAnimationFrame(() => { cardEl.style.transform = ''; });
+  });
+  const editIcon = document.createElement('i');
+  editIcon.className = 'fa-solid fa-pen text-blue-500 text-xl cursor-pointer';
+  editIcon.addEventListener('click', e => {
+    e.stopPropagation();
+    openEditModal(entry.UID);
+  });
+  const delIcon = document.createElement('i');
+  delIcon.className = 'fa-solid fa-trash text-red-500 text-xl cursor-pointer ml-3';
+  delIcon.addEventListener('click', async e => {
+    e.stopPropagation();
+    if (!confirm('정말 삭제하시겠습니까?')) return;
+    try {
+      const res = await window.electronAPI.deletePasswordEntry(entry.UID);
+      if (res.status) {
+        removeCard(entry.UID);
+        showToast('삭제되었습니다.');
+      } else {
+        showToast('삭제 실패: ' + res.error_message, 'error');
+      }
+    } catch {
+      showToast('삭제 오류', 'error');
+    }
+  });
+  rightDiv.append(favIcon, editIcon, delIcon);
+  header.appendChild(rightDiv);
+  card.appendChild(header);
+
+  // 2) Field list
+  const config = fieldConfig[entry.type] || [];
+  config.forEach(({ key, label }) => {
+    const value = entry[key];
+    if (key !== 'pwd' && (value == null || value === '')) return;
+    const row = document.createElement('div');
+    row.className = 'flex flex-wrap mb-2 bg-gray-50 p-2 rounded-lg';
+    const keyEl = document.createElement('span');
+    keyEl.className = 'font-medium text-indigo-600 mr-2';
+    keyEl.textContent = `${label}:`;
+    const valEl = document.createElement('span');
+    valEl.classList.add('break-words','text-gray-800');
+    if (key === 'pwd') {
+      valEl.textContent = '••••••';
+      let revealed = null;
+      window.electronAPI.getPasswordDetail({ UID: entry.UID })
+        .then(res => {
+          if (res.status && res.data.pwd) {
+            revealed = res.data.pwd;
+            valEl.textContent = '*'.repeat(revealed.length);
+          }
+        });
+      valEl.addEventListener('mouseenter', async () => {
+        const res = await window.electronAPI.getPasswordDetail({ UID: entry.UID });
+        if (res.status && res.data.pwd) {
+          revealed = res.data.pwd;
+          valEl.textContent = revealed;
+        }
+      });
+      valEl.addEventListener('mouseleave', () => {
+        valEl.textContent = revealed ? '*'.repeat(revealed.length) : '••••••';
+      });
+      valEl.addEventListener('click', async e => {
+        e.stopPropagation();
+        const toCopy = revealed || (await window.electronAPI.getPasswordDetail({ UID: entry.UID })).data.pwd;
+        await navigator.clipboard.writeText(toCopy);
+        showToast('비밀번호 복사됨');
+      });
+    } else {
+      valEl.textContent = value;
+      valEl.classList.add('cursor-pointer');
+      valEl.addEventListener('click', e => {
+        e.stopPropagation();
+        navigator.clipboard.writeText(value);
+        showToast('복사되었습니다.');
+      });
+    }
+    row.append(keyEl, valEl);
+    card.appendChild(row);
+  });
+
+  return card;
+};

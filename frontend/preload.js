@@ -102,6 +102,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getOldCount: () =>
         ipcRenderer.invoke('getOldCount'),
 
+    // 유출된 비밀번호 리스트 조회
+    getLeakedPasswords: () =>
+        ipcRenderer.invoke('getLeakedPasswords'),
+
+    // 유출된 비밀번호 개수 조회
+    getLeakedCount: () =>
+        ipcRenderer.invoke('getLeakedCount'),
+
     // 클립보드 쓰기 (30초 후 자동 삭제)
     writeClipboard: text => ipcRenderer.invoke('writeClipboard', text),
 

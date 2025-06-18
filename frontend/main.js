@@ -704,6 +704,28 @@ ipcMain.handle('getOldCount', async () => {
     }
 });
 
+// 유출된 비밀번호 리스트
+ipcMain.handle('getLeakedPasswords', async () => {
+    if (!currentFilePath) return { status:false, error_message:'파일이 선택되지 않았습니다.' };
+    try {
+        const resp = await sendToBackend('getLeakedPasswords', { file_path: currentFilePath });
+        return resp;
+    } catch (err) {
+        return { status:false, error_message: err.message };
+    }
+});
+
+// 유출된 비밀번호 개수
+ipcMain.handle('getLeakedCount', async () => {
+    if (!currentFilePath) return { status:false, error_message:'파일이 선택되지 않았습니다.' };
+    try {
+        const resp = await sendToBackend('getLeakedCount', { file_path: currentFilePath });
+        return resp;
+    } catch (err) {
+        return { status:false, error_message: err.message };
+    }
+});
+
 ipcMain.handle('getPasswordsByTag', async (_evt, { tag }) => {
     if (!currentFilePath) {
         return { status: false, error_message: '파일이 선택되지 않았습니다.' };
