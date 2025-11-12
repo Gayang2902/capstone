@@ -179,6 +179,8 @@ async function getSaltForUser(username) {
   if (!payload.salt) {
     throw new Error('Server did not return salt');
   }
+  console.log(`[ZKP] salt for ${username}: ${payload.salt}`);
+  // console.log(publicVerifierBigInt.toString());
   return payload.salt;
 }
 

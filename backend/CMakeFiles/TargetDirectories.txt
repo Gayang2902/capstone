@@ -1,0 +1,3 @@
+/Users/baki/Desktop/final/capstone/backend/CMakeFiles/main.dir
+/Users/baki/Desktop/final/capstone/backend/CMakeFiles/edit_cache.dir
+/Users/baki/Desktop/final/capstone/backend/CMakeFiles/rebuild_cache.dir
