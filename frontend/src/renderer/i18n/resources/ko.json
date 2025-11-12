@@ -205,7 +205,7 @@
   "setting": {
     "titles": {
       "database": "데이터베이스 설정",
-      "export": "데이터 내보내기"
+      "transfer": "파일 업로드 / 다운로드"
     },
     "labels": {
       "databasePath": "데이터베이스 경로",
@@ -213,27 +213,41 @@
       "currentPassword": "기존 비밀번호",
       "newPassword": "새 비밀번호",
       "autoLock": "자동 잠금 설정",
-      "inactive": "비활성화 시간"
+      "inactive": "비활성화 시간",
+      "zkpUsername": "ZKP 사용자명",
+      "zkpPassword": "ZKP 비밀번호"
     },
     "actions": {
       "exportFile": "파일 내보내기",
       "change": "변경하기",
-      "exportCsv": "CSV 내보내기"
+      "exportCsv": "CSV 내보내기",
+      "zkpSignup": "회원가입",
+      "zkpLogin": "로그인",
+      "zkpUpload": "파일 업로드",
+      "zkpDownload": "파일 다운로드"
     },
     "hints": {
       "autoLock": "선택된 시간이 지나면 자동으로 잠금 화면으로 돌아갑니다.",
-      "export": "현재 데이터베이스를 CSV 파일로 내보냅니다. 내보낸 파일은 안전한 위치에 보관하세요."
+      "export": "현재 데이터베이스를 CSV 파일로 내보냅니다. 내보낸 파일은 안전한 위치에 보관하세요.",
+      "transfer": "제로 지식 인증 서버로 현재 데이터베이스를 업로드하거나 서버에 저장된 파일을 내려받습니다."
     },
     "status": {
       "noPath": "경로를 불러올 수 없습니다.",
       "masterChanged": "마스터 비밀번호가 성공적으로 변경되었습니다.",
-      "exported": "내보내기 완료: {{path}}"
+      "exported": "내보내기 완료: {{path}}",
+      "zkpSuccess": "요청이 완료되었습니다.",
+      "zkpSignedUp": "회원가입이 완료되었습니다.",
+      "zkpLoggedIn": "로그인에 성공했습니다.",
+      "zkpUploaded": "서버에 파일이 업로드되었습니다.",
+      "zkpDownloaded": "다운로드 완료: {{path}}"
     },
     "errors": {
       "oldRequired": "기존 마스터 비밀번호를 입력해주세요.",
       "newRequired": "새 마스터 비밀번호를 입력해주세요.",
       "changeFailed": "변경 실패",
-      "exportFailed": "내보내기 실패"
+      "exportFailed": "내보내기 실패",
+      "credentialsRequired": "아이디와 비밀번호를 모두 입력해주세요.",
+      "zkpGeneric": "요청을 처리할 수 없습니다."
     },
     "autoLock": {
       "minutes": "{{count}}분"

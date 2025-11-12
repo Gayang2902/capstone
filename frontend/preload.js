@@ -122,4 +122,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // 태그별 PW 가져오기
     getPasswordsByTag: (tag) => ipcRenderer.invoke('getPasswordsByTag', { tag }),
 
+    // ZKP 서버 연동
+    zkpSignup: (username, password) => ipcRenderer.invoke('zkp:signup', { username, password }),
+    zkpLogin: (username, password) => ipcRenderer.invoke('zkp:login', { username, password }),
+    zkpUpload: () => ipcRenderer.invoke('zkp:upload'),
+    zkpDownload: () => ipcRenderer.invoke('zkp:download'),
+
 });

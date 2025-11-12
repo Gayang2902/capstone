@@ -36,7 +36,11 @@ const SettingPage = () => {
   const [statusMessage, setStatusMessage] = useState('');
   const [statusTone, setStatusTone] = useState('neutral');
   const [autoLock, setAutoLock] = useState(() => localStorage.getItem('autoLockMinutes') || '5');
-  const [exportStatus, setExportStatus] = useState('');
+  const [zkpUsername, setZkpUsername] = useState('');
+  const [zkpPassword, setZkpPassword] = useState('');
+  const [zkpPasswordVisible, setZkpPasswordVisible] = useState(false);
+  const [zkpStatus, setZkpStatus] = useState({ tone: 'neutral', message: '' });
+  const [zkpLoading, setZkpLoading] = useState(false);
 
   useEffect(() => {
     const fetchPath = async () => {
@@ -65,7 +69,6 @@ const SettingPage = () => {
     setAutoLock(value);
     localStorage.setItem('autoLockMinutes', value);
     resetTimer();
-    setExportStatus('');
   };
 
   const handleMasterChange = async () => {
@@ -93,18 +96,64 @@ const SettingPage = () => {
     }
   };
 
-  const handleExport = async () => {
+  const runZkpAction = async (action, successResolver) => {
+    if (!electronAPI) return;
+    setZkpLoading(true);
+    setZkpStatus({ tone: 'neutral', message: '' });
     try {
-      const res = await electronAPI?.exportCsv?.();
-      if (res?.status) {
-        setExportStatus(t('setting.status.exported', { path: res.file_path || '' }));
-      } else {
-        throw new Error(res?.error_message || t('setting.errors.exportFailed'));
+      const result = await action();
+      if (!result?.status) {
+        throw new Error(result?.error_message || t('setting.errors.zkpGeneric'));
       }
+      const message =
+        typeof successResolver === 'function'
+          ? successResolver(result)
+          : successResolver || result.message || t('setting.status.zkpSuccess');
+      setZkpStatus({ tone: 'success', message });
     } catch (error) {
-      setExportStatus(error.message || t('setting.errors.exportFailed'));
+      setZkpStatus({ tone: 'error', message: error.message || t('setting.errors.zkpGeneric') });
+    } finally {
+      setZkpLoading(false);
     }
   };
+
+  const handleZkpSignup = () => {
+    if (!zkpUsername.trim() || !zkpPassword.trim()) {
+      setZkpStatus({ tone: 'error', message: t('setting.errors.credentialsRequired') });
+      return;
+    }
+    runZkpAction(
+      () => electronAPI?.zkpSignup?.(zkpUsername.trim(), zkpPassword),
+      t('setting.status.zkpSignedUp')
+    );
+  };
+
+  const handleZkpLogin = () => {
+    if (!zkpUsername.trim() || !zkpPassword.trim()) {
+      setZkpStatus({ tone: 'error', message: t('setting.errors.credentialsRequired') });
+      return;
+    }
+    runZkpAction(
+      () => electronAPI?.zkpLogin?.(zkpUsername.trim(), zkpPassword),
+      t('setting.status.zkpLoggedIn')
+    );
+  };
+
+  const handleZkpUpload = () => {
+    runZkpAction(
+      () => electronAPI?.zkpUpload?.(),
+      t('setting.status.zkpUploaded')
+    );
+  };
+
+  const handleZkpDownload = () => {
+    runZkpAction(
+      () => electronAPI?.zkpDownload?.(),
+      (res) => t('setting.status.zkpDownloaded', { path: res?.file_path || '' })
+    );
+  };
+
+  const hasCredentials = zkpUsername.trim() !== '' && zkpPassword.trim() !== '';
 
   return (
     <AppShell>
@@ -208,19 +257,103 @@ const SettingPage = () => {
         </Card>
 
         <Card variant="outlined">
-          <CardHeader title={t('setting.titles.export')} />
+          <CardHeader title={t('setting.titles.transfer')} />
           <CardContent>
-            <Typography variant="body2" color="text.secondary">
-              {t('setting.hints.export')}
-            </Typography>
-            <Button variant="contained" color="success" sx={{ mt: 2 }} onClick={handleExport}>
-              {t('setting.actions.exportCsv')}
-            </Button>
-            {exportStatus && (
-              <Alert severity="info" sx={{ mt: 2 }}>
-                {exportStatus}
-              </Alert>
-            )}
+            <Stack spacing={2}>
+              <Typography variant="body2" color="text.secondary">
+                {t('setting.hints.transfer')}
+              </Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label={t('setting.labels.zkpUsername')}
+                    value={zkpUsername}
+                    onChange={(event) => setZkpUsername(event.target.value)}
+                    disabled={zkpLoading}
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label={t('setting.labels.zkpPassword')}
+                    type={zkpPasswordVisible ? 'text' : 'password'}
+                    value={zkpPassword}
+                    onChange={(event) => setZkpPassword(event.target.value)}
+                    disabled={zkpLoading}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={() => setZkpPasswordVisible((prev) => !prev)}>
+                            {zkpPasswordVisible ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+              </Grid>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    fullWidth
+                    disabled={!hasCredentials || zkpLoading}
+                    onClick={handleZkpSignup}
+                  >
+                    {t('setting.actions.zkpSignup')}
+                  </Button>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                    disabled={!hasCredentials || zkpLoading}
+                    onClick={handleZkpLogin}
+                  >
+                    {t('setting.actions.zkpLogin')}
+                  </Button>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Button
+                    variant="contained"
+                    color="success"
+                    fullWidth
+                    disabled={zkpLoading}
+                    onClick={handleZkpUpload}
+                  >
+                    {t('setting.actions.zkpUpload')}
+                  </Button>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    fullWidth
+                    disabled={zkpLoading}
+                    onClick={handleZkpDownload}
+                  >
+                    {t('setting.actions.zkpDownload')}
+                  </Button>
+                </Grid>
+              </Grid>
+              {zkpStatus.message && (
+                <Alert
+                  severity={
+                    zkpStatus.tone === 'error'
+                      ? 'error'
+                      : zkpStatus.tone === 'success'
+                        ? 'success'
+                        : 'info'
+                  }
+                  sx={{ mt: 1 }}
+                >
+                  {zkpStatus.message}
+                </Alert>
+              )}
+            </Stack>
           </CardContent>
         </Card>
       </Stack>

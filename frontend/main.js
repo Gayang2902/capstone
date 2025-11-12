@@ -9,7 +9,9 @@ const { registerFileHandlers } = require('./src/ipc/fileHandlers');
 const { registerPasswordHandlers } = require('./src/ipc/passwordHandlers');
 const { registerStatsHandlers } = require('./src/ipc/statsHandlers');
 const { registerUtilHandlers } = require('./src/ipc/utilHandlers');
+const { registerZkpHandlers } = require('./src/ipc/zkpHandlers');
 
+const ENABLE_DEVTOOLS = process.env.ENABLE_DEVTOOLS !== '0';
 
 let mainWindow;
 let backendProcess;
@@ -52,7 +54,7 @@ function startBackend() {
     let exePath;
     switch (process.platform) {
         case 'darwin':
-            exePath = path.join(__dirname, '..', 'backend', 'build', 'mac', 'mac', 'main');
+            exePath = path.join(__dirname, '..', 'backend', 'mac', 'main');
             break;
         case 'win32':
             exePath = path.join(__dirname, '..', 'backend', 'x64', 'Release', 'capstone_backend.exe');
@@ -200,6 +202,14 @@ function createMainWindow() {
         const distPath = path.join(__dirname, 'dist', 'index.html');
         mainWindow.loadFile(distPath);
     }
+
+    if (ENABLE_DEVTOOLS) {
+        mainWindow.webContents.on('did-finish-load', () => {
+            if (!mainWindow.isDestroyed()) {
+                mainWindow.webContents.openDevTools({ mode: 'detach' });
+            }
+        });
+    }
 }
 
 
@@ -222,6 +232,7 @@ app.whenReady().then(() => {
     registerPasswordHandlers(ipcMain, context);
     registerStatsHandlers(ipcMain, context);
     registerUtilHandlers(ipcMain, mainWindow);
+    registerZkpHandlers(ipcMain, context, mainWindow);
 
 
     globalShortcut.register('CommandOrControl+Q', () => {
