@@ -1,0 +1,310 @@
+{
+  "common": {
+    "appName": "Password Manager",
+    "processing": "Processing...",
+    "loading": "Loading...",
+    "darkModeToggle": "Toggle dark mode",
+    "confirmDelete": "Do you want to delete this item?",
+    "errors": {
+      "delete": "An error occurred while deleting.",
+      "saveFailed": "Failed to save.",
+      "saveGeneric": "An error occurred while saving.",
+      "updateFailed": "Failed to update.",
+      "updateGeneric": "An error occurred while updating.",
+      "fetchList": "Unable to load the list.",
+      "labelRequired": "Please enter a label."
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving...",
+      "edit": "Edit",
+      "delete": "Delete",
+      "copy": "Copy",
+      "close": "Close",
+      "favorite": "Favorite",
+      "toggleFavorite": "Toggle favorite",
+      "refresh": "Refresh",
+      "add": "Add",
+      "view": "View",
+      "hide": "Hide",
+      "language": "Language",
+      "generate": "Generate",
+      "regenerate": "Refresh",
+      "open": "Open",
+      "create": "Create",
+      "authenticate": "Authenticate",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password"
+    },
+    "fields": {
+      "comments": "Comments",
+      "name": "Name",
+      "password": "Password",
+      "id": "ID",
+      "host": "Host",
+      "port": "Port",
+      "bankName": "Bank Name",
+      "accountNumber": "Account Number",
+      "accountHolder": "Account Holder",
+      "accountPassword": "Account Password",
+      "englishName": "English Name",
+      "address": "Address",
+      "birthday": "Date of Birth",
+      "nationalId": "National ID",
+      "content": "Content",
+      "url": "URL",
+      "email": "Email",
+      "cardNumber": "Card Number",
+      "cvc": "CVC",
+      "expiry": "Expiry Date"
+    }
+  },
+  "types": {
+    "wifi": "Wi-Fi",
+    "server": "Server",
+    "bankbook": "Bankbook",
+    "identity": "Identity",
+    "security": "Security",
+    "website": "Website",
+    "card": "Card",
+    "unknown": "Unknown"
+  },
+  "navigation": {
+    "home": "Home",
+    "statistic": "Statistics",
+    "group": "Group",
+    "chatbot": "Chatbot",
+    "setting": "Settings"
+  },
+  "shell": {
+    "tooltips": {
+      "openGenerator": "Open password generator",
+      "preventScreenshot": "Prevent screenshots",
+      "allowScreenshot": "Allow screenshots",
+      "goStart": "Go to start page",
+      "help": "Help",
+      "language": "Switch language"
+    }
+  },
+  "start": {
+    "header": "Password Manager",
+    "actions": {
+      "openFile": "Open file",
+      "createFile": "Create new file",
+      "authenticate": "Authenticate"
+    },
+    "placeholder": {
+      "masterKey": "Enter master password"
+    },
+    "empty": "No file selected.",
+    "status": {
+      "created": "Created a new file.",
+      "authSuccess": "Authentication succeeded."
+    },
+    "errors": {
+      "openFailed": "Unable to open the file.",
+      "authFailed": "Authentication failed.",
+      "pickWithReason": "Error while selecting file: {{message}}",
+      "openWithReason": "Error while opening file: {{message}}",
+      "createWithReason": "Error while creating file: {{message}}",
+      "authWithReason": "Error while authenticating: {{message}}"
+    },
+    "aria": {
+      "deletePath": "Remove path",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password"
+    }
+  },
+  "home": {
+    "searchPlaceholder": "Search...",
+    "total": "Total {{count}} items",
+    "actions": {
+      "addEntry": "Add password",
+      "refresh": "Refresh",
+      "sort": "Sort"
+    },
+    "sort": {
+      "byAdded": "Newest",
+      "byName": "Name",
+      "byType": "Type",
+      "toggle": "Toggle order"
+    },
+    "empty": "No passwords stored."
+  },
+  "group": {
+    "modal": {
+      "total": "Total {{count}} items"
+    },
+    "empty": "No passwords for this category.",
+    "count": "{{count}} items"
+  },
+  "entry": {
+    "actions": {
+      "toggleFavorite": "Toggle favorite",
+      "hide": "Hide",
+      "show": "Show",
+      "copy": "Copy",
+      "copyField": "Click to copy",
+      "loading": "Loading...",
+      "unavailable": "Unavailable",
+      "copied": "Copied to clipboard."
+    }
+  },
+  "statistic": {
+    "strength": {
+      "strong": "Strong",
+      "normal": "Average",
+      "weak": "Weak"
+    },
+    "charts": {
+      "strengthDistribution": "Strength distribution",
+      "typeDistribution": "Strength by category"
+    },
+    "summary": {
+      "total": "Total passwords",
+      "weak": "Weak passwords",
+      "normal": "Average passwords",
+      "strong": "Strong passwords"
+    },
+    "count": "{{count}} items",
+  "cards": {
+    "reused": {
+      "title": "Reused passwords",
+      "description": "The same password is used in multiple places."
+    },
+      "leaked": {
+        "title": "Leaked passwords",
+        "description": "These entries may have been exposed in data breaches."
+      },
+      "old": {
+        "title": "Old passwords",
+        "description": "These entries exceed the recommended rotation period."
+    },
+    "action": "Review"
+  },
+  "modal": {
+    "title": {
+      "reused": "Reused passwords",
+      "leaked": "Leaked passwords",
+      "old": "Old passwords"
+    },
+    "group": "Group {{index}}",
+    "total": "Total {{count}} items",
+    "empty": "No records found.",
+    "close": "Close"
+  },
+  "alerts": {
+    "unableToFetch": "Unable to load the list.",
+    "empty": "No records available."
+  },
+    "list": {
+      "unknown": "unknown"
+    }
+  },
+  "setting": {
+    "titles": {
+      "database": "Database settings",
+      "export": "Export data"
+    },
+    "labels": {
+      "databasePath": "Database path",
+      "changeMaster": "Change master password",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "autoLock": "Auto-lock settings",
+      "inactive": "Inactivity duration"
+    },
+    "actions": {
+      "exportFile": "Export file",
+      "change": "Change",
+      "exportCsv": "Export CSV"
+    },
+    "hints": {
+      "autoLock": "The app locks automatically after the selected time of inactivity.",
+      "export": "Export the current database as a CSV file. Store the exported file safely."
+    },
+    "status": {
+      "noPath": "Unable to load the path.",
+      "masterChanged": "Master password changed successfully.",
+      "exported": "Export complete: {{path}}"
+    },
+    "errors": {
+      "oldRequired": "Enter the current master password.",
+      "newRequired": "Enter the new master password.",
+      "changeFailed": "Failed to change the master password.",
+      "exportFailed": "Failed to export."
+    },
+    "autoLock": {
+      "minutes_one": "{{count}} minute",
+      "minutes_other": "{{count}} minutes"
+    }
+  },
+  "generator": {
+    "title": "Password generator",
+    "length": "Length",
+    "options": {
+      "includeLower": "Include lowercase letters",
+      "includeUpper": "Include uppercase letters",
+      "includeNumber": "Include numbers",
+      "includeSymbol": "Include special characters",
+      "includeWord": "Include random word"
+    },
+    "customSymbols": {
+      "label": "Allowed symbols",
+      "reset": "Reset to default",
+      "hint": "Enter only symbols permitted by the service policy."
+    },
+    "status": {
+      "waiting": "Waiting to generate",
+      "copySuccess": "Copied to clipboard for 30 seconds.",
+      "copyError": "Failed to copy. Please try again."
+    },
+    "actions": {
+      "generate": "Generate",
+      "refresh": "Regenerate",
+      "copy": "Copy"
+    },
+    "errors": {
+      "requirePool": "Select at least one character type or enable the random word option.",
+      "render": "An error occurred in the password generator."
+    },
+    "strength": {
+      "veryWeak": "Very weak",
+      "weak": "Weak",
+      "normal": "Average",
+      "good": "Good",
+      "strong": "Strong",
+      "veryStrong": "Very strong"
+    },
+    "suggestions": {
+      "increaseVariety": "Increase the length and use a variety of character types.",
+      "lengthTwelve": "Use at least 12 characters.",
+      "addVariety": "Add more character types (uppercase, numbers, symbols).",
+      "wordComplexity": "When including a dictionary word, make the remaining characters complex.",
+      "avoidRepeats": "Avoid repeating the same character three or more times.",
+      "avoidSequences": "Avoid consecutive number or letter patterns."
+    }
+  },
+  "addEntry": {
+    "title": "Add new password",
+    "actions": {
+      "backToType": "← Back to type selection"
+    },
+    "selectedType": "Selected type: {{type}}",
+    "placeholder": {
+      "label": "Enter label"
+    },
+    "errors": {
+      "selectType": "Select a type first.",
+      "fillAll": "Complete all fields."
+    }
+  },
+  "editEntry": {
+    "title": "Edit password",
+    "errors": {
+      "updateFailed": "Failed to update the entry.",
+      "updateGeneric": "An error occurred while updating."
+    }
+  }
+}
