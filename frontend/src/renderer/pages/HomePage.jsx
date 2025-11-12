@@ -264,7 +264,12 @@ const HomePage = () => {
                     transition={{ type: 'spring', stiffness: 220, damping: 28, mass: 0.8 }}
                     style={{ width: '100%' }}
                   >
-                    <EntryCard entry={entry} onEdit={setEditEntry} onDelete={handleDelete} />
+                    <EntryCard
+                      entry={entry}
+                      onEdit={setEditEntry}
+                      onDelete={handleDelete}
+                      enableWebsiteFavicon
+                    />
                   </motion.div>
                 );
               })}
