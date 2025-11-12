@@ -1,3 +1,28 @@
+# Visual Studio 관련 빌드 캐시
+.vs/
+*.VC.db
+*.opendb
+*.ipch
+*.suo
+*.user
+*.pdb
+*.obj
+*.idb
+*.ilk
+*.log
+*.tlog
+*.cache
+*.db
+*.exe
+*.dll
+*.lib
+*.pch
+*.aps
+*.ncb
+*.res
+*.sdf
+*.lastbuildstate
+
 # Dependencies
 node_modules/
 
