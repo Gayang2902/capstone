@@ -1,42 +1,47 @@
-#pragma once
+ï»¿#include "database.hpp"
+
 #include <fstream>
 #include <iostream>
-#include <vector>
 #include <algorithm>
 #include <cstring>
-#include <string>
 #include <random>
 
-#include "database.hpp"
-#include "utils.hpp"
-
 #include <sodium.h>
+
+#include "utils.hpp"
 #include "json_c.hpp"
+
 #include <cryptopp/aes.h>
 #include <cryptopp/modes.h>
 #include <cryptopp/filters.h>
 #include <cryptopp/secblock.h>
 
+using nlohmann::json;
 using namespace CryptoPP;
 using namespace std;
-using json = nlohmann::json;
 
-static void printError(const string& error_message) {
-    cerr << "[Database Error] " << error_message << "\n";
+static void printError(const string& msg) {
+    cerr << "[Database Error] " << msg << "\n";
 }
 
-Database::Database(const string& file_path_, const string& master_key)
+// ====== ìƒì„±/ì†Œë©¸ ======
+Database::Database(const string& file_path_, const string& user_password_)
     : file_path(file_path_),
     master_key(),
+    user_password(user_password_),
     entries(),
     is_modified(false)
 {
-    if (!deriveKey(master_key)) {
-        printError("Failed argon2 key derive!!!");
+    // ì—¬ê¸°ëŠ” KDFë¥¼ ìˆ˜í–‰í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤.
+    // - loadFromFile(): íŒŒì¼ì—ì„œ SALTë¥¼ ì½ê³  íŒŒìƒ
+    // - saveToFile(): ìƒˆ SALTë¥¼ ìƒì„±í•˜ê³  íŒŒìƒ
+    if (sodium_init() == -1) {
+        printError("[Database] sodium_init failed");
     }
 }
 
 Database::~Database() {
+    // ë¯¼ê° ì •ë³´ ë©”ëª¨ë¦¬ ë®ê¸°
     fill(master_key.begin(), master_key.end(), '\0');
 
     if (is_modified) {
@@ -44,42 +49,28 @@ Database::~Database() {
     }
 }
 
-bool Database::deriveKey(const string& user_key) {
-    const size_t key_len = 32; // Ãâ·Â Å° ±æÀÌ
-    vector<uint8_t> out_key(key_len);
-
-    if (sodium_init() == -1) {
-        printError("[Database] init sodium failed");
-        return false;
-    }
-
-    // 16bytes salt
-    string salt = file_path;
-    if (salt.size() < crypto_pwhash_SALTBYTES) {
-        salt.append(crypto_pwhash_SALTBYTES - salt.size(), '#');
-    }
-    else if (salt.size() > crypto_pwhash_SALTBYTES) {
-        salt = salt.substr(0, crypto_pwhash_SALTBYTES);
-    }
+// ====== ë‚´ë¶€ ìœ í‹¸ ======
+bool Database::deriveKey(const string& user_key, const unsigned char* salt) {
+    const size_t key_len = 32; // AES-256
+    vector<unsigned char> out_key(key_len);
 
     int ret = crypto_pwhash(
         out_key.data(), key_len,
         user_key.c_str(), user_key.size(),
-        reinterpret_cast<const unsigned char*>(salt.data()),
+        salt,
         crypto_pwhash_OPSLIMIT_MODERATE,
         crypto_pwhash_MEMLIMIT_MODERATE,
         crypto_pwhash_ALG_ARGON2ID13
     );
-
     if (ret != 0) {
-        return false; // Å° ÆÄ»ı ½ÇÆĞ (¸Ş¸ğ¸® ºÎÁ· µî)
+        printError("Key derivation failed");
+        return false;
     }
 
     master_key.assign(reinterpret_cast<const char*>(out_key.data()), key_len);
     return true;
 }
 
-// ÆÄÀÏÀ» ¹ÙÀÌ³Ê¸® ¸ğµå·Î ÀĞ¾î stringÀ¸·Î ¹İÈ¯
 string Database::readAllBytes() const {
     ifstream ifs(file_path, ios::binary);
     if (!ifs.is_open()) {
@@ -88,17 +79,13 @@ string Database::readAllBytes() const {
     ifs.seekg(0, ios::end);
     streamsize sz = ifs.tellg();
     ifs.seekg(0, ios::beg);
-
-    if (sz <= 0)
-        return "";
-
+    if (sz <= 0) return "";
     string buffer;
     buffer.resize(static_cast<size_t>(sz));
     ifs.read(&buffer[0], sz);
     return buffer;
 }
 
-// stringÀ» ÆÄÀÏ¿¡ ¹ÙÀÌ³Ê¸® ¸ğµå·Î ¾²±â
 bool Database::writeAllBytes(const string& bytes) {
     ofstream ofs(file_path, ios::binary | ios::trunc);
     if (!ofs.is_open()) {
@@ -108,7 +95,6 @@ bool Database::writeAllBytes(const string& bytes) {
     return true;
 }
 
-// AES256-CBC ¾ÏÈ£È­
 bool Database::encryptAES256WithIV(const string& plaintext,
     const string& iv_bytes,
     string& out_ciphertext) const
@@ -119,16 +105,16 @@ bool Database::encryptAES256WithIV(const string& plaintext,
     }
 
     try {
-        CBC_Mode<AES>::Encryption encryptor;
-        SecByteBlock keyBytes(reinterpret_cast<const CryptoPP::byte*>(master_key.data()), master_key.size());
+        CBC_Mode<AES>::Encryption enc;
+        SecByteBlock key(reinterpret_cast<const CryptoPP::byte*>(master_key.data()), master_key.size());
         SecByteBlock iv(reinterpret_cast<const CryptoPP::byte*>(iv_bytes.data()), iv_bytes.size());
-        encryptor.SetKeyWithIV(keyBytes, keyBytes.size(), iv, iv.size());
+        enc.SetKeyWithIV(key, key.size(), iv, iv.size());
 
         StringSource ss(
             plaintext,
             true,
             new StreamTransformationFilter(
-                encryptor,
+                enc,
                 new StringSink(out_ciphertext),
                 BlockPaddingSchemeDef::PKCS_PADDING
             )
@@ -141,27 +127,26 @@ bool Database::encryptAES256WithIV(const string& plaintext,
     return true;
 }
 
-// AES256-CBC º¹È£È­
 bool Database::decryptAES256WithIV(const string& ciphertext,
     const string& iv_bytes,
     string& out_plaintext) const
 {
     if (master_key.size() != 32 || iv_bytes.size() != AES::BLOCKSIZE) {
-        printError("Å° ¶Ç´Â IV ±æÀÌ°¡ ¿Ã¹Ù¸£Áö ¾ÊÀ½");
+        printError("í‚¤ ë˜ëŠ” IV ê¸¸ì´ê°€ ì˜¬ë°”ë¥´ì§€ ì•ŠìŒ");
         return false;
     }
 
     try {
-        CBC_Mode<AES>::Decryption decryptor;
-        SecByteBlock keyBytes(reinterpret_cast<const CryptoPP::byte*>(master_key.data()), master_key.size());
+        CBC_Mode<AES>::Decryption dec;
+        SecByteBlock key(reinterpret_cast<const CryptoPP::byte*>(master_key.data()), master_key.size());
         SecByteBlock iv(reinterpret_cast<const CryptoPP::byte*>(iv_bytes.data()), iv_bytes.size());
-        decryptor.SetKeyWithIV(keyBytes, keyBytes.size(), iv, iv.size());
+        dec.SetKeyWithIV(key, key.size(), iv, iv.size());
 
         StringSource ss(
             ciphertext,
             true,
             new StreamTransformationFilter(
-                decryptor,
+                dec,
                 new StringSink(out_plaintext),
                 BlockPaddingSchemeDef::PKCS_PADDING
             )
@@ -174,50 +159,109 @@ bool Database::decryptAES256WithIV(const string& ciphertext,
     return true;
 }
 
-// ¸Ş¸ğ¸® »óÀÇ ÀüÃ¼ ¿£Æ®¸®µéÀ» º¹»çÇØ¼­ ¹İÈ¯
+// ====== JSON ë³€í™˜ í—¬í¼ ======
+PasswordEntry Database::jsonToEntry(const json& data) {
+    PasswordEntry e{};
+    e.UID = data.value("UID", "");
+    e.label = data.value("label", "");
+    e.created_at = data.value("created_at", "");
+    e.modified_at = data.value("modified_at", "");
+    e.comments = data.value("comments", "");
+    e.favorite = data.value("favorite", false);
+    e.type = data.value("type", "");
+
+    e.name = data.value("name", "");
+    e.pwd = data.value("pwd", "");
+    e.id = data.value("id", "");
+    e.host = data.value("host", "");
+    e.port = data.value("port", "");
+    e.num = data.value("num", "");
+    e.master = data.value("master", "");
+    e.citizen = data.value("citizen", "");
+    e.eng_name = data.value("eng_name", "");
+    e.address = data.value("address", "");
+    e.birth_date = data.value("birth_date", "");
+    e.content = data.value("content", "");
+    e.url = data.value("url", "");
+    e.email = data.value("email", "");
+    e.card_number = data.value("card_number", "");
+    e.cvc = data.value("cvc", "");
+    e.last_day = data.value("last_day", "");
+    e.bank_name = data.value("bank_name", "");
+    return e;
+}
+
+json Database::entryToJson(const PasswordEntry& e) {
+    json j;
+    j["UID"] = e.UID;
+    j["label"] = e.label;
+    j["created_at"] = e.created_at;
+    j["modified_at"] = e.modified_at;
+    j["comments"] = e.comments;
+    j["favorite"] = e.favorite;
+    j["type"] = e.type;
+
+    j["name"] = e.name;
+    j["pwd"] = e.pwd;
+    j["id"] = e.id;
+    j["host"] = e.host;
+    j["port"] = e.port;
+    j["num"] = e.num;
+    j["master"] = e.master;
+    j["citizen"] = e.citizen;
+    j["eng_name"] = e.eng_name;
+    j["address"] = e.address;
+    j["birth_date"] = e.birth_date;
+    j["content"] = e.content;
+    j["url"] = e.url;
+    j["email"] = e.email;
+    j["card_number"] = e.card_number;
+    j["cvc"] = e.cvc;
+    j["last_day"] = e.last_day;
+    j["bank_name"] = e.bank_name;
+    return j;
+}
+
+// ====== CRUD in-memory ======
 vector<PasswordEntry> Database::getAllData() const {
     return entries;
 }
 
-// »õ PasswordEntry¸¦ entries¿¡ Ãß°¡
 bool Database::addEntry(const PasswordEntry& new_entry) {
     entries.push_back(new_entry);
     is_modified = true;
     return true;
 }
 
-// uid¿¡ ÇØ´çÇÏ´Â Ç×¸ñÀ» Ã£¾Æ ÇÊµå ¾÷µ¥ÀÌÆ®
-bool Database::updateEntry(const string& uid, const unordered_map<string, string>& args)
-{
+bool Database::updateEntry(const string& uid, const unordered_map<string, string>& args) {
     for (auto& e : entries) {
         if (e.UID == uid) {
             for (const auto& kv : args) {
                 const string& key = kv.first;
                 const string& value = kv.second;
 
-                if (key == "label")          e.label = value;
-                else if (key == "comments")  e.comments = value;
-                else if (key == "favorite")  e.favorite = (value == "true");
-                else if (key == "type")      e.type = value;
-                else if (key == "name")      e.name = value;
-                else if (key == "pwd")       e.pwd = value;
-                else if (key == "id")        e.id = value;
-                else if (key == "host")      e.host = value;
-                else if (key == "port")      e.port = value;
-                else if (key == "num")       e.num = value;
-                else if (key == "master")    e.master = value;
-                else if (key == "citizen")   e.citizen = value;
-                else if (key == "eng_name")  e.eng_name = value;
-                else if (key == "address")   e.address = value;
-                else if (key == "birth_date")e.birth_date = value;
-                else if (key == "content")   e.content = value;
-                else if (key == "url")       e.url = value;
-                else if (key == "email")     e.email = value;
-                else if (key == "card_number") e.card_number = value;
-                else if (key == "cvc")         e.cvc = value;
-                else if (key == "last_day")    e.last_day = value;
-                else if (key == "bank_name")   e.bank_name = value;
-                // ¡°created_at¡±, ¡°modified_at¡± °°Àº ÇÊµå´Â °Ç³Ê¶Ü
+                if (key == "label")        e.label = value;
+                else if (key == "comments")     e.comments = value;
+                else if (key == "favorite")     e.favorite = (value == "true");
+                else if (key == "type")         e.type = value;
+                else if (key == "name")         e.name = value;
+                else if (key == "pwd")          e.pwd = value;
+                else if (key == "id")           e.id = value;
+                else if (key == "host")         e.host = value;
+                else if (key == "port")         e.port = value;
+                else if (key == "num")          e.num = value;
+                else if (key == "master")       e.master = value;
+                else if (key == "citizen")      e.citizen = value;
+                else if (key == "eng_name")     e.eng_name = value;
+                else if (key == "address")      e.address = value;
+                else if (key == "birth_date")   e.birth_date = value;
+                else if (key == "content")      e.content = value;
+                else if (key == "url")          e.url = value;
+                else if (key == "email")        e.email = value;
+                else if (key == "card_number")  e.card_number = value;
+                else if (key == "cvc")          e.cvc = value;
+                else if (key == "last_day")     e.last_day = value;
+                else if (key == "bank_name")    e.bank_name = value;
             }
             e.modified_at = getCurrentDateString();
             is_modified = true;
@@ -227,7 +271,6 @@ bool Database::updateEntry(const string& uid, const unordered_map<string, string
     return false;
 }
 
-// uid¿¡ ÇØ´çÇÏ´Â Ç×¸ñ »èÁ¦
 bool Database::deleteEntry(const string& uid) {
     auto it = remove_if(entries.begin(), entries.end(),
         [&](const PasswordEntry& e) { return e.UID == uid; });
@@ -237,117 +280,76 @@ bool Database::deleteEntry(const string& uid) {
     return true;
 }
 
-// uid¿¡ ÇØ´çÇÏ´Â ´ÜÀÏ Ç×¸ñ Á¶È¸
 PasswordEntry Database::getEntry(const string& uid) const {
     for (const auto& e : entries) {
-        if (e.UID == uid) {
-            return e;
-        }
+        if (e.UID == uid) return e;
     }
     return PasswordEntry{};
 }
 
-// ¡°type¡± ÇÊµå°¡ tag¿Í ÀÏÄ¡ÇÏ´Â ¸ğµç Ç×¸ñ ¹İÈ¯
 vector<PasswordEntry> Database::searchByTag(const string& tag) const {
     vector<PasswordEntry> rst;
     for (const auto& e : entries) {
-        if (e.type == tag) {
-            rst.push_back(e);
-        }
+        if (e.type == tag) rst.push_back(e);
     }
     return rst;
 }
 
-// º¤ÅÍ ±æÀÌ ¹İÈ¯
 size_t Database::getPasswordCount() const {
     return entries.size();
 }
 
-// »õ ºñ¹Ğ¹øÈ£·Î Argon2 Å° À¯µµ ÈÄ ÀüÃ¼ ÆÄÀÏ Àç¾ÏÈ£È­
-bool Database::updateMasterKey(const string& new_user_password) {
-    // ±âÁ¸ Å° ¸Ş¸ğ¸® µ¤¾î¾²±â
-    fill(master_key.begin(), master_key.end(), '\0');
-
-    // »õ·Î¿î Å° À¯µµ
-    if (!deriveKey(new_user_password)) {
-        printError("»õ·Î¿î Å° À¯µµ ½ÇÆĞ");
-        return false;
-    }
-
-    // in_memory_data ÀüÃ¼¸¦ »õ Å°·Î ¾ÏÈ£È­ÇÏ¿© ÆÄÀÏ ÀúÀå
-    if (!saveToFile()) {
-        printError("Å° ±³Ã¼ ÈÄ ÆÄÀÏ ÀúÀå ½ÇÆĞ");
-        return false;
-    }
-    return true;
-}
-
-// loadFromFile: ÆÄÀÏ ÀĞ±â ¡æ º¹È£È­ ¡æ JSON ÆÄ½Ì ¡æ ¸Ş¸ğ¸®¿¡ ·Îµå
+// ====== íŒŒì¼ I/O ======
+// íŒŒì¼ í¬ë§·: [SALT (crypto_pwhash_SALTBYTES)] [IV (AES::BLOCKSIZE)] [CIPHERTEXT...]
 bool Database::loadFromFile() {
-    // ÆÄÀÏÀ» ÀĞ¾î ¾ÏÈ£È­µÈ ¹ÙÀÌ³Ê¸® µ¥ÀÌÅÍ¸¦ °¡Á®¿È
-    string encrypted = readAllBytes();
-    if (encrypted.empty()) {
+    string fileData = readAllBytes();
+    if (fileData.empty()) {
         entries.clear();
         is_modified = false;
-        return true;
+        return true; // ì‹ ê·œ íŒŒì¼ë¡œ ê°„ì£¼
     }
 
-    // IV ºĞ¸® ¹× ³ª¸ÓÁö¸¦ ¾ÏÈ£¹®À¸·Î Ã³¸®
-    if (encrypted.size() <= AES::BLOCKSIZE) {
-        printError("Encrypted data too short to contain IV");
+    const size_t SALT_LEN = crypto_pwhash_SALTBYTES;
+    const size_t IV_LEN = AES::BLOCKSIZE;
+
+    if (fileData.size() <= (SALT_LEN + IV_LEN)) {
+        printError("Encrypted data too short to contain header");
         return false;
     }
-    string iv_bytes = encrypted.substr(0, AES::BLOCKSIZE);
-    string cipher_bytes = encrypted.substr(AES::BLOCKSIZE);
 
-    // IV¸¦ »ç¿ëÇØ º¹È£È­
+    const unsigned char* salt =
+        reinterpret_cast<const unsigned char*>(fileData.data());
+    string iv_bytes = fileData.substr(SALT_LEN, IV_LEN);
+    string cipher = fileData.substr(SALT_LEN + IV_LEN);
+
+    // íŒŒìƒí‚¤ ìƒì„±
+    if (!deriveKey(user_password, salt)) {
+        printError("Key derivation failed on load");
+        return false;
+    }
+
+    // ë³µí˜¸í™”
     string plaintext;
-    if (!decryptAES256WithIV(cipher_bytes, iv_bytes, plaintext)) {
-        printError("ÆÄÀÏ º¹È£È­ ½ÇÆĞ");
+    if (!decryptAES256WithIV(cipher, iv_bytes, plaintext)) {
+        printError("Decryption failed");
         return false;
     }
 
-    // JSON ÆÄ½Ì ¡æ entries º¤ÅÍ·Î º¯È¯
     try {
         json root = json::parse(plaintext);
         entries.clear();
         if (root.is_array()) {
-            for (const auto& data : root) {
-                PasswordEntry e;
-                e.UID = data.value("UID", "");
-                e.label = data.value("label", "");
-                e.created_at = data.value("created_at", "");
-                e.modified_at = data.value("modified_at", "");
-                e.comments = data.value("comments", "");
-                e.favorite = data.value("favorite", false);
-                e.type = data.value("type", "");
-
-                // »õ ±¸Á¶: JSON¿¡¼­ °³º° ÇÊµåµéÀ» ¹Ù·Î ÀĞ¾îµéÀÓ
-                e.name = data.value("name", "");
-                e.pwd = data.value("pwd", "");
-                e.id = data.value("id", "");
-                e.host = data.value("host", "");
-                e.port = data.value("port", "");
-                e.num = data.value("num", "");
-                e.master = data.value("master", "");
-                e.citizen = data.value("citizen", "");
-                e.eng_name = data.value("eng_name", "");
-                e.address = data.value("address", "");
-                e.birth_date = data.value("birth_date", "");
-                e.content = data.value("content", "");
-                e.url = data.value("url", "");
-                e.email = data.value("email", "");
-                e.card_number = data.value("card_number", "");
-                e.cvc = data.value("cvc", "");
-                e.last_day = data.value("last_day", "");
-                e.bank_name = data.value("bank_name", "");
-
-                entries.push_back(move(e));
+            for (const auto& item : root) {
+                entries.push_back(jsonToEntry(item));
             }
         }
+        else {
+            printError("Root JSON is not an array");
+            return false;
+        }
     }
-    catch (const exception& err) {
-        printError(string("JSON ÆÄ½Ì ½ÇÆĞ: ") + err.what());
+    catch (const exception& e) {
+        printError(string("JSON parse error: ") + e.what());
         return false;
     }
 
@@ -355,65 +357,71 @@ bool Database::loadFromFile() {
     return true;
 }
 
-// entries¸¦ JSON·Î dump -> ¾ÏÈ£È­ -> ÆÄÀÏ ¾²±â
 bool Database::saveToFile() {
-    // entries º¤ÅÍ¸¦ JSON ¹è¿­·Î Á÷·ÄÈ­
+    // ë©”ëª¨ë¦¬ â†’ JSON
     json root = json::array();
     for (const auto& e : entries) {
-        json data;
-        data["UID"] = e.UID;
-        data["label"] = e.label;
-        data["created_at"] = e.created_at;
-        data["modified_at"] = e.modified_at;
-        data["comments"] = e.comments;
-        data["favorite"] = e.favorite;
-        data["type"] = e.type;
-
-        // »õ ±¸Á¶: JSON¿¡ °³º° ÇÊµåµé ¸ğµÎ Ãß°¡
-        data["name"] = e.name;
-        data["pwd"] = e.pwd;
-        data["id"] = e.id;
-        data["host"] = e.host;
-        data["port"] = e.port;
-        data["num"] = e.num;
-        data["master"] = e.master;
-        data["citizen"] = e.citizen;
-        data["eng_name"] = e.eng_name;
-        data["address"] = e.address;
-        data["birth_date"] = e.birth_date;
-        data["content"] = e.content;
-        data["url"] = e.url;
-        data["email"] = e.email;
-        data["card_number"] = e.card_number;
-        data["cvc"] = e.cvc;
-        data["last_day"] = e.last_day;
-        data["bank_name"] = e.bank_name;
-
-        root.push_back(data);
+        root.push_back(entryToJson(e));
     }
-    string plain = root.dump(); // Á÷·ÄÈ­
+    string plain = root.dump();
 
-    // IV »ı¼º
-    string iv_bytes(AES::BLOCKSIZE, '\0');
-    random_device rd;
-    uniform_int_distribution<int> dist(0, 255);
-    for (size_t i = 0; i < iv_bytes.size(); ++i) {
-        iv_bytes[i] = static_cast<char>(dist(rd));
-    }
+    // í—¤ë” ìƒì„±
+    const size_t SALT_LEN = crypto_pwhash_SALTBYTES;
+    const size_t IV_LEN = AES::BLOCKSIZE;
 
-    string cipher;
-    if (!encryptAES256WithIV(plain, iv_bytes, cipher)) {
-        printError("¾ÏÈ£È­ ½ÇÆĞ");
+    // SALT
+    vector<unsigned char> salt(SALT_LEN);
+    randombytes_buf(salt.data(), SALT_LEN);
+
+    // ìƒˆ SALTë¡œ í‚¤ íŒŒìƒ
+    if (!deriveKey(user_password, salt.data())) {
+        printError("Key derivation failed during save");
         return false;
     }
 
-    // IV + ciphertext °áÇÕÇÏ¿© ÆÄÀÏ¿¡ ¾²±â
-    string combined = iv_bytes + cipher;
-    if (!writeAllBytes(combined)) {
-        printError("ÆÄÀÏ ¾²±â ½ÇÆĞ");
+    // IV
+    string iv_bytes(IV_LEN, '\0');
+    {
+        random_device rd;
+        uniform_int_distribution<int> dist(0, 255);
+        for (auto& ch : iv_bytes) ch = static_cast<char>(dist(rd));
+    }
+
+    // ì•”í˜¸í™”
+    string cipher;
+    if (!encryptAES256WithIV(plain, iv_bytes, cipher)) {
+        printError("Encryption failed");
+        return false;
+    }
+
+    // [salt | iv | cipher]ë¡œ ê²°í•©
+    string out;
+    out.reserve(SALT_LEN + IV_LEN + cipher.size());
+    out.append(reinterpret_cast<const char*>(salt.data()), SALT_LEN);
+    out.append(iv_bytes);
+    out.append(cipher);
+
+    if (!writeAllBytes(out)) {
+        printError("File write failed");
         return false;
     }
 
     is_modified = false;
+    return true;
+}
+
+// ====== ë§ˆìŠ¤í„° í‚¤ êµì²´ ======
+bool Database::updateMasterKey(const string& new_user_password) {
+    // ê¸°ì¡´ ëŒ€ì¹­í‚¤ ë©”ëª¨ë¦¬ ë®ê¸°
+    fill(master_key.begin(), master_key.end(), '\0');
+
+    // ì‚¬ìš©ì ë¹„ë°€ë²ˆí˜¸ êµì²´
+    user_password = new_user_password;
+
+    // ìƒˆ SALTë¡œ ì¬ì•”í˜¸í™”í•˜ì—¬ ì €ì¥
+    if (!saveToFile()) {
+        printError("í‚¤ êµì²´ í›„ íŒŒì¼ ì €ì¥ ì‹¤íŒ¨");
+        return false;
+    }
     return true;
 }
