@@ -26,7 +26,7 @@ import SwapVertIcon from '@mui/icons-material/SwapVert';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import NightsStayRoundedIcon from '@mui/icons-material/NightsStayRounded';
 import WbSunnyRoundedIcon from '@mui/icons-material/WbSunnyRounded';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, LayoutGroup, motion } from 'framer-motion';
 
 const HomePage = () => {
   const {
@@ -250,34 +250,33 @@ const HomePage = () => {
         )}
 
         {!loadingEntries && !entriesError && filteredEntries.length > 0 && (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <AnimatePresence initial={false}>
-              {filteredEntries.map((entry) => {
-                return (
-                  <motion.div
-                    key={entry.UID}
-                    layout
-                    layoutId={`entry-${entry.UID}`}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{
-                      layout: { type: 'spring', stiffness: 320, damping: 34, mass: 0.85 },
-                      opacity: { duration: 0.2 },
-                    }}
-                    style={{ width: '100%' }}
-                  >
-                    <EntryCard
-                      entry={entry}
-                      onEdit={setEditEntry}
-                      onDelete={handleDelete}
-                      enableWebsiteFavicon
-                    />
-                  </motion.div>
-                );
-              })}
-            </AnimatePresence>
-          </Box>
+          <LayoutGroup id="home-entry-list">
+            <Box
+              component={motion.div}
+              layout
+              sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+              transition={{ layout: { type: 'spring', stiffness: 320, damping: 32 } }}
+            >
+              {filteredEntries.map((entry) => (
+                <motion.div
+                  key={entry.UID}
+                  layout
+                  layoutId={`entry-${entry.UID}`}
+                  transition={{
+                    layout: { type: 'spring', stiffness: 400, damping: 32, mass: 0.9 },
+                  }}
+                  style={{ width: '100%' }}
+                >
+                  <EntryCard
+                    entry={entry}
+                    onEdit={setEditEntry}
+                    onDelete={handleDelete}
+                    enableWebsiteFavicon
+                  />
+                </motion.div>
+              ))}
+            </Box>
+          </LayoutGroup>
         )}
       </Stack>
 

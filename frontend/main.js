@@ -11,7 +11,7 @@ const { registerStatsHandlers } = require('./src/ipc/statsHandlers');
 const { registerUtilHandlers } = require('./src/ipc/utilHandlers');
 const { registerZkpHandlers } = require('./src/ipc/zkpHandlers');
 
-const ENABLE_DEVTOOLS = process.env.ENABLE_DEVTOOLS !== '1';
+const ENABLE_DEVTOOLS = process.env.ENABLE_DEVTOOLS !== '1'
 
 let mainWindow;
 let backendProcess;

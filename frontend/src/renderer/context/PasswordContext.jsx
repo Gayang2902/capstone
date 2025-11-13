@@ -37,6 +37,20 @@ const normalizeEntryList = (items = []) => {
   }));
 };
 
+const compareTimestamps = (a, b, dir) => {
+  const diff = getTimestamp(a) - getTimestamp(b);
+  if (diff !== 0) {
+    return dir * diff;
+  }
+  const fallback = getOrderFallback(b) - getOrderFallback(a);
+  if (fallback !== 0) {
+    return fallback;
+  }
+  const aUID = String(a?.UID ?? '');
+  const bUID = String(b?.UID ?? '');
+  return bUID.localeCompare(aUID);
+};
+
 const sortEntries = (items = [], mode = 'added', direction = 'desc') => {
   const dir = direction === 'asc' ? 1 : -1;
 
@@ -55,7 +69,11 @@ const sortEntries = (items = [], mode = 'added', direction = 'desc') => {
         const effectiveDir = direction === 'desc' ? 1 : -1;
         const compare = effectiveDir * aLabel.localeCompare(bLabel, undefined, { sensitivity: 'base' });
         if (compare !== 0) return compare;
-        return getOrderFallback(b) - getOrderFallback(a);
+        const fallback = getOrderFallback(b) - getOrderFallback(a);
+        if (fallback !== 0) return fallback;
+        const aUID = String(a?.UID ?? '');
+        const bUID = String(b?.UID ?? '');
+        return bUID.localeCompare(aUID);
       });
     case 'type':
       return [...items].sort((a, b) => {
@@ -65,7 +83,7 @@ const sortEntries = (items = [], mode = 'added', direction = 'desc') => {
         const aOrder = TYPE_ORDER[a.type] ?? Number.MAX_SAFE_INTEGER;
         const bOrder = TYPE_ORDER[b.type] ?? Number.MAX_SAFE_INTEGER;
         if (aOrder !== bOrder) return dir * (aOrder - bOrder);
-        return dir * (getTimestamp(a) - getTimestamp(b));
+        return compareTimestamps(a, b, dir);
       });
     case 'added':
     default:
@@ -73,7 +91,7 @@ const sortEntries = (items = [], mode = 'added', direction = 'desc') => {
         const aScore = normalizeFavorite(a);
         const bScore = normalizeFavorite(b);
         if (aScore !== bScore) return bScore - aScore;
-        return dir * (getTimestamp(a) - getTimestamp(b));
+        return compareTimestamps(a, b, dir);
       });
   }
 };
