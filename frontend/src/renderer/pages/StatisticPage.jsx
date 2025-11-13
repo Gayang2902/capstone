@@ -22,12 +22,39 @@ import {
   IconButton,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { LayoutGroup, motion } from 'framer-motion';
 
 const TAGS = ['website', 'server'];
+
+const isFavoriteEntry = (value) => value === true || value === 'true';
+
+const getOrderFallback = (entry) =>
+  typeof entry?._orderRank === 'number' ? entry._orderRank : 0;
+
+const getTimestamp = (entry) => {
+  const time = new Date(entry?.created_at).getTime();
+  if (Number.isFinite(time)) return time;
+  return getOrderFallback(entry);
+};
+
+const compareModalEntries = (a, b) => {
+  const aFav = isFavoriteEntry(a.favorite);
+  const bFav = isFavoriteEntry(b.favorite);
+  if (aFav !== bFav) return aFav ? -1 : 1;
+  const tsDiff = getTimestamp(b) - getTimestamp(a);
+  if (tsDiff !== 0) return tsDiff;
+  const fallbackDiff = getOrderFallback(b) - getOrderFallback(a);
+  if (fallbackDiff !== 0) return fallbackDiff;
+  const aUID = String(a?.UID ?? '');
+  const bUID = String(b?.UID ?? '');
+  return bUID.localeCompare(aUID);
+};
+
+const sortGroupEntries = (items = []) => [...items].sort(compareModalEntries);
 const StatisticPage = () => {
   const electronAPI = useElectronAPI();
   const { t, i18n } = useTranslation();
-  const { refreshEntries, deleteEntry } = usePasswords();
+  const { entries, refreshEntries, deleteEntry } = usePasswords();
   const [strengthCounts, setStrengthCounts] = useState({ weak: 0, normal: 0, strong: 0 });
   const [tagCounts, setTagCounts] = useState({ strong: [], normal: [], weak: [] });
   const [vulnerableCounts, setVulnerableCounts] = useState({
@@ -46,6 +73,14 @@ const StatisticPage = () => {
   const barRef = useRef(null);
   const doughnutInstance = useRef(null);
   const barInstance = useRef(null);
+
+  const entryMap = useMemo(() => {
+    const map = new Map();
+    entries.forEach((entry) => {
+      map.set(entry.UID, entry);
+    });
+    return map;
+  }, [entries]);
 
   const totalPasswords = useMemo(
     () => strengthCounts.weak + strengthCounts.normal + strengthCounts.strong,
@@ -334,11 +369,12 @@ const StatisticPage = () => {
     async (type) => {
       const groups = await fetchIssueEntries(type);
       if (groups === null) return;
+      const sortedGroups = groups.map((group) => sortGroupEntries(group));
       setIssueModal({
         open: true,
         type,
-        groups,
-        empty: groups.length === 0,
+        groups: sortedGroups,
+        empty: sortedGroups.length === 0,
       });
       setEditEntry(null);
     },
@@ -368,11 +404,12 @@ const StatisticPage = () => {
         });
         return;
       }
+      const sortedGroups = groups.map((group) => sortGroupEntries(group));
       setIssueModal((prev) => ({
         open: prev.open,
         type,
-        groups,
-        empty: groups.length === 0,
+        groups: sortedGroups,
+        empty: sortedGroups.length === 0,
       }));
     },
     [fetchIssueEntries],
@@ -432,6 +469,27 @@ const StatisticPage = () => {
     { key: 'leaked', color: 'error', value: vulnerableCounts.leaked },
     { key: 'old', color: 'warning', value: vulnerableCounts.old },
   ];
+
+  useEffect(() => {
+    if (!issueModal.open || entryMap.size === 0) return;
+    setIssueModal((prev) => {
+      const updatedGroups = prev.groups.map((group) => {
+        const enriched = group.map((item) => {
+          const latest = entryMap.get(item.UID);
+          return latest ? { ...item, ...latest } : item;
+        });
+        return sortGroupEntries(enriched);
+      });
+      const changed = updatedGroups.some((group, groupIdx) =>
+        group.some((entry, entryIdx) => entry.favorite !== prev.groups[groupIdx]?.[entryIdx]?.favorite),
+      );
+      if (!changed) return prev;
+      return {
+        ...prev,
+        groups: updatedGroups,
+      };
+    });
+  }, [entryMap, issueModal.open]);
 
   return (
     <AppShell>
@@ -594,32 +652,51 @@ const StatisticPage = () => {
               <Typography color="text.secondary">{t('statistic.modal.empty')}</Typography>
             </Box>
           ) : (
-            <Stack spacing={3}>
-              {issueModal.groups.map((group, groupIndex) => (
-                <Paper key={`issue-group-${groupIndex}`} variant="outlined" sx={{ p: 2 }}>
-                  {showGroupLabels && (
-                    <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2" color="primary">
-                        {t('statistic.modal.group', { index: groupIndex + 1 })}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {t('statistic.modal.total', { count: group.length })}
-                      </Typography>
+            <LayoutGroup id={`issue-groups-${issueModal.type || 'default'}`}>
+              <Stack spacing={3} component={motion.div} layout>
+                {issueModal.groups.map((group, groupIndex) => (
+                  <Paper
+                    key={`issue-group-${groupIndex}`}
+                    component={motion.div}
+                    layout
+                    variant="outlined"
+                    sx={{ p: 2 }}
+                    transition={{
+                      layout: { type: 'spring', stiffness: 360, damping: 32, mass: 0.9 },
+                    }}
+                  >
+                    {showGroupLabels && (
+                      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+                        <Typography variant="subtitle2" color="primary">
+                          {t('statistic.modal.group', { index: groupIndex + 1 })}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {t('statistic.modal.total', { count: group.length })}
+                        </Typography>
+                      </Stack>
+                    )}
+                    <Stack spacing={2} component={motion.div} layout>
+                      {group.map((entry, entryIndex) => {
+                        const entryKey = entry.UID ?? `${issueModal.type}-${groupIndex}-${entryIndex}`;
+                        return (
+                          <motion.div
+                            key={entryKey}
+                            layout
+                            layoutId={`issue-entry-${entryKey}`}
+                            transition={{
+                              layout: { type: 'spring', stiffness: 360, damping: 32, mass: 0.9 },
+                            }}
+                            style={{ width: '100%' }}
+                          >
+                            <EntryCard entry={entry} onEdit={setEditEntry} onDelete={handleDeleteEntry} />
+                          </motion.div>
+                        );
+                      })}
                     </Stack>
-                  )}
-                  <Stack spacing={2}>
-                    {group.map((entry, entryIndex) => (
-                      <EntryCard
-                        key={entry.UID ?? `${issueModal.type}-${groupIndex}-${entryIndex}`}
-                        entry={entry}
-                        onEdit={setEditEntry}
-                        onDelete={handleDeleteEntry}
-                      />
-                    ))}
-                  </Stack>
-                </Paper>
-              ))}
-            </Stack>
+                  </Paper>
+                ))}
+              </Stack>
+            </LayoutGroup>
           )}
         </DialogContent>
         <DialogActions>

@@ -21,6 +21,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { LayoutGroup, motion } from 'framer-motion';
 
 const GROUP_TYPES = [
   { type: 'wifi', icon: 'fa-solid fa-wifi', color: '#6366F1' },
@@ -175,16 +176,26 @@ const GroupPage = () => {
           )}
 
           {!loadingEntries && modalEntries.length > 0 && (
-            <Stack spacing={2}>
-              {modalEntries.map((entry) => (
-                <EntryCard
-                  key={entry.UID}
-                  entry={entry}
-                  onEdit={setEditEntry}
-                  onDelete={handleDelete}
-                />
-              ))}
-            </Stack>
+            <LayoutGroup id={`group-modal-${selectedType || 'unknown'}`}>
+              <Stack spacing={2} component={motion.div} layout>
+                {modalEntries.map((entry, index) => {
+                  const key = entry.UID ?? `${selectedType}-${index}`;
+                  return (
+                    <motion.div
+                      key={key}
+                      layout
+                      layoutId={`group-entry-${key}`}
+                      transition={{
+                        layout: { type: 'spring', stiffness: 360, damping: 32, mass: 0.9 },
+                      }}
+                      style={{ width: '100%' }}
+                    >
+                      <EntryCard entry={entry} onEdit={setEditEntry} onDelete={handleDelete} />
+                    </motion.div>
+                  );
+                })}
+              </Stack>
+            </LayoutGroup>
           )}
         </DialogContent>
         <DialogActions>
