@@ -16,8 +16,28 @@ const TYPE_ORDER = {
   card: 1,
 };
 
+const isFavoriteEntry = (value) => value === true || value === 'true';
+
+const normalizeFavorite = (entry) => (isFavoriteEntry(entry.favorite) ? FAVORITE_WEIGHT : 0);
+
+const getOrderFallback = (entry) => (typeof entry?._orderRank === 'number' ? entry._orderRank : 0);
+
+const getTimestamp = (entry) => {
+  const time = new Date(entry?.created_at).getTime();
+  if (Number.isFinite(time)) return time;
+  return getOrderFallback(entry);
+};
+
+const normalizeEntryList = (items = []) => {
+  const total = items.length;
+  return items.map((item, index) => ({
+    ...item,
+    favorite: isFavoriteEntry(item.favorite),
+    _orderRank: total - index,
+  }));
+};
+
 const sortEntries = (items = [], mode = 'added', direction = 'desc') => {
-  const normalizeFavorite = (entry) => (entry.favorite === true || entry.favorite === 'true' ? FAVORITE_WEIGHT : 0);
   const dir = direction === 'asc' ? 1 : -1;
 
   switch (mode) {
@@ -33,7 +53,9 @@ const sortEntries = (items = [], mode = 'added', direction = 'desc') => {
         if (aStartsWithLetter && !bStartsWithLetter) return -1;
         if (!aStartsWithLetter && bStartsWithLetter) return 1;
         const effectiveDir = direction === 'desc' ? 1 : -1;
-        return effectiveDir * aLabel.localeCompare(bLabel, undefined, { sensitivity: 'base' });
+        const compare = effectiveDir * aLabel.localeCompare(bLabel, undefined, { sensitivity: 'base' });
+        if (compare !== 0) return compare;
+        return getOrderFallback(b) - getOrderFallback(a);
       });
     case 'type':
       return [...items].sort((a, b) => {
@@ -43,7 +65,7 @@ const sortEntries = (items = [], mode = 'added', direction = 'desc') => {
         const aOrder = TYPE_ORDER[a.type] ?? Number.MAX_SAFE_INTEGER;
         const bOrder = TYPE_ORDER[b.type] ?? Number.MAX_SAFE_INTEGER;
         if (aOrder !== bOrder) return dir * (aOrder - bOrder);
-        return dir * (new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+        return dir * (getTimestamp(a) - getTimestamp(b));
       });
     case 'added':
     default:
@@ -51,7 +73,7 @@ const sortEntries = (items = [], mode = 'added', direction = 'desc') => {
         const aScore = normalizeFavorite(a);
         const bScore = normalizeFavorite(b);
         if (aScore !== bScore) return bScore - aScore;
-        return dir * (new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+        return dir * (getTimestamp(a) - getTimestamp(b));
       });
   }
 };
@@ -82,7 +104,7 @@ export const PasswordProvider = ({ children }) => {
       }
       const list = Array.isArray(res.data?.data) ? res.data.data : [];
       setEntries((prev) => {
-        const source = list.length ? list : prev;
+        const source = list.length ? normalizeEntryList(list) : prev;
         return sortEntries(source, sortMode, sortDirection);
       });
     } catch (error) {
@@ -141,25 +163,35 @@ export const PasswordProvider = ({ children }) => {
 
   const toggleFavorite = useCallback(
     async (entry) => {
-      const nextFavorite = !(entry.favorite === true || entry.favorite === 'true');
-      const res = await electronAPI?.updatePasswordEntry?.({
-        UID: entry.UID,
-        favorite: nextFavorite.toString(),
-      });
-      if (res?.status) {
-        setEntries((prev) =>
-          sortEntries(
-            prev.map((item) =>
-              item.UID === entry.UID ? { ...item, favorite: nextFavorite.toString() } : item,
-            ),
-            sortMode,
-            sortDirection,
-          ),
+      const prevFavorite = isFavoriteEntry(entry.favorite);
+      const nextFavorite = !prevFavorite;
+      let previousEntries = null;
+
+      setEntries((prev) => {
+        previousEntries = prev.map((item) => ({ ...item }));
+        const updated = prev.map((item) =>
+          item.UID === entry.UID ? { ...item, favorite: nextFavorite } : item,
         );
+        return sortEntries(updated, sortMode, sortDirection);
+      });
+
+      try {
+        const res = await electronAPI?.updatePasswordEntry?.({
+          UID: entry.UID,
+          favorite: nextFavorite.toString(),
+        });
+        if (!res?.status) {
+          throw new Error(res?.error_message || t('common.errors.updateFailed'));
+        }
+        return res;
+      } catch (error) {
+        if (previousEntries) {
+          setEntries(previousEntries);
+        }
+        return { status: false, error_message: error.message };
       }
-      return res;
     },
-    [electronAPI, sortMode, sortDirection],
+    [electronAPI, sortMode, sortDirection, t],
   );
 
   const getPasswordDetail = useCallback(

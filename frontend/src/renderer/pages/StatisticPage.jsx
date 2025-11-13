@@ -23,7 +23,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
-const TAGS = ['website', 'server', 'wifi', 'card'];
+const TAGS = ['website', 'server'];
 const StatisticPage = () => {
   const electronAPI = useElectronAPI();
   const { t, i18n } = useTranslation();

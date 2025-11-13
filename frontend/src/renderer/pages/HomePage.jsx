@@ -251,17 +251,20 @@ const HomePage = () => {
 
         {!loadingEntries && !entriesError && filteredEntries.length > 0 && (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <AnimatePresence initial={false} mode="popLayout">
+            <AnimatePresence initial={false}>
               {filteredEntries.map((entry) => {
-                const isFavorite = entry.favorite === true || entry.favorite === 'true';
                 return (
                   <motion.div
-                    key={`${entry.UID}-${isFavorite ? 'fav' : 'normal'}`}
+                    key={entry.UID}
                     layout
-                    initial={{ opacity: 0, y: isFavorite ? -18 : 18 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: isFavorite ? -18 : 18 }}
-                    transition={{ type: 'spring', stiffness: 220, damping: 28, mass: 0.8 }}
+                    layoutId={`entry-${entry.UID}`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{
+                      layout: { type: 'spring', stiffness: 320, damping: 34, mass: 0.85 },
+                      opacity: { duration: 0.2 },
+                    }}
                     style={{ width: '100%' }}
                   >
                     <EntryCard
