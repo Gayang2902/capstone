@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -68,6 +68,8 @@ const AnimatedThemeIcon = ({ isDarkMode }) => (
     </motion.span>
   </AnimatePresence>
 );
+
+const HELP_URL = 'https://kor-baki.github.io/';
 
 const AppShell = ({ headerExtras = null, children, showDefaultDarkToggle = true }) => {
   const location = useLocation();
@@ -144,6 +146,10 @@ const AppShell = ({ headerExtras = null, children, showDefaultDarkToggle = true 
     const next = i18n.language === 'ko' ? 'en' : 'ko';
     i18n.changeLanguage(next);
   };
+
+  const handleHelpClick = useCallback(() => {
+    window.open(HELP_URL, '_blank', 'noopener=yes,noreferrer=yes,width=1200,height=900');
+  }, []);
 
   const resolvedHeaderExtras =
     typeof headerExtras === 'function' ? headerExtras({ toggleDarkMode, isDarkMode }) : headerExtras;
@@ -315,7 +321,7 @@ const AppShell = ({ headerExtras = null, children, showDefaultDarkToggle = true 
                   </Tooltip>
 
                   <Tooltip title={t('shell.tooltips.help')}>
-                    <IconButton color="secondary" size="large">
+                    <IconButton color="secondary" size="large" onClick={handleHelpClick}>
                       <HelpIcon fontSize="medium" />
                     </IconButton>
                   </Tooltip>

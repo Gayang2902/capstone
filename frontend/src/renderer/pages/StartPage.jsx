@@ -65,6 +65,13 @@ const StartPage = () => {
   }, []);
 
   useEffect(() => {
+    electronAPI?.allowScreenshot?.();
+    return () => {
+      electronAPI?.preventScreenshot?.();
+    };
+  }, [electronAPI]);
+
+  useEffect(() => {
     if (filePaths.length === 0) {
       setCurrentIndex(-1);
       return;
