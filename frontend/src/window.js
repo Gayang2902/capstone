@@ -34,7 +34,8 @@ function createMainWindow() {
         }
     });
 
-    mainWindow.loadFile(path.join(__dirname, 'pages', 'start', 'start.html'));
+    // mainWindow.loadFile(path.join(__dirname, 'pages', 'start', 'start.html'));
+    mainWindow.loadFile(path.join(__dirname, 'dist', 'index.html'));
 }
 
 function getMainWindow() {

@@ -41,5 +41,42 @@
     "react-i18next": "^16.2.2",
     "react-router-dom": "^6.30.1",
     "snarkjs": "^0.7.5"
+  },
+  "build": {
+    "appId": "com.dph.passwordmanager",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**",
+      "!dist/mac*/**",
+      "!dist/*.zip",
+      "!dist/*.blockmap",
+      "!dist/builder-debug.yml",
+      "main.js",
+      "preload.js",
+      "src/**",
+      "assets/**",
+      "package.json"
+    ],
+    "mac": {
+      "icon": "assets/icons/PM.icns"
+    },
+    "win": {
+      "icon": "assets/icons/PM.ico"
+    },
+    "linux": {
+      "icon": "assets/icons/PM.png"
+    },
+    "extraResources": [
+      {
+        "from": "../backend/build/",
+        "to": "backend/build"
+      },
+      {
+        "from": "../backend/x64/Debug",
+        "to": "backend/x64/Debug"
+      }
+    ]
   }
 }

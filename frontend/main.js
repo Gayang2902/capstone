@@ -1,6 +1,6 @@
 // File: main.js
 
-const { app, BrowserWindow, ipcMain, Menu, globalShortcut } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu, globalShortcut, nativeImage } = require('electron');
 const { spawn } = require('child_process');
 const path = require('path');
 
@@ -54,7 +54,7 @@ function startBackend() {
     let exePath;
     switch (process.platform) {
         case 'darwin':
-            exePath = path.join(__dirname, '..', 'backend', 'mac', 'main');
+            exePath = path.join(__dirname, '..', 'backend', 'build', 'mac', 'main');
             break;
         case 'win32':
             exePath = path.join(__dirname, '..', 'backend', 'x64', 'Release', 'capstone_backend.exe');
@@ -65,6 +65,13 @@ function startBackend() {
         default:
             throw new Error(`지원하지 않는 플랫폼: ${process.platform}`);
     }
+
+    const prodBackendPath = path.join(
+        process.resourcesPath,  // dist/mac-arm64/.../Resources
+        'backend',
+        'mac',
+        'backend_server'        // 위 extraResources 의 "to" 기준
+    );
 
     backendProcess = spawn(exePath, [], {
         stdio: ['pipe', 'pipe', 'inherit']
@@ -165,9 +172,26 @@ context.sendToBackend = sendToBackend;
 // --- Main Window Creation ---
 
 function createMainWindow() {
+    const iconDir = path.join(__dirname, 'assets', 'icons');
+    const windowIcon = path.join(iconDir, process.platform === 'win32' ? 'PM.ico' : 'PM.png');
+
+    if (process.platform === 'darwin' && app.dock) {
+        let dockIcon = nativeImage.createFromPath(path.join(iconDir, 'PM.icns'));
+        if (dockIcon.isEmpty()) {
+            console.warn('[WARN] PM.icns를 읽을 수 없어 PNG 아이콘으로 대체합니다.');
+            dockIcon = nativeImage.createFromPath(path.join(iconDir, 'PM.png'));
+        }
+        if (!dockIcon.isEmpty()) {
+            app.dock.setIcon(dockIcon);
+        } else {
+            console.warn('[WARN] dock 아이콘을 설정할 수 없습니다. icns/png 파일을 확인하세요.');
+        }
+    }
+
     mainWindow = new BrowserWindow({
         width: 1500,
         height: 900,
+        icon: windowIcon,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             contextIsolation: true,

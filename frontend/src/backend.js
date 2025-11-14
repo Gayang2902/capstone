@@ -1,6 +1,6 @@
-
 const { spawn } = require('child_process');
 const path = require('path');
+const { app } = require('electron');
 
 let backendProcess;
 let stdoutBuffer = '';
@@ -17,23 +17,53 @@ function startBackend() {
     });
 
     let exePath;
-    switch (process.platform) {
-        case 'darwin':
-            exePath = path.join(__dirname, '..', '..', 'backend', 'build', 'mac', 'mac', 'main');
-            break;
-        case 'win32':
-            exePath = path.join(__dirname, '..', '..', 'backend', 'x64', 'Release', 'capstone_backend.exe');
-            break;
-        case 'linux':
-            exePath = path.join(__dirname, '..', '..', 'backend', 'build', 'linux', 'main');
-            break;
-        default:
-            throw new Error(`지원하지 않는 플랫폼: ${process.platform}`);
+
+    console.log('[backend] startBackend 호출됨, process.platform =', process.platform);
+
+    const isPackaged = app && app.isPackaged;
+
+    if (isPackaged) {
+        // 앱이 패키징된(.app / .exe) 상태일 때: electron-builder extraResources 기준
+        switch (process.platform) {
+            case 'darwin':
+                exePath = path.join(process.resourcesPath, 'backend', 'mac', 'main');
+                break;
+            case 'win32':
+                exePath = path.join(process.resourcesPath, 'backend', 'x64', 'Release', 'capstone_backend.exe');
+                break;
+            case 'linux':
+                exePath = path.join(process.resourcesPath, 'backend', 'linux', 'main');
+                break;
+            default:
+                throw new Error(`지원하지 않는 플랫폼: ${process.platform}`);
+        }
+    } else {
+        // 개발 모드: 로컬 소스 구조 기준
+        switch (process.platform) {
+            case 'darwin':
+                // ~/Desktop/capstone/backend/build/mac/main
+                exePath = path.join(__dirname, '..', '..', 'backend', 'build', 'mac', 'main');
+                break;
+            case 'win32':
+                exePath = path.join(__dirname, '..', '..', 'backend', 'x64', 'Release', 'capstone_backend.exe');
+                break;
+            case 'linux':
+                exePath = path.join(__dirname, '..', '..', 'backend', 'build', 'linux', 'main');
+                break;
+            default:
+                throw new Error(`지원하지 않는 플랫폼: ${process.platform}`);
+        }
     }
 
+    console.log('[backend] exePath =', exePath, 'isPackaged =', isPackaged, 'cwd =', process.cwd());
+
     backendProcess = spawn(exePath, [], {
-        stdio: ['pipe', 'pipe', 'inherit']
+        stdio: ['pipe', 'pipe', 'pipe'],
+        cwd: path.dirname(exePath),
     });
+
+    console.log('[backend] spawned pid =', backendProcess.pid);
+
     backendProcess.stdout.setEncoding('utf8');
 
     backendReady = true;
