@@ -47,3 +47,10 @@ pnpm-debug.log*
 
 # Misc
 *.local
+
+frontend/dist/
+frontend/release/
+frontend/*.dmg
+frontend/*.zip
+frontend/release/**
+frontend/release/mac-arm64/
